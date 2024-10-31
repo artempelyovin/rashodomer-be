@@ -1,5 +1,7 @@
+import string
+
 from src.core.entities import User
-from src.core.exceptions import LoginAlreadyExistsError
+from src.core.exceptions import LoginAlreadyExistsError, PasswordMissingSpecialCharacterError, PasswordTooShortError
 from src.core.repositories import UserRepository
 from src.core.services import PasswordService
 
@@ -12,8 +14,19 @@ class RegisterUserUseCase:
     def register(self, first_name: str, last_name: str, login: str, password: str) -> User:
         user = self._user_repo.find_by_login(login=login)
         if user:
-            raise LoginAlreadyExistsError
+            raise LoginAlreadyExistsError(login=login)
+        self._validate_password(password)
         password_hash = self._password_service.hash_password(password)
         return self._user_repo.create(
             first_name=first_name, last_name=last_name, login=login, password_hash=password_hash
         )
+
+    def _validate_password(self, password: str) -> None:
+        if len(password) < 8:
+            raise PasswordTooShortError
+        if not self._has_special_characters(password):
+            raise PasswordMissingSpecialCharacterError
+
+    @staticmethod
+    def _has_special_characters(password: str) -> bool:
+        return any(char in string.punctuation for char in password)
