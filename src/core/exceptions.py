@@ -6,7 +6,7 @@ class BaseError(Exception):
 
     def __init__(self, message: str) -> None:
         if message:
-            super().__init__(self.message)
+            super().__init__(message)
         elif self.message:
             super().__init__(self.message)
 
