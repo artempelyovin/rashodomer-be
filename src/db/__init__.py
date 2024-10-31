@@ -8,4 +8,3 @@ engine = AsyncEngine(
     )
 )
 Session = async_sessionmaker(engine)
-
