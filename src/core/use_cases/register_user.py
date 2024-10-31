@@ -13,7 +13,7 @@ class RegisterUserUseCase:
         self._password_service = password_service
 
     async def register(self, first_name: str, last_name: str, login: str, password: str) -> User:
-        user = self._user_repo.find_by_login(login=login)
+        user = await self._user_repo.find_by_login(login=login)
         if user:
             raise LoginAlreadyExistsError(login=login)
         self._validate_password(password)
