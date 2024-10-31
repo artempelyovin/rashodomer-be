@@ -2,13 +2,12 @@ import string
 
 from src.core.entities import User
 from src.core.exceptions import LoginAlreadyExistsError, PasswordMissingSpecialCharacterError, PasswordTooShortError
-from src.core.repositories import UserRepository
-from src.core.services import PasswordService
+from src.core.services import PasswordService, UserService
 
 
 class RegisterUserUseCase:
-    def __init__(self, user_repository: UserRepository, password_service: PasswordService) -> None:
-        self._user_repo = user_repository
+    def __init__(self, user_service: UserService, password_service: PasswordService) -> None:
+        self._user_repo = user_service
         self._password_service = password_service
 
     def register(self, first_name: str, last_name: str, login: str, password: str) -> User:
