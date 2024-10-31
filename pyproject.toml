@@ -4,6 +4,7 @@ version = "0.0.1"
 description = ""
 authors = ["artempelevin <artempelevin@list.ru>"]
 readme = "README.md"
+packages = [{ include = "src" }]
 
 
 [tool.poetry.dependencies]
@@ -12,6 +13,7 @@ pydantic = "^2.9.2"
 asyncpg = "^0.30.0"
 sqlalchemy = "^2.0.36"
 alembic = "^1.13.3"
+greenlet = "^3.1.1"  # TODO: почему `alembic` не подцепляет автоматом?
 
 
 [tool.poetry.group.dev.dependencies]
@@ -41,7 +43,7 @@ ignore = [
     "D400", # First line should end with a period
     "D415", # First line should end with a period, question mark, or exclamation point
     "COM812", # Missing trailing comma (skip it because it conflicts with `ruff format`)
-    "ISC001",  # single-line-implicit-string-concatenation (skip it because it conflicts with `ruff format`)
+    "ISC001", # single-line-implicit-string-concatenation (skip it because it conflicts with `ruff format`)
 ]
 
 
