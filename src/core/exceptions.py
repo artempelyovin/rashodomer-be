@@ -26,7 +26,12 @@ class IncorrectPasswordError(BaseError):
 
 
 class PasswordTooShortError(BaseError):
-    message: str = _("Password is too short. It must be at least 8 characters long")
+    def __init__(self, password_length: int) -> None:
+        super().__init__(
+            _("Password is too short. It must be at least {password_length} characters long").format(
+                password_length=password_length
+            )
+        )
 
 
 class PasswordMissingSpecialCharacterError(BaseError):

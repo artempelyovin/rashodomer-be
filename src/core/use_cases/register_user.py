@@ -6,6 +6,8 @@ from src.core.services import PasswordService, UserService
 
 
 class RegisterUserUseCase:
+    MIN_PASSWORD_LENGTH = 8
+
     def __init__(self, user_service: UserService, password_service: PasswordService) -> None:
         self._user_repo = user_service
         self._password_service = password_service
@@ -21,8 +23,8 @@ class RegisterUserUseCase:
         )
 
     def _validate_password(self, password: str) -> None:
-        if len(password) < 8:
-            raise PasswordTooShortError
+        if len(password) < self.MIN_PASSWORD_LENGTH:
+            raise PasswordTooShortError(password_length=self.MIN_PASSWORD_LENGTH)
         if not self._has_special_characters(password):
             raise PasswordMissingSpecialCharacterError
 
