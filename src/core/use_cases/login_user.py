@@ -1,6 +1,6 @@
-from src.core.entities import User
-from src.core.exceptions import IncorrectPasswordError, LoginNotExistsError
-from src.core.services import PasswordService, UserService
+from core.entities import User
+from core.exceptions import IncorrectPasswordError, LoginNotExistsError
+from core.services import PasswordService, UserService
 
 
 class LoginUserUseCase:

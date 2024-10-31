@@ -1,4 +1,4 @@
-from src.core.utils import _
+from core.utils import _
 
 
 class BaseError(Exception):

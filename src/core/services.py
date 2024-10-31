@@ -1,7 +1,7 @@
 from typing import Protocol
 
-from src.core.entities import Budget, Category, Expense, Income, User
-from src.core.enums import CategoryType
+from core.entities import Budget, Category, Expense, Income, User
+from core.enums import CategoryType
 
 
 class PasswordService(Protocol):

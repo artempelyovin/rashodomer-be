@@ -3,7 +3,7 @@ from uuid import UUID
 
 from pydantic import BaseModel
 
-from src.core.enums import CategoryType
+from core.enums import CategoryType
 
 
 class User(BaseModel):

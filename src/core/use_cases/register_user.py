@@ -1,8 +1,8 @@
 import string
 
-from src.core.entities import User
-from src.core.exceptions import LoginAlreadyExistsError, PasswordMissingSpecialCharacterError, PasswordTooShortError
-from src.core.services import PasswordService, UserService
+from core.entities import User
+from core.exceptions import LoginAlreadyExistsError, PasswordMissingSpecialCharacterError, PasswordTooShortError
+from core.services import PasswordService, UserService
 
 
 class RegisterUserUseCase:
