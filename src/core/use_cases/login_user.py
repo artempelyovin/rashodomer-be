@@ -13,6 +13,6 @@ class LoginUserUseCase:
         if not user:
             raise LoginNotExistsError(login=login)
         password_hash = self._password_service.hash_password(password)
-        if user.password_hash != password_hash:
+        if not self._password_service.check_password(password=password, password_hash=password_hash):
             raise IncorrectPasswordError
         return user
