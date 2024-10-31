@@ -4,7 +4,7 @@ from core.utils import _
 class BaseError(Exception):
     message: str | None = None
 
-    def __init__(self, message: str) -> None:
+    def __init__(self, message: str | None = None) -> None:
         if message:
             super().__init__(message)
         elif self.message:
