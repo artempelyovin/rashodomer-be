@@ -9,6 +9,9 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.12"
 pydantic = "^2.9.2"
+asyncpg = "^0.30.0"
+sqlalchemy = "^2.0.36"
+alembic = "^1.13.3"
 
 
 [tool.poetry.group.dev.dependencies]
