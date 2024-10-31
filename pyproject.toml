@@ -1,0 +1,47 @@
+[tool.poetry]
+name = "rashodomer"
+version = "0.0.1"
+description = ""
+authors = ["artempelevin <artempelevin@list.ru>"]
+readme = "README.md"
+
+
+[tool.poetry.dependencies]
+python = "^3.12"
+pydantic = "^2.9.2"
+
+
+[tool.poetry.group.dev.dependencies]
+ruff = "0.7.1"  # we update it with our hands because all rules are enabled
+mypy = "^1.13.0"
+
+
+[tool.ruff]
+line-length = 120
+indent-width = 4
+target-version = "py312"
+fix = true
+
+
+[tool.ruff.lint]
+fixable = ["I"]  # fix only `isort`
+select = ["ALL"]
+ignore = [
+    "D100", # Missing docstring in public module
+    "D101", # Missing docstring in public class
+    "D102", # Missing docstring in public method
+    "D103", # Missing docstring in public function
+    "D104", # Missing docstring in public package
+    "D107", # Missing docstring in `__init__`
+    "D203", # One blank line before class (ignored by D211)
+    "D212", # Multi line summary first line (ignored by D213)
+    "D400", # First line should end with a period
+    "D415", # First line should end with a period, question mark, or exclamation point
+    "COM812", # Missing trailing comma (skip it because it conflicts with `ruff format`)
+    "ISC001",  # single-line-implicit-string-concatenation (skip it because it conflicts with `ruff format`)
+]
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
