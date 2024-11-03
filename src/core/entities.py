@@ -14,7 +14,7 @@ class User(BaseModel):
     login: str
     password_hash: str
     created_at: datetime
-    last_activity: datetime
+    last_login: datetime
 
 
 class Budget(BaseModel):

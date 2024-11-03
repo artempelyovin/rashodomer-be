@@ -20,7 +20,7 @@ class UserModel(Base):
     login: Mapped[str] = mapped_column(types.String(64), unique=True)
     password_hash: Mapped[str] = mapped_column(types.Text)
     created_at: Mapped[datetime] = mapped_column(types.DateTime, server_default=func.now())
-    updated_at: Mapped[datetime] = mapped_column(types.DateTime, server_default=func.now())
+    last_login: Mapped[datetime] = mapped_column(types.DateTime, server_default=func.now())
 
     def to_entity(self) -> User:
         return User(
@@ -30,7 +30,7 @@ class UserModel(Base):
             login=self.login,
             password_hash=self.password_hash,
             created_at=self.created_at,
-            last_activity=self.updated_at,
+            last_login=self.last_login,
         )
 
     @staticmethod
@@ -42,5 +42,5 @@ class UserModel(Base):
             login=user.login,
             password_hash=user.password_hash,
             created_at=user.created_at,
-            updated_at=user.last_activity,
+            last_login=user.last_login,
         )

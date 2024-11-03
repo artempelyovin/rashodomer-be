@@ -19,13 +19,13 @@ router = APIRouter()
     description="Register a new user",
     tags=["auth"],
 )
-async def register(  # noqa: ANN201
+async def register(
     user_info: UserRegistrationSchema,
     user_service: Annotated[UserService, Depends(get_user_service)],
     password_service: Annotated[PasswordService, Depends(get_password_service)],
 ):
-    register_use_case = RegisterUserUseCase(user_service=user_service, password_service=password_service)
-    return await register_use_case.register(
+    use_case = RegisterUserUseCase(user_service=user_service, password_service=password_service)
+    return await use_case.register(
         first_name=user_info.first_name,
         last_name=user_info.last_name,
         login=user_info.login,

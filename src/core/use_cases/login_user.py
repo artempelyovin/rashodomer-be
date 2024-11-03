@@ -1,3 +1,5 @@
+from datetime import UTC, datetime
+
 from core.entities import User
 from core.exceptions import IncorrectPasswordError, LoginNotExistsError
 from core.services import PasswordService, UserService
@@ -15,4 +17,4 @@ class LoginUserUseCase:
         password_hash = self._password_service.hash_password(password)
         if not self._password_service.check_password(password=password, password_hash=password_hash):
             raise IncorrectPasswordError
-        return user
+        return await self._user_repo.update_last_login(user_id=user.id, last_login=datetime.now(tz=UTC))
