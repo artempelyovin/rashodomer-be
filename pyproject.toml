@@ -51,6 +51,7 @@ ignore = [
     "ISC001", # single-line-implicit-string-concatenation (skip it because it conflicts with `ruff format`)
     "TD002", # Missing T O D O author
     "TD003", # Missing T O D O link
+    "ANN",  # flake8-annotations (skip it because using `mypy`)
 ]
 
 
