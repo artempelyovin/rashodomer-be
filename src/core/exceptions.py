@@ -1,38 +1,49 @@
+from abc import abstractmethod
+from dataclasses import dataclass
+
 from core.utils import _
 
 
+@dataclass(frozen=True)
 class BaseError(Exception):
-    message: str | None = None
-
-    def __init__(self, message: str | None = None) -> None:
-        if message:
-            super().__init__(message)
-        elif self.message:
-            super().__init__(self.message)
+    @abstractmethod
+    def message(self) -> str:
+        pass
 
 
+@dataclass(frozen=True)
 class LoginAlreadyExistsError(BaseError):
-    def __init__(self, login: str) -> None:
-        super().__init__(_('Login "{login}" already exists').format(login=login))
+    login: str
+
+    def message(self) -> str:
+        return _('Login "{login}" already exists').format(login=self.login)
 
 
+@dataclass(frozen=True)
 class LoginNotExistsError(BaseError):
-    def __init__(self, login: str) -> None:
-        super().__init__(_('Login "{login}" does not exist').format(login=login))
+    login: str
+
+    def message(self) -> str:
+        return _('Login "{login}" does not exist').format(login=self.login)
 
 
+@dataclass(frozen=True)
 class IncorrectPasswordError(BaseError):
-    message: str = _("Incorrect password")
+    def message(self) -> str:
+        return _("Incorrect password")
 
 
+@dataclass(frozen=True)
 class PasswordTooShortError(BaseError):
-    def __init__(self, password_length: int) -> None:
-        super().__init__(
-            _("Password is too short. It must be at least {password_length} characters long").format(
-                password_length=password_length
-            )
+    password_length: str
+
+    def message(self) -> str:
+        return _("Password is too short. It must be at least {password_length} characters long").format(
+            password_length=self.password_length
         )
 
 
+@dataclass(frozen=True)
 class PasswordMissingSpecialCharacterError(BaseError):
-    message: str = _("Password is missing special character")
+    def message(self) -> str:
+        return _("Password is missing special character")
