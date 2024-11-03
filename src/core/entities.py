@@ -1,54 +1,59 @@
+from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Annotated
 from uuid import UUID
 
-from pydantic import BaseModel
-
 from core.enums import CategoryType
+from core.utils import uuid4_str
 
 
-class User(BaseModel):
-    id: Annotated[str, UUID]
+@dataclass
+class User:
+    id: str = field(default_factory=uuid4_str, kw_only=True)
     first_name: str
     last_name: str
     login: str
     password_hash: str
-    created_at: datetime
-    last_login: datetime
+    created_at: datetime = field(default_factory=datetime.now, kw_only=True)
+    last_login: datetime = field(default_factory=datetime.now, kw_only=True)
 
 
-class Budget(BaseModel):
-    id: Annotated[str, UUID]
+@dataclass
+class Budget:
+    id: str = field(default_factory=uuid4_str, kw_only=True)
     name: str
-    description: str | None
+    description: str
     amount: float
-    user_id: Annotated[str, UUID]
+    user_id: str
 
 
-class Category(BaseModel):
-    id: Annotated[str, UUID]
+@dataclass
+class Category:
+    id: str = field(default_factory=uuid4_str, kw_only=True)
     name: str
-    description: str | None
+    description: str
     type: CategoryType
-    is_archived: bool = False
+    is_archived: bool = field(default=False, kw_only=True)
     user_id: Annotated[str, UUID]
-    created_at: datetime
-    updated_at: datetime
+    created_at: datetime = field(default_factory=datetime.now, kw_only=True)
+    updated_at: datetime = field(default_factory=datetime.now, kw_only=True)
 
 
-class Expense(BaseModel):
-    id: Annotated[str, UUID]
+@dataclass
+class Expense:
+    id: str = field(default_factory=uuid4_str, kw_only=True)
     amount: float
-    description: str | None
-    category_id: Annotated[str, UUID]
-    user_id: Annotated[str, UUID]
+    description: str
+    category_id: str
+    user_id: str
     timestamp: datetime
 
 
-class Income(BaseModel):
-    id: Annotated[str, UUID]
+@dataclass
+class Income:
+    id: str = field(default_factory=uuid4_str, kw_only=True)
     amount: float
-    description: str | None
-    category_id: Annotated[str, UUID]
-    user_id: Annotated[str, UUID]
+    description: str
+    category_id: str
+    user_id: str
     timestamp: datetime
