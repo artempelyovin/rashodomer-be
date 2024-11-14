@@ -5,14 +5,14 @@ from core.utils import _
 
 
 @dataclass(frozen=True)
-class BaseError(Exception):
+class BaseCoreError(Exception):
     @abstractmethod
     def message(self) -> str:
         pass
 
 
 @dataclass(frozen=True)
-class LoginAlreadyExistsError(BaseError):
+class LoginAlreadyExistsError(BaseCoreError):
     login: str
 
     def message(self) -> str:
@@ -20,7 +20,7 @@ class LoginAlreadyExistsError(BaseError):
 
 
 @dataclass(frozen=True)
-class LoginNotExistsError(BaseError):
+class LoginNotExistsError(BaseCoreError):
     login: str
 
     def message(self) -> str:
@@ -28,13 +28,13 @@ class LoginNotExistsError(BaseError):
 
 
 @dataclass(frozen=True)
-class IncorrectPasswordError(BaseError):
+class IncorrectPasswordError(BaseCoreError):
     def message(self) -> str:
         return _("Incorrect password")
 
 
 @dataclass(frozen=True)
-class PasswordTooShortError(BaseError):
+class PasswordTooShortError(BaseCoreError):
     password_length: int
 
     def message(self) -> str:
@@ -44,6 +44,6 @@ class PasswordTooShortError(BaseError):
 
 
 @dataclass(frozen=True)
-class PasswordMissingSpecialCharacterError(BaseError):
+class PasswordMissingSpecialCharacterError(BaseCoreError):
     def message(self) -> str:
         return _("Password is missing special character")
