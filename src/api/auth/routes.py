@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends
 from starlette import status
 
 from api.auth.schemas import UserRegistrationSchema, UserSchema
-from api.depends import get_password_service, get_user_service
+from api.depends import password_service_factory, user_service_factory
 from core.services import PasswordService, UserService
 from core.use_cases.register_user import RegisterUserUseCase
 
@@ -21,8 +21,8 @@ router = APIRouter()
 )
 async def register(
     user_info: UserRegistrationSchema,
-    user_service: Annotated[UserService, Depends(get_user_service)],
-    password_service: Annotated[PasswordService, Depends(get_password_service)],
+    user_service: Annotated[UserService, Depends(user_service_factory)],
+    password_service: Annotated[PasswordService, Depends(password_service_factory)],
 ):
     use_case = RegisterUserUseCase(user_service=user_service, password_service=password_service)
     return await use_case.register(

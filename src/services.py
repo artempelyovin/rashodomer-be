@@ -1,7 +1,9 @@
 import bcrypt
 
+from core.services import PasswordService
 
-class PasswordBcryptService:
+
+class PasswordBcryptService(PasswordService):
     @staticmethod
     def hash_password(password: str) -> str:
         hash_ = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
