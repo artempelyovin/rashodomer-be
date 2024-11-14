@@ -6,8 +6,7 @@ from core.services import BudgetService, CategoryService, ExpenseService, Income
 
 
 class MemoryUserService(UserService):
-    def __init__(self) -> None:
-        self._users: dict[str, User] = {}
+    _users: dict[str, User] = {}  # noqa: RUF012
 
     async def create(self, first_name: str, last_name: str, login: str, password_hash: str) -> User:
         user = User(first_name=first_name, last_name=last_name, login=login, password_hash=password_hash)
@@ -48,8 +47,7 @@ class MemoryUserService(UserService):
 
 
 class MemoryBudgetService(BudgetService):
-    def __init__(self) -> None:
-        self._budgets: dict[str, Budget] = {}
+    _budgets: dict[str, Budget] = {}  # noqa: RUF012
 
     async def create(self, name: str, description: str, amount: float, user_id: str) -> Budget:
         budget = Budget(name=name, description=description, amount=amount, user_id=user_id)
@@ -83,8 +81,7 @@ class MemoryBudgetService(BudgetService):
 
 
 class MemoryCategoryService(CategoryService):
-    def __init__(self) -> None:
-        self._categories: dict[str, Category] = {}
+    _categories: dict[str, Category] = {}  # noqa: RUF012
 
     async def create(self, user_id: str, name: str, description: str, category_type: CategoryType) -> Category:
         category = Category(name=name, description=description, type=category_type, user_id=user_id)
@@ -128,8 +125,7 @@ class MemoryCategoryService(CategoryService):
 
 
 class MemoryExpenseService(ExpenseService):
-    def __init__(self) -> None:
-        self._expenses: dict[str, Expense] = {}
+    _expenses: dict[str, Expense] = {}  # noqa: RUF012
 
     async def create(
         self, amount: float, description: str, category_id: str, user_id: str, timestamp: datetime
@@ -167,8 +163,7 @@ class MemoryExpenseService(ExpenseService):
 
 
 class MemoryIncomeService(IncomeService):
-    def __init__(self) -> None:
-        self._incomes: dict[str, Income] = {}
+    _incomes: dict[str, Income] = {}  # noqa: RUF012
 
     async def create(
         self, amount: float, description: str, category_id: str, user_id: str, timestamp: datetime
