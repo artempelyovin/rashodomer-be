@@ -16,6 +16,11 @@ class UserRegistrationSchema(BaseModel):
     password: str = PasswordField
 
 
+class UserLoginSchema(BaseModel):
+    login: str = LoginField
+    password: str = PasswordField
+
+
 class UserSchema(BaseModel):
     id: UUID
     first_name: str = FirstNameField
