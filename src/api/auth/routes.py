@@ -20,14 +20,14 @@ router = APIRouter()
     tags=["auth"],
 )
 async def register(
-    user_info: UserRegistrationSchema,
+    body: UserRegistrationSchema,
     user_service: Annotated[UserService, Depends(user_service_factory)],
     password_service: Annotated[PasswordService, Depends(password_service_factory)],
 ):
     use_case = RegisterUserUseCase(user_service=user_service, password_service=password_service)
     return await use_case.register(
-        first_name=user_info.first_name,
-        last_name=user_info.last_name,
-        login=user_info.login,
-        password=user_info.password,
+        first_name=body.first_name,
+        last_name=body.last_name,
+        login=body.login,
+        password=body.password,
     )
