@@ -20,7 +20,7 @@ class MemoryUserService(UserService):
         return None
 
     async def get(self, user_id: str) -> User | None:
-        return self._users[user_id]
+        return self._users.get(user_id, None)
 
     async def update_first_name(self, user_id: str, first_name: str) -> User:
         user = self._users[user_id]
@@ -59,6 +59,9 @@ class MemoryBudgetService(BudgetService):
 
     async def find(self, user_id: str) -> list[Budget]:
         return [budget for budget in self._budgets.values() if budget.user_id == user_id]
+
+    async def find_by_name(self, user_id: str, name: str) -> list[Budget]:
+        return [budget for budget in self._budgets.values() if budget.user_id == user_id and budget.name == name]
 
     async def change_budget(
         self,

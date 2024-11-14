@@ -50,6 +50,9 @@ class BudgetService(ABC):
     async def find(self, user_id: str) -> list[Budget]: ...
 
     @abstractmethod
+    async def find_by_name(self, user_id: str, name: str) -> list[Budget]: ...
+
+    @abstractmethod
     async def change_budget(
         self,
         budget_id: str,

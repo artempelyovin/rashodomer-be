@@ -3,20 +3,26 @@ from starlette.requests import Request
 from starlette.responses import JSONResponse
 
 from core.exceptions import (
+    AmountMustBePositiveError,
     BaseCoreError,
+    BudgetAlreadyExistsError,
     IncorrectPasswordError,
     LoginAlreadyExistsError,
     LoginNotExistsError,
     PasswordMissingSpecialCharacterError,
     PasswordTooShortError,
+    UserNotExistsError,
 )
 
 CORE_ERROR_TO_HTTP_STATUS_MAPPING: dict[type[BaseCoreError], int] = {
     LoginAlreadyExistsError: status.HTTP_400_BAD_REQUEST,
     LoginNotExistsError: status.HTTP_404_NOT_FOUND,
+    UserNotExistsError: status.HTTP_404_NOT_FOUND,
     IncorrectPasswordError: status.HTTP_400_BAD_REQUEST,
     PasswordTooShortError: status.HTTP_400_BAD_REQUEST,
     PasswordMissingSpecialCharacterError: status.HTTP_400_BAD_REQUEST,
+    AmountMustBePositiveError: status.HTTP_400_BAD_REQUEST,
+    BudgetAlreadyExistsError: status.HTTP_400_BAD_REQUEST,
 }
 
 

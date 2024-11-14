@@ -28,6 +28,14 @@ class LoginNotExistsError(BaseCoreError):
 
 
 @dataclass(frozen=True)
+class UserNotExistsError(BaseCoreError):
+    user_id: str
+
+    def message(self) -> str:
+        return _("User with ID '{user_id}' does not exist").format(user_id=self.user_id)
+
+
+@dataclass(frozen=True)
 class IncorrectPasswordError(BaseCoreError):
     def message(self) -> str:
         return _("Incorrect password")
@@ -47,3 +55,17 @@ class PasswordTooShortError(BaseCoreError):
 class PasswordMissingSpecialCharacterError(BaseCoreError):
     def message(self) -> str:
         return _("Password is missing special character")
+
+
+@dataclass(frozen=True)
+class AmountMustBePositiveError(BaseCoreError):
+    def message(self) -> str:
+        return _("Amount must be positive")
+
+
+@dataclass(frozen=True)
+class BudgetAlreadyExistsError(BaseCoreError):
+    name: str
+
+    def message(self) -> str:
+        return _("A budget with the name '{name}' already exists").format(name=self.name)
