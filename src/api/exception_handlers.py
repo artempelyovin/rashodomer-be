@@ -20,7 +20,7 @@ CORE_ERROR_TO_HTTP_STATUS_MAPPING: dict[type[BaseCoreError], int] = {
 }
 
 
-def core_exception_handler(request: Request, core_error: BaseCoreError) -> JSONResponse:  # noqa: ARG001
+def core_exception_handler(_: Request, core_error: BaseCoreError) -> JSONResponse:
     status_code = CORE_ERROR_TO_HTTP_STATUS_MAPPING[type(core_error)]
     return JSONResponse(
         content={"content": None, "status_code": status_code, "error": True, "detailed": core_error.message()},
