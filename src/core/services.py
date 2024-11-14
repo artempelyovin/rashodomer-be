@@ -33,7 +33,7 @@ class UserService(ABC):
     async def update_last_login(self, user_id: str, last_login: datetime) -> User: ...
 
     @abstractmethod
-    async def change_password(self, password: str) -> User: ...
+    async def change_password_hash(self, user_id: str, password_hash: str) -> User: ...
 
     @abstractmethod
     async def delete(self, user_id: str) -> None: ...
@@ -41,17 +41,18 @@ class UserService(ABC):
 
 class BudgetService(ABC):
     @abstractmethod
-    async def create(self, name: str, amount: float, user_id: str, description: str | None) -> Budget: ...
+    async def create(self, name: str, description: str, amount: float, user_id: str) -> Budget: ...
 
     @abstractmethod
     async def get(self, budget_id: str) -> Budget | None: ...
 
     @abstractmethod
-    async def find(self, user_id: str) -> Budget | None: ...
+    async def find(self, user_id: str) -> list[Budget]: ...
 
     @abstractmethod
     async def change_budget(
         self,
+        budget_id: str,
         name: str | None = None,
         description: str | None = None,
         amount: float | None = None,
@@ -63,20 +64,21 @@ class BudgetService(ABC):
 
 class CategoryService(ABC):
     @abstractmethod
-    async def create(self, user_id: str, name: str, description: str | None) -> Category: ...
+    async def create(self, user_id: str, name: str, description: str, category_type: CategoryType) -> Category: ...
 
     @abstractmethod
     async def get(self, category_id: str) -> Category | None: ...
 
     @abstractmethod
-    async def find(self, user_id: str, type_: CategoryType | None = None) -> list[Category]: ...
+    async def find(self, user_id: str, category_type: CategoryType | None = None) -> list[Category]: ...
 
     @abstractmethod
     async def change_category(
         self,
+        category_id: str,
         name: str | None = None,
         description: str | None = None,
-        type_: CategoryType | None = None,
+        category_type: CategoryType | None = None,
         is_archived: bool | None = None,
     ) -> Category: ...
 
@@ -87,21 +89,22 @@ class CategoryService(ABC):
 class ExpenseService(ABC):
     @abstractmethod
     async def create(
-        self, amount: float, category_id: str, user_id: str, description: str | None = None
+        self, amount: float, description: str, category_id: str, user_id: str, timestamp: datetime
     ) -> Expense: ...
 
     @abstractmethod
     async def get(self, expense_id: str) -> Expense | None: ...
 
     @abstractmethod
-    async def find(self, user_id: str) -> Expense | None: ...
+    async def find(self, user_id: str) -> list[Expense]: ...
 
     @abstractmethod
     async def change_expense(
-        self,
-        amount: float | None = None,
-        category_id: str | None = None,
-        description: str | None = None,
+            self,
+            expense_id: str,
+            amount: float | None = None,
+            category_id: str | None = None,
+            description: str | None = None,
     ) -> Expense: ...
 
     @abstractmethod
@@ -110,21 +113,25 @@ class ExpenseService(ABC):
 
 class IncomeService(ABC):
     @abstractmethod
-    async def create(self, amount: float, category_id: str, user_id: str, description: str | None = None) -> Income: ...
+    async def create(
+        self, amount: float, description: str, category_id: str, user_id: str, timestamp: datetime
+    ) -> Income: ...
 
     @abstractmethod
     async def get(self, income_id: str) -> Income | None: ...
 
     @abstractmethod
-    async def find(self, user_id: str) -> Income | None: ...
+    async def find(self, user_id: str) -> list[Income]: ...
 
     @abstractmethod
     async def change_income(
         self,
+        income_id: str,
         amount: float | None = None,
         category_id: str | None = None,
         description: str | None = None,
-    ) -> Income: ...
+    ) -> Income:
+        pass
 
     @abstractmethod
     async def delete(self, income_id: str) -> None: ...
