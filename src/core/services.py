@@ -100,11 +100,11 @@ class ExpenseService(ABC):
 
     @abstractmethod
     async def change_expense(
-            self,
-            expense_id: str,
-            amount: float | None = None,
-            category_id: str | None = None,
-            description: str | None = None,
+        self,
+        expense_id: str,
+        amount: float | None = None,
+        category_id: str | None = None,
+        description: str | None = None,
     ) -> Expense: ...
 
     @abstractmethod
