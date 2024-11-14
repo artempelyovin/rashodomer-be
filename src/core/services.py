@@ -1,17 +1,17 @@
+from abc import ABC
 from datetime import datetime
-from typing import Protocol
 
 from core.entities import Budget, Category, Expense, Income, User
 from core.enums import CategoryType
 
 
-class PasswordService(Protocol):
+class PasswordService(ABC):
     def hash_password(self, password: str) -> str: ...
 
     def check_password(self, password: str, password_hash: str) -> bool: ...
 
 
-class UserService(Protocol):
+class UserService(ABC):
     async def create(self, first_name: str, last_name: str, login: str, password_hash: str) -> User: ...
 
     async def find_by_login(self, login: str) -> User | None: ...
@@ -29,7 +29,7 @@ class UserService(Protocol):
     async def delete(self, user_id: str) -> None: ...
 
 
-class BudgetService(Protocol):
+class BudgetService(ABC):
     async def create(self, name: str, amount: float, user_id: str, description: str | None) -> Budget: ...
 
     async def get(self, budget_id: str) -> Budget | None: ...
@@ -46,7 +46,7 @@ class BudgetService(Protocol):
     async def delete(self, budget_id: str) -> None: ...
 
 
-class CategoryService(Protocol):
+class CategoryService(ABC):
     async def create(self, user_id: str, name: str, description: str | None) -> Category: ...
 
     async def get(self, category_id: str) -> Category | None: ...
@@ -64,7 +64,7 @@ class CategoryService(Protocol):
     async def delete(self, category_id: str) -> None: ...
 
 
-class ExpenseService(Protocol):
+class ExpenseService(ABC):
     async def create(
         self, amount: float, category_id: str, user_id: str, description: str | None = None
     ) -> Expense: ...
@@ -83,7 +83,7 @@ class ExpenseService(Protocol):
     async def delete(self, expense_id: str) -> None: ...
 
 
-class IncomeService(Protocol):
+class IncomeService(ABC):
     async def create(self, amount: float, category_id: str, user_id: str, description: str | None = None) -> Income: ...
 
     async def get(self, income_id: str) -> Income | None: ...
