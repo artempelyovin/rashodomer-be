@@ -4,11 +4,9 @@ from core.services import PasswordService
 
 
 class PasswordBcryptService(PasswordService):
-    @staticmethod
-    def hash_password(password: str) -> str:
+    def hash_password(self, password: str) -> str:
         hash_ = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
         return hash_.decode()
 
-    @staticmethod
-    def check_password(password: str, password_hash: str) -> bool:
+    def check_password(self, password: str, password_hash: str) -> bool:
         return bcrypt.checkpw(password.encode(), password_hash.encode())
