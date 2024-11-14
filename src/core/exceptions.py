@@ -16,7 +16,7 @@ class LoginAlreadyExistsError(BaseCoreError):
     login: str
 
     def message(self) -> str:
-        return _('Login "{login}" already exists').format(login=self.login)
+        return _("Login '{login}' already exists").format(login=self.login)
 
 
 @dataclass(frozen=True)
@@ -24,7 +24,7 @@ class LoginNotExistsError(BaseCoreError):
     login: str
 
     def message(self) -> str:
-        return _('Login "{login}" does not exist').format(login=self.login)
+        return _("Login '{login}' does not exist").format(login=self.login)
 
 
 @dataclass(frozen=True)
