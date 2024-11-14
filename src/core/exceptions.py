@@ -35,7 +35,7 @@ class IncorrectPasswordError(BaseError):
 
 @dataclass(frozen=True)
 class PasswordTooShortError(BaseError):
-    password_length: str
+    password_length: int
 
     def message(self) -> str:
         return _("Password is too short. It must be at least {password_length} characters long").format(
