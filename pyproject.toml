@@ -10,19 +10,15 @@ packages = [{ include = "src" }]
 [tool.poetry.dependencies]
 python = "^3.12"
 pydantic = "^2.9.2"
-asyncpg = "^0.30.0"
-sqlalchemy = "^2.0.36"
-alembic = "^1.13.3"
-greenlet = "^3.1.1"  # TODO: почему `alembic` не подцепляет автоматом?
 bcrypt = "^4.2.0"
-fastapi = "^0.115.4"
+fastapi = "^0.115.5"
 uvicorn = "^0.32.0"
-pre-commit = "^4.0.1"
 
 
 [tool.poetry.group.dev.dependencies]
 ruff = "0.7.1"  # we update it with our hands because all rules are enabled
 mypy = "^1.13.0"
+pre-commit = "^4.0.1"
 
 
 [tool.ruff]
