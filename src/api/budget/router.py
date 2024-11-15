@@ -6,9 +6,9 @@ from starlette import status
 
 from api.base import APIResponse, APIResponseList, write_response, write_response_list
 from api.budget.schemas import BudgetSchema, CreateBudgetSchema
-from api.depends import authentication_user, budget_service_factory, user_service_factory
+from api.depends import authentication_user, budget_service_factory
 from core.entities import User
-from core.services import BudgetService, UserService
+from core.services import BudgetService
 from core.use_cases.create_budget import CreateBudgetUseCase
 from core.use_cases.get_budget import GetBudgetUseCase
 from core.use_cases.list_budgets import ListBudgetUseCase
@@ -25,14 +25,11 @@ router = APIRouter()
 )
 async def create_budget(
     body: CreateBudgetSchema,
-    _: Annotated[User, Depends(authentication_user)],
-    user_service: Annotated[UserService, Depends(user_service_factory)],
+    user: Annotated[User, Depends(authentication_user)],
     budget_service: Annotated[BudgetService, Depends(budget_service_factory)],
 ) -> APIResponse[BudgetSchema]:
-    use_case = CreateBudgetUseCase(user_service=user_service, budget_service=budget_service)
-    budget = await use_case.create(
-        name=body.name, description=body.description, amount=body.amount, user_id=body.user_id
-    )
+    use_case = CreateBudgetUseCase(budget_service=budget_service)
+    budget = await use_case.create(name=body.name, description=body.description, amount=body.amount, user_id=user.id)
     return write_response(content=budget, schema=BudgetSchema, status_code=status.HTTP_201_CREATED)
 
 
@@ -45,10 +42,9 @@ async def create_budget(
 )
 async def list_budgets(
     user: Annotated[User, Depends(authentication_user)],
-    user_service: Annotated[UserService, Depends(user_service_factory)],
     budget_service: Annotated[BudgetService, Depends(budget_service_factory)],
 ) -> APIResponseList[BudgetSchema]:
-    use_case = ListBudgetUseCase(user_service=user_service, budget_service=budget_service)
+    use_case = ListBudgetUseCase(budget_service=budget_service)
     budgets = await use_case.list(user_id=user.id)
     return write_response_list(content=budgets, schema=BudgetSchema)
 
@@ -62,10 +58,9 @@ async def list_budgets(
 )
 async def get_budget(
     user: Annotated[User, Depends(authentication_user)],
-    user_service: Annotated[UserService, Depends(user_service_factory)],
     budget_service: Annotated[BudgetService, Depends(budget_service_factory)],
     budget_id: Annotated[str, UUID4] = Path(..., description="The ID of the budget"),
 ) -> APIResponse[BudgetSchema]:
-    use_case = GetBudgetUseCase(user_service=user_service, budget_service=budget_service)
+    use_case = GetBudgetUseCase(budget_service=budget_service)
     budget = await use_case.get(user_id=user.id, budget_id=budget_id)
     return write_response(content=budget, schema=BudgetSchema)

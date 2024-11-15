@@ -19,7 +19,6 @@ class CreateBudgetSchema(FromAttributeModel):
     name: str = NameField
     description: str = DescriptionField
     amount: float = AmountField
-    user_id: Annotated[str, UUID4] = UserIDField
 
 
 class BudgetSchema(FromAttributeModel):
