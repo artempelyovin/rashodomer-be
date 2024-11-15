@@ -9,7 +9,7 @@ DescriptionField = Field(
     description="The description of the budget",
     examples=["A budget for tracking all cash transactions and managing daily expenses"],
 )
-AmountField = Field(..., ge=0, description="The amount of the budget", examples=[42200])
+AmountField = Field(..., description="The amount of the budget", examples=[42200])
 UserIDField = Field(..., description="ID of user who created this budget")
 
 
