@@ -30,7 +30,7 @@ async def create_budget(
 ) -> APIResponse[BudgetSchema]:
     use_case = CreateBudgetUseCase(budget_service=budget_service)
     budget = await use_case.create(name=body.name, description=body.description, amount=body.amount, user_id=user.id)
-    return write_response(content=budget, schema=BudgetSchema, status_code=status.HTTP_201_CREATED)
+    return write_response(data=budget, schema=BudgetSchema, status_code=status.HTTP_201_CREATED)
 
 
 @router.get(
@@ -65,4 +65,4 @@ async def get_budget(
 ) -> APIResponse[BudgetSchema]:
     use_case = GetBudgetUseCase(budget_service=budget_service)
     budget = await use_case.get(user_id=user.id, budget_id=budget_id)
-    return write_response(content=budget, schema=BudgetSchema)
+    return write_response(data=budget, schema=BudgetSchema)

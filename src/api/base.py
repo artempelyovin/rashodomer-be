@@ -42,7 +42,7 @@ class APIResponseList(_BaseResponse[PydanticSchema]):
 
 
 def write_response(
-    content: Any,
+    data: Any,
     schema: type[PydanticSchema],
     *,
     status_code: int = status.HTTP_200_OK,
@@ -50,7 +50,7 @@ def write_response(
     detail: str | None = None,
 ) -> APIResponse[PydanticSchema]:
     return APIResponse[schema](  # type: ignore[valid-type]
-        data=content,
+        data=data,
         status_code=status_code,
         error=error,
         detail=detail,
