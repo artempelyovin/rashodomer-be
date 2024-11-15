@@ -5,13 +5,15 @@ from starlette.responses import JSONResponse
 from core.exceptions import (
     AmountMustBePositiveError,
     BaseCoreError,
+    BudgetAccessDeniedError,
     BudgetAlreadyExistsError,
+    BudgetNotExistsError,
     IncorrectPasswordError,
     LoginAlreadyExistsError,
     LoginNotExistsError,
     PasswordMissingSpecialCharacterError,
     PasswordTooShortError,
-    UserNotExistsError, BudgetNotExistsError, BudgetAccessDeniedError,
+    UserNotExistsError,
 )
 
 CORE_ERROR_TO_HTTP_STATUS_MAPPING: dict[type[BaseCoreError], int] = {
@@ -25,7 +27,6 @@ CORE_ERROR_TO_HTTP_STATUS_MAPPING: dict[type[BaseCoreError], int] = {
     BudgetAlreadyExistsError: status.HTTP_400_BAD_REQUEST,
     BudgetNotExistsError: status.HTTP_404_NOT_FOUND,
     BudgetAccessDeniedError: status.HTTP_403_FORBIDDEN,
-
 }
 
 
