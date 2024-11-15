@@ -3,7 +3,21 @@ from datetime import datetime
 
 from core.entities import Budget, Category, Expense, Income, User
 from core.enums import CategoryType
-from core.services import BudgetService, CategoryService, ExpenseService, IncomeService, TokenService, UserService
+from core.services import (
+    BudgetService,
+    CategoryService,
+    ExpenseService,
+    IncomeService,
+    TokenService,
+    Total,
+    UserService,
+)
+
+
+def paginate[T](items: list[T], limit: int | None = None, offset: int = 0) -> tuple[Total, list[T]]:
+    if limit is None:
+        return len(items), items[offset:]
+    return len(items), items[offset : offset + limit]
 
 
 class MemoryTokenService(TokenService):
@@ -73,14 +87,17 @@ class MemoryBudgetService(BudgetService):
     async def get(self, budget_id: str) -> Budget | None:
         return self._budgets.get(budget_id, None)
 
-    async def find(self, user_id: str, limit: int | None, offset: int) -> tuple[int, list[Budget]]:
+    async def find(self, user_id: str, limit: int | None = None, offset: int = 0) -> tuple[Total, list[Budget]]:
         budgets = [budget for budget in self._budgets.values() if budget.user_id == user_id]
         if limit is None:
             return len(budgets), budgets[offset:]
         return len(budgets), budgets[offset : offset + limit]
 
-    async def find_by_name(self, user_id: str, name: str) -> list[Budget]:
-        return [budget for budget in self._budgets.values() if budget.user_id == user_id and budget.name == name]
+    async def find_by_name(
+        self, user_id: str, name: str, limit: int | None = None, offset: int = 0
+    ) -> tuple[Total, list[Budget]]:
+        budgets = [budget for budget in self._budgets.values() if budget.user_id == user_id and budget.name == name]
+        return paginate(budgets, limit, offset)
 
     async def change_budget(
         self,
@@ -113,15 +130,17 @@ class MemoryCategoryService(CategoryService):
     async def get(self, category_id: str) -> Category | None:
         return self._categories[category_id]
 
-    async def find(self, user_id: str, category_type: CategoryType | None = None) -> list[Category]:
+    async def find(
+        self, user_id: str, category_type: CategoryType | None = None, limit: int | None = None, offset: int = 0
+    ) -> tuple[Total, list[Category]]:
         user_categories = [
             category
             for category in self._categories.values()
             if category.user_id == user_id and category.type == category_type
         ]
-        if category_type is None:
-            return user_categories
-        return [category for category in user_categories if category.type == category_type]
+        if category_type is not None:
+            user_categories = [category for category in user_categories if category.type == category_type]
+        return paginate(user_categories, limit, offset)
 
     async def change_category(
         self,
@@ -161,8 +180,9 @@ class MemoryExpenseService(ExpenseService):
     async def get(self, expense_id: str) -> Expense | None:
         return self._expenses[expense_id]
 
-    async def find(self, user_id: str) -> list[Expense]:
-        return [expense for expense in self._expenses.values() if expense.user_id == user_id]
+    async def find(self, user_id: str, limit: int | None = None, offset: int = 0) -> tuple[Total, list[Expense]]:
+        expenses = [expense for expense in self._expenses.values() if expense.user_id == user_id]
+        return paginate(expenses, limit, offset)
 
     async def change_expense(
         self,
@@ -199,8 +219,9 @@ class MemoryIncomeService(IncomeService):
     async def get(self, income_id: str) -> Income | None:
         return self._incomes[income_id]
 
-    async def find(self, user_id: str) -> list[Income]:
-        return [income for income in self._incomes.values() if income.user_id == user_id]
+    async def find(self, user_id: str, limit: int | None = None, offset: int = 0) -> tuple[Total, list[Income]]:
+        incomes = [income for income in self._incomes.values() if income.user_id == user_id]
+        return paginate(incomes, limit, offset)
 
     async def change_income(
         self,

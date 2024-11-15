@@ -4,6 +4,8 @@ from datetime import datetime
 from core.entities import Budget, Category, Expense, Income, User
 from core.enums import CategoryType
 
+type Total = int
+
 
 class PasswordService(ABC):
     @abstractmethod
@@ -55,10 +57,12 @@ class BudgetService(ABC):
     async def get(self, budget_id: str) -> Budget | None: ...
 
     @abstractmethod
-    async def find(self, user_id: str, limit: int | None, offset: int) -> tuple[int, list[Budget]]: ...
+    async def find(self, user_id: str, limit: int | None = None, offset: int = 0) -> tuple[Total, list[Budget]]: ...
 
     @abstractmethod
-    async def find_by_name(self, user_id: str, name: str) -> list[Budget]: ...
+    async def find_by_name(
+        self, user_id: str, name: str, limit: int | None = None, offset: int = 0
+    ) -> tuple[Total, list[Budget]]: ...
 
     @abstractmethod
     async def change_budget(
@@ -81,7 +85,9 @@ class CategoryService(ABC):
     async def get(self, category_id: str) -> Category | None: ...
 
     @abstractmethod
-    async def find(self, user_id: str, category_type: CategoryType | None = None) -> list[Category]: ...
+    async def find(
+        self, user_id: str, category_type: CategoryType | None = None, limit: int | None = None, offset: int = 0
+    ) -> tuple[Total, list[Category]]: ...
 
     @abstractmethod
     async def change_category(
@@ -107,7 +113,7 @@ class ExpenseService(ABC):
     async def get(self, expense_id: str) -> Expense | None: ...
 
     @abstractmethod
-    async def find(self, user_id: str) -> list[Expense]: ...
+    async def find(self, user_id: str, limit: int | None = None, offset: int = 0) -> tuple[Total, list[Expense]]: ...
 
     @abstractmethod
     async def change_expense(
@@ -132,7 +138,7 @@ class IncomeService(ABC):
     async def get(self, income_id: str) -> Income | None: ...
 
     @abstractmethod
-    async def find(self, user_id: str) -> list[Income]: ...
+    async def find(self, user_id: str, limit: int | None = None, offset: int = 0) -> tuple[Total, list[Income]]: ...
 
     @abstractmethod
     async def change_income(
