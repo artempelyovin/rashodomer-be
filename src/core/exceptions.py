@@ -10,6 +10,9 @@ class BaseCoreError(Exception):
     def message(self) -> str:
         pass
 
+    def __str__(self):
+        return self.message()
+
 
 @dataclass(frozen=True)
 class LoginAlreadyExistsError(BaseCoreError):
@@ -83,3 +86,9 @@ class BudgetNotExistsError(BaseCoreError):
 class BudgetAccessDeniedError(BaseCoreError):
     def message(self) -> str:
         return _("Attempt to access another user's budget.")
+
+
+@dataclass(frozen=True)
+class UnauthorizedError(BaseCoreError):
+    def message(self) -> str:
+        return _("Authentication failed")
