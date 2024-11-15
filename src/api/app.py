@@ -2,7 +2,7 @@ from fastapi import FastAPI
 
 from api.auth.router import router as auth_router
 from api.budget.router import router as budget_router
-from api.exception_handlers import core_exception_handler
+from api.exceptions import core_exception_handler
 from core.exceptions import BaseCoreError
 
 fast_api = FastAPI()
