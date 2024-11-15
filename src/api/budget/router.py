@@ -43,10 +43,12 @@ async def create_budget(
 async def list_budgets(
     user: Annotated[User, Depends(authentication_user)],
     budget_service: Annotated[BudgetService, Depends(budget_service_factory)],
+    limit: int | None = None,
+    offset: int = 0,
 ) -> APIResponseList[BudgetSchema]:
     use_case = ListBudgetUseCase(budget_service=budget_service)
-    budgets = await use_case.list(user_id=user.id)
-    return write_response_list(content=budgets, schema=BudgetSchema)
+    total, budgets = await use_case.list(user_id=user.id, limit=limit, offset=offset)
+    return write_response_list(items=budgets, total=total, limit=limit, offset=offset, schema=BudgetSchema)
 
 
 @router.get(

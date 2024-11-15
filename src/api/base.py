@@ -28,8 +28,17 @@ class APIResponse(_BaseResponse[PydanticSchema]):
     data: PydanticSchema | None = Field(None, description="Useful content (`null` if there is an error)")
 
 
+class ListSchema(BaseModel, Generic[PydanticSchema]):
+    total: int = Field(..., ge=0, examples=[1])
+    limit: int | None = Field(None, ge=0)
+    offset: int = Field(0, ge=0)
+    items: list[PydanticSchema]
+
+
 class APIResponseList(_BaseResponse[PydanticSchema]):
-    data: list[PydanticSchema] = Field(default_factory=list, description="Useful content (`null` if there is an error)")
+    data: ListSchema[PydanticSchema] = Field(
+        default_factory=list, description="Useful content (`null` if there is an error)"
+    )
 
 
 def write_response(
@@ -48,17 +57,27 @@ def write_response(
     )
 
 
-def write_response_list(
-    content: Iterable[Any],
+def write_response_list(  # noqa: PLR0913
+    total: int,
+    items: Iterable[Any],
     schema: type[PydanticSchema],
     *,
+    limit: int | None = None,
+    offset: int = 0,
     status_code: int = status.HTTP_200_OK,
     error: bool = False,
     detail: str | None = None,
 ) -> APIResponseList[PydanticSchema]:
-    return APIResponseList[schema](  # type: ignore[valid-type]
-        data=content,  # type: ignore[arg-type]
-        status_code=status_code,
-        error=error,
-        detail=detail,
+    return APIResponseList[schema].model_validate(  # type: ignore[valid-type]
+        {
+            "data": {
+                "total": total,
+                "limit": limit,
+                "offset": offset,
+                "items": items,
+            },
+            "status_code": status_code,
+            "error": error,
+            "detail": detail,
+        }
     )

@@ -73,8 +73,11 @@ class MemoryBudgetService(BudgetService):
     async def get(self, budget_id: str) -> Budget | None:
         return self._budgets.get(budget_id, None)
 
-    async def find(self, user_id: str) -> list[Budget]:
-        return [budget for budget in self._budgets.values() if budget.user_id == user_id]
+    async def find(self, user_id: str, limit: int | None, offset: int) -> tuple[int, list[Budget]]:
+        budgets = [budget for budget in self._budgets.values() if budget.user_id == user_id]
+        if limit is None:
+            return len(budgets), budgets[offset:]
+        return len(budgets), budgets[offset : offset + limit]
 
     async def find_by_name(self, user_id: str, name: str) -> list[Budget]:
         return [budget for budget in self._budgets.values() if budget.user_id == user_id and budget.name == name]
