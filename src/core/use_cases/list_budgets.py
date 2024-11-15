@@ -12,5 +12,4 @@ class ListBudgetUseCase:
         user = await self._user_repo.get(user_id)
         if not user:
             raise UserNotExistsError(user_id=user_id)
-        budgets = await self._budget_repo.find(user_id=user_id)
-        return budgets
+        return await self._budget_repo.find(user_id=user_id)
