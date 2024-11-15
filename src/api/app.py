@@ -13,6 +13,7 @@ fast_api.add_exception_handler(
     handler=core_exception_handler,  # type: ignore[arg-type]
 )
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app=fast_api, host="0.0.0.0", port=8000)
+
+    uvicorn.run(app=fast_api, host="127.0.0.1", port=8000)
