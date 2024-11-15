@@ -10,7 +10,7 @@ class BaseCoreError(Exception):
     def message(self) -> str:
         pass
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.message()
 
 
