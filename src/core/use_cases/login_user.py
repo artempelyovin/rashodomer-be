@@ -20,4 +20,4 @@ class LoginUserUseCase:
         if not self._password_service.check_password(password=password, password_hash=password_hash):
             raise IncorrectPasswordError
         await self._user_repo.update_last_login(user_id=user.id, last_login=datetime.now(tz=UTC))
-        return self._token_service.create_new_token(user_id=user.id)
+        return await self._token_service.create_new_token(user_id=user.id)
