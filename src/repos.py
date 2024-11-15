@@ -55,7 +55,7 @@ class MemoryBudgetService(BudgetService):
         return budget
 
     async def get(self, budget_id: str) -> Budget | None:
-        return self._budgets[budget_id]
+        return self._budgets.get(budget_id, None)
 
     async def find(self, user_id: str) -> list[Budget]:
         return [budget for budget in self._budgets.values() if budget.user_id == user_id]

@@ -69,3 +69,17 @@ class BudgetAlreadyExistsError(BaseCoreError):
 
     def message(self) -> str:
         return _("A budget with the name '{name}' already exists").format(name=self.name)
+
+
+@dataclass(frozen=True)
+class BudgetNotExistsError(BaseCoreError):
+    budget_id: str
+
+    def message(self) -> str:
+        return _("Budget with ID '{budget_id}' does not exist").format(budget_id=self.budget_id)
+
+
+@dataclass(frozen=True)
+class BudgetAccessDeniedError(BaseCoreError):
+    def message(self) -> str:
+        return _("Attempt to access another user's budget.")

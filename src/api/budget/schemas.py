@@ -26,3 +26,6 @@ class BudgetSchema(BaseModel):
     description: str = DescriptionField
     amount: float = AmountField
     user_id: str = UserIDField
+
+
+BudgetListSchema = list[BudgetSchema]

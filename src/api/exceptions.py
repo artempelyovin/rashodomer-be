@@ -11,7 +11,7 @@ from core.exceptions import (
     LoginNotExistsError,
     PasswordMissingSpecialCharacterError,
     PasswordTooShortError,
-    UserNotExistsError,
+    UserNotExistsError, BudgetNotExistsError, BudgetAccessDeniedError,
 )
 
 CORE_ERROR_TO_HTTP_STATUS_MAPPING: dict[type[BaseCoreError], int] = {
@@ -23,6 +23,9 @@ CORE_ERROR_TO_HTTP_STATUS_MAPPING: dict[type[BaseCoreError], int] = {
     PasswordMissingSpecialCharacterError: status.HTTP_400_BAD_REQUEST,
     AmountMustBePositiveError: status.HTTP_400_BAD_REQUEST,
     BudgetAlreadyExistsError: status.HTTP_400_BAD_REQUEST,
+    BudgetNotExistsError: status.HTTP_404_NOT_FOUND,
+    BudgetAccessDeniedError: status.HTTP_403_FORBIDDEN,
+
 }
 
 
