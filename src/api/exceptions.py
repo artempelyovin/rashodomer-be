@@ -14,7 +14,8 @@ from core.exceptions import (
     LoginNotExistsError,
     PasswordMissingSpecialCharacterError,
     PasswordTooShortError,
-    UserNotExistsError, UnauthorizedError,
+    UnauthorizedError,
+    UserNotExistsError,
 )
 
 CORE_ERROR_TO_HTTP_STATUS_MAPPING: dict[type[BaseCoreError], int] = {
