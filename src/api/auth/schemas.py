@@ -1,15 +1,17 @@
 from datetime import datetime
+from typing import Annotated
 from uuid import UUID
 
 from pydantic import BaseModel, Field
 
+IdField = Field(..., description="Unique ID of the user")
 FirstNameField = Field(..., examples=["Ivan"])
 LastNameField = Field(..., examples=["Ivanov"])
 LoginField = Field(..., examples=["ivan-ivanov"])
 PasswordField = Field(..., examples=["qwerty123456"])
 
 
-class UserRegistrationSchema(BaseModel):
+class CreateUserSchema(BaseModel):
     first_name: str = FirstNameField
     last_name: str = LastNameField
     login: str = LoginField
@@ -22,7 +24,7 @@ class UserLoginSchema(BaseModel):
 
 
 class UserSchema(BaseModel):
-    id: UUID
+    id: Annotated[str, UUID] = IdField
     first_name: str = FirstNameField
     last_name: str = LastNameField
     login: str = LoginField

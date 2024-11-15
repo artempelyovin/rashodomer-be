@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends
 from starlette import status
 
-from api.auth.schemas import UserLoginSchema, UserRegistrationSchema, UserSchema
+from api.auth.schemas import UserLoginSchema, CreateUserSchema, UserSchema
 from api.depends import password_service_factory, user_service_factory
 from core.services import PasswordService, UserService
 from core.use_cases.login_user import LoginUserUseCase
@@ -21,7 +21,7 @@ router = APIRouter()
     tags=["auth"],
 )
 async def register(
-    body: UserRegistrationSchema,
+    body: CreateUserSchema,
     user_service: Annotated[UserService, Depends(user_service_factory)],
     password_service: Annotated[PasswordService, Depends(password_service_factory)],
 ):
