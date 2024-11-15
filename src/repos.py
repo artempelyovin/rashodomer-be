@@ -10,11 +10,11 @@ class MemoryTokenService(TokenService):
     # format: user_id: token
     _tokens: dict[str, str] = {}  # noqa: RUF012
 
-    def create_new_token(self, user_id: str) -> str:
+    async def create_new_token(self, user_id: str) -> str:
         self._tokens[user_id] = str(uuid.uuid4())
         return self._tokens[user_id]
 
-    def get_user_id_by_token(self, token: str) -> str | None:
+    async def get_user_id_by_token(self, token: str) -> str | None:
         for user_id, exist_token in self._tokens.items():
             if exist_token == token:
                 return user_id
