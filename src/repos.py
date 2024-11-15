@@ -169,8 +169,10 @@ class FileBudgetService(BudgetService, JsonFileMixin):
         self.save(self._budgets)
         return budget
 
-    async def delete(self, budget_id: str) -> None:
-        self._budgets.pop(budget_id)
+    async def delete(self, budget_id: str) -> Budget:
+        budget = self._budgets.pop(budget_id)
+        self.save(self._budgets)
+        return budget
 
 
 class FileCategoryService(CategoryService, JsonFileMixin):

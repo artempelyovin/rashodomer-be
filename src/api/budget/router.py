@@ -10,6 +10,7 @@ from api.depends import authentication_user, budget_service_factory
 from core.entities import User
 from core.services import BudgetService
 from core.use_cases.budget_create import CreateBudgetUseCase
+from core.use_cases.budget_delete import DeleteBudgetUseCase
 from core.use_cases.budget_get import GetBudgetUseCase
 from core.use_cases.budget_list import ListBudgetUseCase
 
@@ -65,4 +66,21 @@ async def get_budget(
 ) -> APIResponse[BudgetSchema]:
     use_case = GetBudgetUseCase(budget_service=budget_service)
     budget = await use_case.get(user_id=user.id, budget_id=budget_id)
+    return write_response(data=budget, schema=BudgetSchema)
+
+
+@router.delete(
+    "/v1/budgets/{budget_id}",
+    status_code=status.HTTP_200_OK,
+    summary="Delete budget",
+    description="Delete the budget by its ID",
+    tags=["budgets"],
+)
+async def delete_budget(
+    user: Annotated[User, Depends(authentication_user)],
+    budget_service: Annotated[BudgetService, Depends(budget_service_factory)],
+    budget_id: Annotated[str, UUID4] = Path(..., description="The ID of the budget"),
+) -> APIResponse[BudgetSchema]:
+    use_case = DeleteBudgetUseCase(budget_service=budget_service)
+    budget = await use_case.delete(user_id=user.id, budget_id=budget_id)
     return write_response(data=budget, schema=BudgetSchema)
