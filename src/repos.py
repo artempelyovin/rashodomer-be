@@ -1,5 +1,9 @@
+import datetime
 import uuid
-from datetime import datetime
+from pathlib import Path
+from typing import Any
+
+import ujson
 
 from core.entities import Budget, Category, Expense, Income, User
 from core.enums import CategoryType
@@ -20,12 +24,48 @@ def paginate[T](items: list[T], limit: int | None = None, offset: int = 0) -> tu
     return len(items), items[offset : offset + limit]
 
 
-class MemoryTokenService(TokenService):
-    # format: user_id: token
-    _tokens: dict[str, str] = {}  # noqa: RUF012
+class JsonFileMixin:
+    filename: str = "data.json"
+    collection: str
+
+    @staticmethod
+    def to_dict(content: dict[str, User]) -> dict[str, Any]:
+        return {k: repr(v) for k, v in content.items()}
+
+    @staticmethod
+    def from_dict(content: dict[str, Any]) -> dict[str, User]:
+        return {k: eval(v) for k, v in content.items()}  # noqa: S307
+
+    def load(self) -> dict[str, Any]:
+        all_collections: dict[str, Any] = {}
+        try:
+            with Path(self.filename).open() as file:
+                all_collections = ujson.load(file)
+        except FileNotFoundError:
+            pass
+        return self.from_dict(all_collections.get(self.collection, {}))
+
+    def save(self, content: dict[str, Any]) -> None:
+        all_collections: dict[str, Any] = {}
+        try:
+            with Path(self.filename).open() as file:
+                all_collections = ujson.load(file)
+        except FileNotFoundError:
+            pass
+        all_collections[self.collection] = self.to_dict(content)
+        with Path(self.filename).open("w") as file:
+            ujson.dump(all_collections, file, indent=4, ensure_ascii=False)
+
+
+class FileTokenService(TokenService, JsonFileMixin):
+    collection = "tokens"
+
+    def __init__(self) -> None:
+        self._tokens: dict[str, str] = self.load()  # format: user_id: token
 
     async def create_new_token(self, user_id: str) -> str:
         self._tokens[user_id] = str(uuid.uuid4())
+        self.save(self._tokens)
         return self._tokens[user_id]
 
     async def get_user_id_by_token(self, token: str) -> str | None:
@@ -35,12 +75,16 @@ class MemoryTokenService(TokenService):
         return None
 
 
-class MemoryUserService(UserService):
-    _users: dict[str, User] = {}  # noqa: RUF012
+class FileUserService(UserService, JsonFileMixin):
+    collection = "users"
+
+    def __init__(self) -> None:
+        self._users: dict[str, User] = self.load()
 
     async def create(self, first_name: str, last_name: str, login: str, password_hash: str) -> User:
         user = User(first_name=first_name, last_name=last_name, login=login, password_hash=password_hash)
         self._users[user.id] = user
+        self.save(self._users)
         return user
 
     async def find_by_login(self, login: str) -> User | None:
@@ -55,33 +99,42 @@ class MemoryUserService(UserService):
     async def update_first_name(self, user_id: str, first_name: str) -> User:
         user = self._users[user_id]
         user.first_name = first_name
+        self.save(self._users)
         return user
 
     async def update_last_name(self, user_id: str, last_name: str) -> User:
         user = self._users[user_id]
         user.last_name = last_name
+        self.save(self._users)
         return user
 
-    async def update_last_login(self, user_id: str, last_login: datetime) -> User:
+    async def update_last_login(self, user_id: str, last_login: datetime.datetime) -> User:
         user = self._users[user_id]
         user.last_login = last_login
+        self.save(self._users)
         return user
 
     async def change_password_hash(self, user_id: str, password_hash: str) -> User:
         user = self._users[user_id]
         user.password_hash = password_hash
+        self.save(self._users)
         return user
 
     async def delete(self, user_id: str) -> None:
         self._users.pop(user_id)
+        self.save(self._users)
 
 
-class MemoryBudgetService(BudgetService):
-    _budgets: dict[str, Budget] = {}  # noqa: RUF012
+class FileBudgetService(BudgetService, JsonFileMixin):
+    collection = "budgets"
+
+    def __init__(self) -> None:
+        self._budgets: dict[str, Budget] = self.load()
 
     async def create(self, name: str, description: str, amount: float, user_id: str) -> Budget:
         budget = Budget(name=name, description=description, amount=amount, user_id=user_id)
         self._budgets[budget.id] = budget
+        self.save(self._budgets)
         return budget
 
     async def get(self, budget_id: str) -> Budget | None:
@@ -113,18 +166,23 @@ class MemoryBudgetService(BudgetService):
             budget.description = description
         if amount is not None:
             budget.amount = amount
+        self.save(self._budgets)
         return budget
 
     async def delete(self, budget_id: str) -> None:
         self._budgets.pop(budget_id)
 
 
-class MemoryCategoryService(CategoryService):
-    _categories: dict[str, Category] = {}  # noqa: RUF012
+class FileCategoryService(CategoryService, JsonFileMixin):
+    collection = "categories"
+
+    def __init__(self) -> None:
+        self._categories: dict[str, Category] = self.load()
 
     async def create(self, user_id: str, name: str, description: str, category_type: CategoryType) -> Category:
         category = Category(name=name, description=description, type=category_type, user_id=user_id)
         self._categories[category.id] = category
+        self.save(self._categories)
         return category
 
     async def get(self, category_id: str) -> Category | None:
@@ -159,22 +217,28 @@ class MemoryCategoryService(CategoryService):
             category.type = category_type
         if is_archived is not None:
             category.is_archived = is_archived
+        self.save(self._categories)
         return category
 
     async def delete(self, category_id: str) -> None:
         self._categories.pop(category_id)
+        self.save(self._categories)
 
 
-class MemoryExpenseService(ExpenseService):
-    _expenses: dict[str, Expense] = {}  # noqa: RUF012
+class FileExpenseService(ExpenseService, JsonFileMixin):
+    collection = "expenses"
+
+    def __init__(self) -> None:
+        self._expenses: dict[str, Expense] = self.load()
 
     async def create(
-        self, amount: float, description: str, category_id: str, user_id: str, timestamp: datetime
+        self, amount: float, description: str, category_id: str, user_id: str, timestamp: datetime.datetime
     ) -> Expense:
         expense = Expense(
             amount=amount, description=description, category_id=category_id, user_id=user_id, timestamp=timestamp
         )
         self._expenses[expense.id] = expense
+        self.save(self._expenses)
         return expense
 
     async def get(self, expense_id: str) -> Expense | None:
@@ -198,22 +262,28 @@ class MemoryExpenseService(ExpenseService):
             expense.category_id = category_id
         if description is not None:
             expense.description = description
+        self.save(self._expenses)
         return expense
 
     async def delete(self, expense_id: str) -> None:
         self._expenses.pop(expense_id)
+        self.save(self._expenses)
 
 
-class MemoryIncomeService(IncomeService):
-    _incomes: dict[str, Income] = {}  # noqa: RUF012
+class FileIncomeService(IncomeService, JsonFileMixin):
+    collection = "incomes"
+
+    def __init__(self) -> None:
+        self._incomes: dict[str, Income] = self.load()
 
     async def create(
-        self, amount: float, description: str, category_id: str, user_id: str, timestamp: datetime
+        self, amount: float, description: str, category_id: str, user_id: str, timestamp: datetime.datetime
     ) -> Income:
         income = Income(
             amount=amount, description=description, category_id=category_id, user_id=user_id, timestamp=timestamp
         )
         self._incomes[income.id] = income
+        self.save(self._incomes)
         return income
 
     async def get(self, income_id: str) -> Income | None:
@@ -237,7 +307,9 @@ class MemoryIncomeService(IncomeService):
             income.category_id = category_id
         if description is not None:
             income.description = description
+        self.save(self._incomes)
         return income
 
     async def delete(self, income_id: str) -> None:
         self._incomes.pop(income_id)
+        self.save(self._incomes)

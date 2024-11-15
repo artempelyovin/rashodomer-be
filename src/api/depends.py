@@ -15,12 +15,12 @@ from core.services import (
 )
 from core.use_cases.auth import AuthenticationUseCase
 from repos import (
-    MemoryBudgetService,
-    MemoryCategoryService,
-    MemoryExpenseService,
-    MemoryIncomeService,
-    MemoryTokenService,
-    MemoryUserService,
+    FileBudgetService,
+    FileCategoryService,
+    FileExpenseService,
+    FileIncomeService,
+    FileTokenService,
+    FileUserService,
 )
 from services import PasswordBcryptService
 
@@ -32,27 +32,27 @@ def password_service_factory() -> PasswordService:
 
 
 def token_service_factory() -> TokenService:
-    return MemoryTokenService()
+    return FileTokenService()
 
 
 def user_service_factory() -> UserService:
-    return MemoryUserService()
+    return FileUserService()
 
 
 def budget_service_factory() -> BudgetService:
-    return MemoryBudgetService()
+    return FileBudgetService()
 
 
 def category_service_factory() -> CategoryService:
-    return MemoryCategoryService()
+    return FileCategoryService()
 
 
 def expense_service_factory() -> ExpenseService:
-    return MemoryExpenseService()
+    return FileExpenseService()
 
 
 def income_service_factory() -> IncomeService:
-    return MemoryIncomeService()
+    return FileIncomeService()
 
 
 async def authentication_user(
