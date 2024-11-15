@@ -1,3 +1,9 @@
+from typing import Annotated
+
+from fastapi import Depends
+from fastapi.security import APIKeyHeader
+
+from core.entities import User
 from core.services import (
     BudgetService,
     CategoryService,
@@ -7,6 +13,7 @@ from core.services import (
     TokenService,
     UserService,
 )
+from core.use_cases.auth import AuthenticationUseCase
 from repos import (
     MemoryBudgetService,
     MemoryCategoryService,
@@ -16,6 +23,8 @@ from repos import (
     MemoryUserService,
 )
 from services import PasswordBcryptService
+
+header_scheme = APIKeyHeader(name="Authorization", auto_error=False)
 
 
 def password_service_factory() -> PasswordService:
@@ -44,3 +53,12 @@ def expense_service_factory() -> ExpenseService:
 
 def income_service_factory() -> IncomeService:
     return MemoryIncomeService()
+
+
+async def authentication_user(
+    token: Annotated[str | None, Depends(header_scheme)],
+    user_service: Annotated[UserService, Depends(user_service_factory)],
+    token_service: Annotated[TokenService, Depends(token_service_factory)],
+) -> User:
+    use_case = AuthenticationUseCase(token_service=token_service, user_service=user_service)
+    return await use_case.authenticate(token=token)

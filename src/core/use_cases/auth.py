@@ -8,7 +8,9 @@ class AuthenticationUseCase:
         self._token_repo = token_service
         self._user_repo = user_service
 
-    async def authenticate(self, token: str) -> User:
+    async def authenticate(self, token: str | None) -> User:
+        if not token:
+            raise UnauthorizedError
         user_id = await self._token_repo.get_user_id_by_token(token=token)
         if not user_id:
             raise UnauthorizedError
