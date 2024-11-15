@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends
 from starlette import status
 
-from api.auth.schemas import UserLoginSchema, CreateUserSchema, UserSchema
+from api.auth.schemas import CreateUserSchema, UserLoginSchema, UserSchema
 from api.depends import password_service_factory, user_service_factory
 from core.services import PasswordService, UserService
 from core.use_cases.login_user import LoginUserUseCase
