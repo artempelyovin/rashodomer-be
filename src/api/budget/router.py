@@ -9,9 +9,9 @@ from api.budget.schemas import BudgetSchema, CreateBudgetSchema
 from api.depends import authentication_user, budget_service_factory
 from core.entities import User
 from core.services import BudgetService
-from core.use_cases.create_budget import CreateBudgetUseCase
-from core.use_cases.get_budget import GetBudgetUseCase
-from core.use_cases.list_budgets import ListBudgetUseCase
+from core.use_cases.budget_create import CreateBudgetUseCase
+from core.use_cases.budget_get import GetBudgetUseCase
+from core.use_cases.budget_list import ListBudgetUseCase
 
 router = APIRouter()
 
