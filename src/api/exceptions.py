@@ -2,6 +2,7 @@ from starlette import status
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
+from api.base import APIResponse
 from core.exceptions import (
     AmountMustBePositiveError,
     BaseCoreError,
@@ -32,7 +33,5 @@ CORE_ERROR_TO_HTTP_STATUS_MAPPING: dict[type[BaseCoreError], int] = {
 
 def core_exception_handler(_: Request, core_error: BaseCoreError) -> JSONResponse:
     status_code = CORE_ERROR_TO_HTTP_STATUS_MAPPING[type(core_error)]
-    return JSONResponse(
-        content={"content": None, "status_code": status_code, "error": True, "detailed": core_error.message()},
-        status_code=status_code,
-    )
+    content = APIResponse(data=None, status_code=status_code, error=True, detail=core_error.message()).dict()
+    return JSONResponse(content=content, status_code=status_code)
