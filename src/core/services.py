@@ -13,6 +13,14 @@ class PasswordService(ABC):
     def check_password(self, password: str, password_hash: str) -> bool: ...
 
 
+class TokenService(ABC):
+    @abstractmethod
+    def create_new_token(self, user_id: str) -> str: ...
+
+    @abstractmethod
+    def get_user_id_by_token(self, token: str) -> str | None: ...
+
+
 class UserService(ABC):
     @abstractmethod
     async def create(self, first_name: str, last_name: str, login: str, password_hash: str) -> User: ...

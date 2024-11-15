@@ -3,10 +3,10 @@ from typing import Annotated
 from fastapi import APIRouter, Depends
 from starlette import status
 
-from api.auth.schemas import CreateUserSchema, UserLoginSchema, UserSchema
+from api.auth.schemas import CreateUserSchema, TokenSchema, UserLoginSchema, UserSchema
 from api.base import APIResponse, write_response
-from api.depends import password_service_factory, user_service_factory
-from core.services import PasswordService, UserService
+from api.depends import password_service_factory, token_service_factory, user_service_factory
+from core.services import PasswordService, TokenService, UserService
 from core.use_cases.login_user import LoginUserUseCase
 from core.use_cases.register_user import RegisterUserUseCase
 
@@ -43,6 +43,10 @@ async def login(
     body: UserLoginSchema,
     user_service: Annotated[UserService, Depends(user_service_factory)],
     password_service: Annotated[PasswordService, Depends(password_service_factory)],
-) -> None:
-    use_case = LoginUserUseCase(user_service=user_service, password_service=password_service)
-    await use_case.login(login=body.login, password=body.password)
+    token_service: Annotated[TokenService, Depends(token_service_factory)],
+) -> APIResponse[TokenSchema]:
+    use_case = LoginUserUseCase(
+        user_service=user_service, password_service=password_service, token_service=token_service
+    )
+    token = await use_case.login(login=body.login, password=body.password)
+    return write_response(content={"token": token}, schema=TokenSchema, status_code=status.HTTP_200_OK)

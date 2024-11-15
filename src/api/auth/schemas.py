@@ -25,6 +25,10 @@ class UserLoginSchema(FromAttributeModel):
     password: str = PasswordField
 
 
+class TokenSchema(FromAttributeModel):
+    token: str = Field(..., description="Authentication token", examples=["2ba2eb37-7c80-49d0-8ff1-9f66cf6e977e"])
+
+
 class UserSchema(FromAttributeModel):
     id: Annotated[str, UUID] = IdField
     first_name: str = FirstNameField
