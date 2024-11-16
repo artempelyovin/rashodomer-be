@@ -21,6 +21,9 @@ ruff = "0.7.1"  # we update it with our hands because all rules are enabled
 mypy = "^1.13.0"
 pre-commit = "^4.0.1"
 types-ujson = "^5.10.0.20240515"
+pytest = "^8.3.3"
+pytest-asyncio = "^0.24.0"
+faker = "^33.0.0"
 
 
 [tool.ruff]
@@ -51,11 +54,20 @@ ignore = [
     "TD002", # Missing T O D O author
     "TD003", # Missing T O D O link
     "ANN",  # flake8-annotations (skip it because using `mypy`)
+    "RUF001",  # ambiguous-unicode-character-string (skip it because many false positives)
+    "RUF002",  # ambiguous-unicode-character-docstring (skip it because many false positives)
+    "RUF003",  # ambiguous-unicode-character-comment (skip it because many false positives)
+    "S101", # Use of `assert` detected (interferes with tests)
 ]
 
 
 [tool.mypy]
 strict = true
+
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
 
 
 [build-system]
