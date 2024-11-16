@@ -6,8 +6,8 @@ from api.auth.schemas import CreateUserSchema, TokenSchema, UserLoginSchema, Use
 from api.base import APIResponse, write_response
 from api.depends import password_service_factory, token_service_factory, user_service_factory
 from core.services import PasswordService, TokenService, UserService
-from core.use_cases.user_login import LoginUserUseCase
-from core.use_cases.user_register import RegisterUserUseCase
+from core.use_cases.auth.login import LoginUserUseCase
+from core.use_cases.auth.register import RegisterUserUseCase
 
 router = APIRouter()
 

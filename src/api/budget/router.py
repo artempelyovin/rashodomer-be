@@ -10,12 +10,12 @@ from api.budget.schemas import BudgetSchema, CreateBudgetSchema, UpdateBudgetSch
 from api.depends import authentication_user, budget_service_factory
 from core.entities import User
 from core.services import BudgetService
-from core.use_cases.budget_create import CreateBudgetUseCase
-from core.use_cases.budget_delete import DeleteBudgetUseCase
-from core.use_cases.budget_find import FindBudgetUseCase
-from core.use_cases.budget_get import GetBudgetUseCase
-from core.use_cases.budget_list import ListBudgetUseCase
-from core.use_cases.budget_update import UpdateBudgetUseCase
+from core.use_cases.budget.create import CreateBudgetUseCase
+from core.use_cases.budget.delete import DeleteBudgetUseCase
+from core.use_cases.budget.find import FindBudgetUseCase
+from core.use_cases.budget.get import GetBudgetUseCase
+from core.use_cases.budget.list import ListBudgetUseCase
+from core.use_cases.budget.update import UpdateBudgetUseCase
 
 router = APIRouter()
 
