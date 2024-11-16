@@ -14,6 +14,7 @@ bcrypt = "^4.2.0"
 fastapi = "^0.115.5"
 uvicorn = "^0.32.0"
 ujson = "^5.10.0"
+emoji = "^2.14.0"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -59,6 +60,10 @@ ignore = [
     "RUF003",  # ambiguous-unicode-character-comment (skip it because many false positives)
     "S101", # Use of `assert` detected (interferes with tests)
 ]
+
+
+[tool.ruff.lint.pylint]
+max-args = 6
 
 
 [tool.mypy]

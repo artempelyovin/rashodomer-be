@@ -1,8 +1,8 @@
 # ruff: noqa: B008
 from typing import Annotated
+from uuid import UUID
 
 from fastapi import APIRouter, Depends, Path, Query
-from pydantic import UUID4
 from starlette import status
 
 from api.base import APIResponse, APIResponseList, write_response, write_response_list
@@ -85,7 +85,7 @@ async def find_budgets(
     tags=["budgets"],
 )
 async def get_budget(
-    budget_id: Annotated[str, UUID4] = Path(..., description="The ID of the budget"),
+    budget_id: Annotated[str, UUID] = Path(..., description="The ID of the budget"),
     *,
     user: User = Depends(authentication_user),
     budget_service: BudgetService = Depends(budget_service_factory),
@@ -104,7 +104,7 @@ async def get_budget(
 )
 async def update_budget(
     body: UpdateBudgetSchema,
-    budget_id: Annotated[str, UUID4] = Path(..., description="The ID of the budget"),
+    budget_id: Annotated[str, UUID] = Path(..., description="The ID of the budget"),
     *,
     user: User = Depends(authentication_user),
     budget_service: BudgetService = Depends(budget_service_factory),
@@ -124,7 +124,7 @@ async def update_budget(
     tags=["budgets"],
 )
 async def delete_budget(
-    budget_id: Annotated[str, UUID4] = Path(..., description="The ID of the budget"),
+    budget_id: Annotated[str, UUID] = Path(..., description="The ID of the budget"),
     *,
     user: User = Depends(authentication_user),
     budget_service: BudgetService = Depends(budget_service_factory),

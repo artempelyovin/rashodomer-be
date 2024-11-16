@@ -9,10 +9,13 @@ from core.exceptions import (
     BudgetAccessDeniedError,
     BudgetAlreadyExistsError,
     BudgetNotExistsError,
+    CategoryAlreadyExistsError,
     EmptyBudgetTextError,
+    EmptyCategoryNameError,
     IncorrectPasswordError,
     LoginAlreadyExistsError,
     LoginNotExistsError,
+    NotEmojiIconError,
     PasswordMissingSpecialCharacterError,
     PasswordTooShortError,
     UnauthorizedError,
@@ -32,6 +35,9 @@ CORE_ERROR_TO_HTTP_STATUS_MAPPING: dict[type[BaseCoreError], int] = {
     BudgetAccessDeniedError: status.HTTP_403_FORBIDDEN,
     UnauthorizedError: status.HTTP_403_FORBIDDEN,
     EmptyBudgetTextError: status.HTTP_400_BAD_REQUEST,
+    EmptyCategoryNameError: status.HTTP_400_BAD_REQUEST,
+    NotEmojiIconError: status.HTTP_400_BAD_REQUEST,
+    CategoryAlreadyExistsError: status.HTTP_400_BAD_REQUEST,
 }
 
 

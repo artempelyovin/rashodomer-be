@@ -1,6 +1,7 @@
 import bcrypt
+import emoji
 
-from core.services import PasswordService
+from core.services import EmojiService, PasswordService
 
 
 class PasswordBcryptService(PasswordService):
@@ -10,3 +11,8 @@ class PasswordBcryptService(PasswordService):
 
     def check_password(self, password: str, password_hash: str) -> bool:
         return bcrypt.checkpw(password.encode(), password_hash.encode())
+
+
+class EmojiPackageService(EmojiService):
+    def is_emoji(self, emoji_text: str) -> bool:
+        return emoji.is_emoji(emoji_text)

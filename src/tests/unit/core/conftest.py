@@ -1,7 +1,8 @@
 import pytest
 from faker import Faker
 
-from core.entities import Budget, User
+from core.entities import Budget, Category, User
+from core.enums import CategoryType
 
 fake = Faker(locale="ru_RU")
 
@@ -9,8 +10,8 @@ fake = Faker(locale="ru_RU")
 @pytest.fixture
 def fake_budget() -> Budget:
     return Budget(
-        name=fake.catch_phrase(),
-        description=fake.catch_phrase(),
+        name=fake.word(),
+        description=fake.sentence(),
         amount=fake.pyfloat(positive=True),
         user_id=str(fake.uuid4()),
     )
@@ -25,4 +26,18 @@ def fake_user() -> User:
         password_hash=str(fake.uuid4()),
         created_at=fake.date_time(),
         last_login=fake.date_time(),
+    )
+
+
+@pytest.fixture
+def fake_category() -> Category:
+    return Category(
+        name=fake.word(),
+        description=fake.sentence(),
+        type=fake.random_element(list(CategoryType)),
+        emoji_icon=fake.random_element([None, fake.emoji()]),
+        is_archived=fake.boolean(),
+        user_id=str(fake.uuid4()),
+        created_at=fake.date_time(),
+        updated_at=fake.date_time(),
     )
