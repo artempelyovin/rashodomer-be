@@ -84,7 +84,7 @@ class BudgetService(ABC):
 
 class CategoryService(ABC):
     @abstractmethod
-    async def create(self, user_id: str, name: str, description: str, category_type: CategoryType) -> Category: ...
+    async def create(self, user_id: str, name: str, description: str, category_type: CategoryType, emoji_icon: str | None) -> Category: ...
 
     @abstractmethod
     async def get(self, category_id: str) -> Category | None: ...
@@ -102,6 +102,7 @@ class CategoryService(ABC):
         description: str | None = None,
         category_type: CategoryType | None = None,
         is_archived: bool | None = None,
+        emoji_icon: str | None = None,
     ) -> Category: ...
 
     @abstractmethod
