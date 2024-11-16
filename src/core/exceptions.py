@@ -4,7 +4,6 @@ from dataclasses import dataclass
 from core.utils import _
 
 
-@dataclass(frozen=True)
 class BaseCoreError(Exception):
     @abstractmethod
     def message(self) -> str:
@@ -38,7 +37,6 @@ class UserNotExistsError(BaseCoreError):
         return _("User with ID '{user_id}' does not exist").format(user_id=self.user_id)
 
 
-@dataclass(frozen=True)
 class IncorrectPasswordError(BaseCoreError):
     def message(self) -> str:
         return _("Incorrect password")
@@ -54,13 +52,11 @@ class PasswordTooShortError(BaseCoreError):
         )
 
 
-@dataclass(frozen=True)
 class PasswordMissingSpecialCharacterError(BaseCoreError):
     def message(self) -> str:
         return _("Password is missing special character")
 
 
-@dataclass(frozen=True)
 class AmountMustBePositiveError(BaseCoreError):
     def message(self) -> str:
         return _("Amount must be positive")
@@ -82,19 +78,16 @@ class BudgetNotExistsError(BaseCoreError):
         return _("Budget with ID '{budget_id}' does not exist").format(budget_id=self.budget_id)
 
 
-@dataclass(frozen=True)
 class BudgetAccessDeniedError(BaseCoreError):
     def message(self) -> str:
         return _("Attempt to access another user's budget.")
 
 
-@dataclass(frozen=True)
 class UnauthorizedError(BaseCoreError):
     def message(self) -> str:
         return _("Authentication failed")
 
 
-@dataclass(frozen=True)
 class EmptyInputError(BaseCoreError):
     def message(self) -> str:
         return _("Input cannot be empty. Please provide a valid input")
