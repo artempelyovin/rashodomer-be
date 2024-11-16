@@ -10,7 +10,7 @@ from core.utils import uuid4_str
 @dataclass
 class User:
     id: str = field(default_factory=uuid4_str, kw_only=True)
-    first_name: str
+    first_name: str  # type: ignore[misc]
     last_name: str  # type: ignore[misc]
     login: str  # type: ignore[misc]
     password_hash: str  # type: ignore[misc]
