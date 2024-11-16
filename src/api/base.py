@@ -22,7 +22,9 @@ class ErrorSchema(BaseModel):
 class _BaseResponse(BaseModel, Generic[PydanticSchema]):
     result: Any | None = None
     status_code: int = Field(default=status.HTTP_200_OK, description="HTTP status code")
-    error: ErrorSchema | None = Field(default=None, description="Details of the error, if any (otherwise `null`)", examples=[None])
+    error: ErrorSchema | None = Field(
+        default=None, description="Details of the error, if any (otherwise `null`)", examples=[None]
+    )
 
 
 class APIResponse(_BaseResponse[PydanticSchema]):
