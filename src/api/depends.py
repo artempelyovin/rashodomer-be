@@ -13,7 +13,7 @@ from core.services import (
     TokenService,
     UserService,
 )
-from core.use_cases.auth import AuthenticationUseCase
+from core.use_cases.auth.authenticate import AuthenticationUseCase
 from repos import (
     FileBudgetService,
     FileCategoryService,
