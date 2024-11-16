@@ -3,7 +3,7 @@ from unittest.mock import Mock
 import pytest
 
 from core.entities import Budget
-from core.exceptions import EmptyInputError
+from core.exceptions import EmptyBudgetTextError
 from core.services import BudgetService
 from core.use_cases.budget.find import FindBudgetUseCase
 from core.utils import uuid4_str
@@ -25,9 +25,9 @@ async def test_success(fake_budget: Budget) -> None:
         assert budget in result_budgets
 
 
-async def test_empty_input() -> None:
+async def test_empty_budget_text() -> None:
     budget_service = Mock(spec=BudgetService)
     use_case = FindBudgetUseCase(budget_service)
 
-    with pytest.raises(EmptyInputError):
+    with pytest.raises(EmptyBudgetTextError):
         await use_case.find(user_id=str(fake.uuid4()), text="", limit=fake.pyint(), offset=fake.pyint())

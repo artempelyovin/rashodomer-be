@@ -88,6 +88,6 @@ class UnauthorizedError(BaseCoreError):
         return _("Authentication failed")
 
 
-class EmptyInputError(BaseCoreError):
+class EmptyBudgetTextError(BaseCoreError):
     def message(self) -> str:
-        return _("Input cannot be empty. Please provide a valid input")
+        return _("Search query cannot be empty. Please provide a valid budget search input")

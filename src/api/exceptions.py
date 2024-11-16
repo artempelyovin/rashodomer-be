@@ -9,7 +9,7 @@ from core.exceptions import (
     BudgetAccessDeniedError,
     BudgetAlreadyExistsError,
     BudgetNotExistsError,
-    EmptyInputError,
+    EmptyBudgetTextError,
     IncorrectPasswordError,
     LoginAlreadyExistsError,
     LoginNotExistsError,
@@ -31,7 +31,7 @@ CORE_ERROR_TO_HTTP_STATUS_MAPPING: dict[type[BaseCoreError], int] = {
     BudgetNotExistsError: status.HTTP_404_NOT_FOUND,
     BudgetAccessDeniedError: status.HTTP_403_FORBIDDEN,
     UnauthorizedError: status.HTTP_403_FORBIDDEN,
-    EmptyInputError: status.HTTP_400_BAD_REQUEST,
+    EmptyBudgetTextError: status.HTTP_400_BAD_REQUEST,
 }
 
 
