@@ -29,7 +29,7 @@ async def register(
     user = await use_case.register(
         first_name=body.first_name, last_name=body.last_name, login=body.login, password=body.password
     )
-    return write_response(data=user, schema=UserSchema, status_code=status.HTTP_201_CREATED)
+    return write_response(result=user, schema=UserSchema, status_code=status.HTTP_201_CREATED)
 
 
 @router.post(
@@ -49,4 +49,4 @@ async def login(
         user_service=user_service, password_service=password_service, token_service=token_service
     )
     token = await use_case.login(login=body.login, password=body.password)
-    return write_response(data={"token": token}, schema=TokenSchema, status_code=status.HTTP_200_OK)
+    return write_response(result={"token": token}, schema=TokenSchema, status_code=status.HTTP_200_OK)

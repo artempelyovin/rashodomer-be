@@ -35,5 +35,5 @@ CORE_ERROR_TO_HTTP_STATUS_MAPPING: dict[type[BaseCoreError], int] = {
 
 def core_exception_handler(_: Request, core_error: BaseCoreError) -> JSONResponse:
     status_code = CORE_ERROR_TO_HTTP_STATUS_MAPPING[type(core_error)]
-    content = APIResponse(data=None, status_code=status_code, error=True, detail=core_error.message()).dict()
+    content = APIResponse(result=None, status_code=status_code, error=True, detail=core_error.message()).dict()
     return JSONResponse(content=content, status_code=status_code)
