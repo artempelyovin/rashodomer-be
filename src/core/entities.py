@@ -11,9 +11,9 @@ from core.utils import uuid4_str
 class User:
     id: str = field(default_factory=uuid4_str, kw_only=True)
     first_name: str
-    last_name: str
-    login: str
-    password_hash: str
+    last_name: str  # type: ignore[misc]
+    login: str  # type: ignore[misc]
+    password_hash: str  # type: ignore[misc]
     created_at: datetime = field(default_factory=datetime.now, kw_only=True)
     last_login: datetime = field(default_factory=datetime.now, kw_only=True)
 
@@ -21,20 +21,20 @@ class User:
 @dataclass
 class Budget:
     id: str = field(default_factory=uuid4_str, kw_only=True)
-    name: str
-    description: str
-    amount: float
-    user_id: str
+    name: str  # type: ignore[misc]
+    description: str  # type: ignore[misc]
+    amount: float  # type: ignore[misc]
+    user_id: str  # type: ignore[misc]
 
 
 @dataclass
 class Category:
     id: str = field(default_factory=uuid4_str, kw_only=True)
-    name: str
-    description: str
-    type: CategoryType
+    name: str  # type: ignore[misc]
+    description: str  # type: ignore[misc]
+    type: CategoryType  # type: ignore[misc]
     is_archived: bool = field(default=False, kw_only=True)
-    user_id: Annotated[str, UUID]
+    user_id: Annotated[str, UUID]  # type: ignore[misc]
     created_at: datetime = field(default_factory=datetime.now, kw_only=True)
     updated_at: datetime = field(default_factory=datetime.now, kw_only=True)
 
@@ -42,18 +42,18 @@ class Category:
 @dataclass
 class Expense:
     id: str = field(default_factory=uuid4_str, kw_only=True)
-    amount: float
-    description: str
-    category_id: str
-    user_id: str
-    timestamp: datetime
+    amount: float  # type: ignore[misc]
+    description: str  # type: ignore[misc]
+    category_id: str  # type: ignore[misc]
+    user_id: str  # type: ignore[misc]
+    timestamp: datetime  # type: ignore[misc]
 
 
 @dataclass
 class Income:
     id: str = field(default_factory=uuid4_str, kw_only=True)
-    amount: float
-    description: str
-    category_id: str
-    user_id: str
-    timestamp: datetime
+    amount: float  # type: ignore[misc]
+    description: str  # type: ignore[misc]
+    category_id: str  # type: ignore[misc]
+    user_id: str  # type: ignore[misc]
+    timestamp: datetime  # type: ignore[misc]
