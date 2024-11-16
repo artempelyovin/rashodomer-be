@@ -21,6 +21,12 @@ class CreateBudgetSchema(FromAttributeModel):
     amount: float = AmountField
 
 
+class UpdateBudgetSchema(FromAttributeModel):
+    name: str | None = Field(None, description="New name of the budget")
+    description: str | None = Field(None, description="New description of the budget")
+    amount: float | None = Field(None, description="New amount of the budget")
+
+
 class BudgetSchema(FromAttributeModel):
     id: Annotated[str, UUID4] = IdField
     name: str = NameField

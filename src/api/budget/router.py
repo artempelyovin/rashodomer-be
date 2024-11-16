@@ -5,7 +5,7 @@ from pydantic import UUID4
 from starlette import status
 
 from api.base import APIResponse, APIResponseList, write_response, write_response_list
-from api.budget.schemas import BudgetSchema, CreateBudgetSchema
+from api.budget.schemas import BudgetSchema, CreateBudgetSchema, UpdateBudgetSchema
 from api.depends import authentication_user, budget_service_factory
 from core.entities import User
 from core.services import BudgetService
@@ -13,6 +13,7 @@ from core.use_cases.budget_create import CreateBudgetUseCase
 from core.use_cases.budget_delete import DeleteBudgetUseCase
 from core.use_cases.budget_get import GetBudgetUseCase
 from core.use_cases.budget_list import ListBudgetUseCase
+from core.use_cases.budget_update import UpdateBudgetUseCase
 
 router = APIRouter()
 
@@ -66,6 +67,26 @@ async def get_budget(
 ) -> APIResponse[BudgetSchema]:
     use_case = GetBudgetUseCase(budget_service=budget_service)
     budget = await use_case.get(user_id=user.id, budget_id=budget_id)
+    return write_response(result=budget, schema=BudgetSchema)
+
+
+@router.patch(
+    "/v1/budgets/{budget_id}",
+    status_code=status.HTTP_200_OK,
+    summary="Update budget",
+    description="Update the budget by its ID",
+    tags=["budgets"],
+)
+async def update_budget(
+    body: UpdateBudgetSchema,
+    user: Annotated[User, Depends(authentication_user)],
+    budget_service: Annotated[BudgetService, Depends(budget_service_factory)],
+    budget_id: Annotated[str, UUID4] = Path(..., description="The ID of the budget"),
+) -> APIResponse[BudgetSchema]:
+    use_case = UpdateBudgetUseCase(budget_service=budget_service)
+    budget = await use_case.update(
+        user_id=user.id, budget_id=budget_id, name=body.name, description=body.description, amount=body.amount
+    )
     return write_response(result=budget, schema=BudgetSchema)
 
 
