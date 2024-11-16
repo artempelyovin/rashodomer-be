@@ -1,5 +1,4 @@
-from typing import Annotated
-
+# ruff: noqa: B008
 from fastapi import APIRouter, Depends
 from starlette import status
 
@@ -22,8 +21,9 @@ router = APIRouter()
 )
 async def register(
     body: CreateUserSchema,
-    user_service: Annotated[UserService, Depends(user_service_factory)],
-    password_service: Annotated[PasswordService, Depends(password_service_factory)],
+    *,
+    user_service: UserService = Depends(user_service_factory),
+    password_service: PasswordService = Depends(password_service_factory),
 ) -> APIResponse[UserSchema]:
     use_case = RegisterUserUseCase(user_service=user_service, password_service=password_service)
     user = await use_case.register(
@@ -41,9 +41,10 @@ async def register(
 )
 async def login(
     body: UserLoginSchema,
-    user_service: Annotated[UserService, Depends(user_service_factory)],
-    password_service: Annotated[PasswordService, Depends(password_service_factory)],
-    token_service: Annotated[TokenService, Depends(token_service_factory)],
+    *,
+    user_service: UserService = Depends(user_service_factory),
+    password_service: PasswordService = Depends(password_service_factory),
+    token_service: TokenService = Depends(token_service_factory),
 ) -> APIResponse[TokenSchema]:
     use_case = LoginUserUseCase(
         user_service=user_service, password_service=password_service, token_service=token_service

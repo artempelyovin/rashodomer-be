@@ -1,3 +1,4 @@
+# ruff: noqa: B008
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Path
@@ -27,8 +28,9 @@ router = APIRouter()
 )
 async def create_budget(
     body: CreateBudgetSchema,
-    user: Annotated[User, Depends(authentication_user)],
-    budget_service: Annotated[BudgetService, Depends(budget_service_factory)],
+    *,
+    user: User = Depends(authentication_user),
+    budget_service: BudgetService = Depends(budget_service_factory),
 ) -> APIResponse[BudgetSchema]:
     use_case = CreateBudgetUseCase(budget_service=budget_service)
     budget = await use_case.create(name=body.name, description=body.description, amount=body.amount, user_id=user.id)
@@ -43,10 +45,11 @@ async def create_budget(
     tags=["budgets"],
 )
 async def list_budgets(
-    user: Annotated[User, Depends(authentication_user)],
-    budget_service: Annotated[BudgetService, Depends(budget_service_factory)],
     limit: int | None = None,
     offset: int = 0,
+    *,
+    user: User = Depends(authentication_user),
+    budget_service: BudgetService = Depends(budget_service_factory),
 ) -> APIResponseList[BudgetSchema]:
     use_case = ListBudgetUseCase(budget_service=budget_service)
     total, budgets = await use_case.list(user_id=user.id, limit=limit, offset=offset)
@@ -61,9 +64,10 @@ async def list_budgets(
     tags=["budgets"],
 )
 async def get_budget(
-    user: Annotated[User, Depends(authentication_user)],
-    budget_service: Annotated[BudgetService, Depends(budget_service_factory)],
     budget_id: Annotated[str, UUID4] = Path(..., description="The ID of the budget"),
+    *,
+    user: User = Depends(authentication_user),
+    budget_service: BudgetService = Depends(budget_service_factory),
 ) -> APIResponse[BudgetSchema]:
     use_case = GetBudgetUseCase(budget_service=budget_service)
     budget = await use_case.get(user_id=user.id, budget_id=budget_id)
@@ -79,9 +83,10 @@ async def get_budget(
 )
 async def update_budget(
     body: UpdateBudgetSchema,
-    user: Annotated[User, Depends(authentication_user)],
-    budget_service: Annotated[BudgetService, Depends(budget_service_factory)],
     budget_id: Annotated[str, UUID4] = Path(..., description="The ID of the budget"),
+    *,
+    user: User = Depends(authentication_user),
+    budget_service: BudgetService = Depends(budget_service_factory),
 ) -> APIResponse[BudgetSchema]:
     use_case = UpdateBudgetUseCase(budget_service=budget_service)
     budget = await use_case.update(
@@ -98,9 +103,10 @@ async def update_budget(
     tags=["budgets"],
 )
 async def delete_budget(
-    user: Annotated[User, Depends(authentication_user)],
-    budget_service: Annotated[BudgetService, Depends(budget_service_factory)],
     budget_id: Annotated[str, UUID4] = Path(..., description="The ID of the budget"),
+    *,
+    user: User = Depends(authentication_user),
+    budget_service: BudgetService = Depends(budget_service_factory),
 ) -> APIResponse[BudgetSchema]:
     use_case = DeleteBudgetUseCase(budget_service=budget_service)
     budget = await use_case.delete(user_id=user.id, budget_id=budget_id)
