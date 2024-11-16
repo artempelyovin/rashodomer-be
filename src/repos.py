@@ -191,8 +191,12 @@ class FileCategoryService(CategoryService, JsonFileMixin):
     def __init__(self) -> None:
         self._categories: dict[str, Category] = self.load()
 
-    async def create(self, user_id: str, name: str, description: str, category_type: CategoryType, emoji_icon: str | None) -> Category:
-        category = Category(name=name, description=description, type=category_type, user_id=user_id, emoji_icon=emoji_icon)
+    async def create(
+        self, user_id: str, name: str, description: str, category_type: CategoryType, emoji_icon: str | None
+    ) -> Category:
+        category = Category(
+            name=name, description=description, type=category_type, user_id=user_id, emoji_icon=emoji_icon
+        )
         self._categories[category.id] = category
         self.save(self._categories)
         return category
@@ -201,25 +205,28 @@ class FileCategoryService(CategoryService, JsonFileMixin):
         return self._categories[category_id]
 
     async def find(
-        self, user_id: str, category_type: CategoryType | None = None, limit: int | None = None, offset: int = 0
+        self,
+        user_id: str,
+        name: str,
+        category_type: CategoryType | None = None,
+        limit: int | None = None,
+        offset: int = 0,
     ) -> tuple[Total, list[Category]]:
         user_categories = [
-            category
-            for category in self._categories.values()
-            if category.user_id == user_id and category.type == category_type
+            category for category in self._categories.values() if category.user_id == user_id and category.name == name
         ]
         if category_type is not None:
             user_categories = [category for category in user_categories if category.type == category_type]
         return paginate(user_categories, limit, offset)
 
     async def change_category(
-            self,
-            category_id: str,
-            name: str | None = None,
-            description: str | None = None,
-            category_type: CategoryType | None = None,
-            is_archived: bool | None = None,
-            emoji_icon: str | None = None,
+        self,
+        category_id: str,
+        name: str | None = None,
+        description: str | None = None,
+        category_type: CategoryType | None = None,
+        is_archived: bool | None = None,
+        emoji_icon: str | None = None,
     ) -> Category:
         category = self._categories[category_id]
         if name is not None:

@@ -15,6 +15,11 @@ class PasswordService(ABC):
     def check_password(self, password: str, password_hash: str) -> bool: ...
 
 
+class EmojiService(ABC):
+    @abstractmethod
+    def is_emoji(self, emoji_text: str) -> bool: ...
+
+
 class TokenService(ABC):
     @abstractmethod
     async def create_new_token(self, user_id: str) -> str: ...
@@ -84,14 +89,21 @@ class BudgetService(ABC):
 
 class CategoryService(ABC):
     @abstractmethod
-    async def create(self, user_id: str, name: str, description: str, category_type: CategoryType, emoji_icon: str | None) -> Category: ...
+    async def create(
+        self, user_id: str, name: str, description: str, category_type: CategoryType, emoji_icon: str | None
+    ) -> Category: ...
 
     @abstractmethod
     async def get(self, category_id: str) -> Category | None: ...
 
     @abstractmethod
     async def find(
-        self, user_id: str, category_type: CategoryType | None = None, limit: int | None = None, offset: int = 0
+        self,
+        user_id: str,
+        name: str,
+        category_type: CategoryType | None = None,
+        limit: int | None = None,
+        offset: int = 0,
     ) -> tuple[Total, list[Category]]: ...
 
     @abstractmethod

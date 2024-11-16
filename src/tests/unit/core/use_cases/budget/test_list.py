@@ -17,7 +17,4 @@ async def success(fake_budget: Budget) -> None:
     assert total == expected_total
     assert len(budgets) == len(expected_budgets)
     for budget, expected_budget in zip(budgets, budgets, strict=True):
-        assert budget.name == expected_budget.name
-        assert budget.description == expected_budget.description
-        assert budget.amount == expected_budget.amount
-        assert budget.user_id == expected_budget.user_id
+        assert budget == expected_budget

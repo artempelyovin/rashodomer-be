@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
+from core.enums import CategoryType
 from core.utils import _
 
 
@@ -91,3 +92,29 @@ class UnauthorizedError(BaseCoreError):
 class EmptyBudgetTextError(BaseCoreError):
     def message(self) -> str:
         return _("Search query cannot be empty. Please provide a valid budget search input")
+
+
+class EmptyCategoryNameError(BaseCoreError):
+    def message(self) -> str:
+        return _("Category name cannot be empty")
+
+
+@dataclass(frozen=True)
+class NotEmojiIconError(BaseCoreError):
+    emoji_icon: str
+
+    def message(self) -> str:
+        return _("The provided icon in text format '{emoji_icon}' is not a valid emoji.").format(
+            emoji_icon=self.emoji_icon
+        )
+
+
+@dataclass(frozen=True)
+class CategoryAlreadyExistsError(BaseCoreError):
+    name: str
+    category_type: CategoryType
+
+    def message(self) -> str:
+        return _("A category with the name '{name}' and type '{category_type}' already exists").format(
+            name=self.name, category_type=self.category_type
+        )

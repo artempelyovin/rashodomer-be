@@ -7,6 +7,7 @@ from core.entities import User
 from core.services import (
     BudgetService,
     CategoryService,
+    EmojiService,
     ExpenseService,
     IncomeService,
     PasswordService,
@@ -22,13 +23,17 @@ from repos import (
     FileTokenService,
     FileUserService,
 )
-from services import PasswordBcryptService
+from services import EmojiPackageService, PasswordBcryptService
 
 header_scheme = APIKeyHeader(name="Authorization", auto_error=False)
 
 
 def password_service_factory() -> PasswordService:
     return PasswordBcryptService()
+
+
+def emoji_service_factory() -> EmojiService:
+    return EmojiPackageService()
 
 
 def token_service_factory() -> TokenService:

@@ -1,6 +1,7 @@
 from typing import Annotated
+from uuid import UUID
 
-from pydantic import UUID4, Field
+from pydantic import Field
 
 from api.base import FromAttributeModel
 
@@ -28,7 +29,7 @@ class UpdateBudgetSchema(FromAttributeModel):
 
 
 class BudgetSchema(FromAttributeModel):
-    id: Annotated[str, UUID4] = IdField
+    id: Annotated[str, UUID] = IdField
     name: str = NameField
     description: str = DescriptionField
     amount: float = AmountField

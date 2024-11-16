@@ -15,8 +15,8 @@ async def test_success(fake_budget: Budget) -> None:
         id=fake_budget.id,
         user_id=fake_budget.user_id,
         # updated params
-        name=fake.catch_phrase(),
-        description=fake.catch_phrase(),
+        name=fake.word(),
+        description=fake.sentence(),
         amount=fake.pyfloat(positive=True),
     )
 
@@ -50,8 +50,8 @@ async def test_budget_not_exists(fake_budget: Budget) -> None:
         await use_case.update(
             user_id=fake_budget.user_id,
             budget_id=fake_budget.id,
-            name=fake.catch_phrase(),
-            description=fake.catch_phrase(),
+            name=fake.word(),
+            description=fake.sentence(),
             amount=fake.pyfloat(positive=True),
         )
 
@@ -65,8 +65,8 @@ async def test_budget_access_denied(fake_budget: Budget) -> None:
         await use_case.update(
             user_id=str(fake.uuid4()),  # another user
             budget_id=fake_budget.id,
-            name=fake.catch_phrase(),
-            description=fake.catch_phrase(),
+            name=fake.word(),
+            description=fake.sentence(),
             amount=fake.pyfloat(positive=True),
         )
 
@@ -80,7 +80,7 @@ async def test_amount_must_be_positive(fake_budget: Budget) -> None:
         await use_case.update(
             user_id=fake_budget.user_id,
             budget_id=fake_budget.id,
-            name=fake.catch_phrase(),
-            description=fake.catch_phrase(),
+            name=fake.word(),
+            description=fake.sentence(),
             amount=fake.pyfloat(positive=False),  # negative
         )

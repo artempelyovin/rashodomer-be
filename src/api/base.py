@@ -50,7 +50,7 @@ def write_response(
     return APIResponse[schema](result=result, status_code=status_code, error=None)  # type: ignore[valid-type]
 
 
-def write_response_list(  # noqa: PLR0913
+def write_response_list(
     total: int,
     items: Iterable[Any],
     schema: type[PydanticSchema],
