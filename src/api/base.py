@@ -12,23 +12,24 @@ class FromAttributeModel(BaseModel):
 PydanticSchema = TypeVar("PydanticSchema", bound=FromAttributeModel)
 
 
+class ErrorSchema(BaseModel):
+    type: str = Field(..., description="Error type")
+    detail: str = Field(
+        ..., description="Detailed description of the error (`null` if there is no error)", examples=[None]
+    )
+
+
 class _BaseResponse(BaseModel, Generic[PydanticSchema]):
     result: Any | None = None
     status_code: int = Field(default=status.HTTP_200_OK, description="HTTP status code")
-    error: bool = Field(
-        default=False,
-        description="Presence of an error (`true` if there is an error and `false` otherwise)",
-    )
-    detail: str | None = Field(
-        default=None, description="Detailed description of the error (`null` if there is no error)", examples=[None]
-    )
+    error: ErrorSchema | None = Field(default=None, description="Details of the error, if any (otherwise `null`)", examples=[None])
 
 
 class APIResponse(_BaseResponse[PydanticSchema]):
     result: PydanticSchema | None = Field(None, description="Useful content (`null` if there is an error)")
 
 
-class ListSchema(BaseModel, Generic[PydanticSchema]):
+class ResultListSchema(BaseModel, Generic[PydanticSchema]):
     total: int = Field(..., ge=0, examples=[1])
     limit: int | None = Field(None, ge=0)
     offset: int = Field(0, ge=0)
@@ -36,25 +37,15 @@ class ListSchema(BaseModel, Generic[PydanticSchema]):
 
 
 class APIResponseList(_BaseResponse[PydanticSchema]):
-    result: ListSchema[PydanticSchema] = Field(
+    result: ResultListSchema[PydanticSchema] = Field(
         default_factory=list, description="Useful content (`null` if there is an error)"
     )
 
 
 def write_response(
-    result: Any,
-    schema: type[PydanticSchema],
-    *,
-    status_code: int = status.HTTP_200_OK,
-    error: bool = False,
-    detail: str | None = None,
+    result: Any, schema: type[PydanticSchema], *, status_code: int = status.HTTP_200_OK
 ) -> APIResponse[PydanticSchema]:
-    return APIResponse[schema](  # type: ignore[valid-type]
-        result=result,
-        status_code=status_code,
-        error=error,
-        detail=detail,
-    )
+    return APIResponse[schema](result=result, status_code=status_code, error=None)  # type: ignore[valid-type]
 
 
 def write_response_list(  # noqa: PLR0913
@@ -65,8 +56,6 @@ def write_response_list(  # noqa: PLR0913
     limit: int | None = None,
     offset: int = 0,
     status_code: int = status.HTTP_200_OK,
-    error: bool = False,
-    detail: str | None = None,
 ) -> APIResponseList[PydanticSchema]:
     return APIResponseList[schema].model_validate(  # type: ignore[valid-type]
         {
@@ -77,7 +66,6 @@ def write_response_list(  # noqa: PLR0913
                 "items": items,
             },
             "status_code": status_code,
-            "error": error,
-            "detail": detail,
+            "error": None,
         }
     )
