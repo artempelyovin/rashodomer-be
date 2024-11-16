@@ -46,8 +46,8 @@ async def create_budget(
     tags=["budgets"],
 )
 async def list_budgets(
-    limit: int | None = None,
-    offset: int = 0,
+    limit: int | None = Query(None, description="Number of budgets to return"),
+    offset: int = Query(0, description="Offset of the budgets to return"),
     *,
     user: User = Depends(authentication_user),
     budget_service: BudgetService = Depends(budget_service_factory),
@@ -65,9 +65,9 @@ async def list_budgets(
     tags=["budgets"],
 )
 async def find_budgets(
-    text: str = Query(..., description="Search text"),
-    limit: int | None = None,
-    offset: int = 0,
+    text: str = Query(..., description="Search text", example="Cash"),
+    limit: int | None = Query(None, description="Number of budgets to return"),
+    offset: int = Query(0, description="Offset of the budgets to return"),
     *,
     user: User = Depends(authentication_user),
     budget_service: BudgetService = Depends(budget_service_factory),
