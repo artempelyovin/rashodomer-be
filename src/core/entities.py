@@ -33,6 +33,7 @@ class Category:
     name: str  # type: ignore[misc]
     description: str  # type: ignore[misc]
     type: CategoryType  # type: ignore[misc]
+    emoji_icon: str | None = field(default=None, kw_only=True)
     is_archived: bool = field(default=False, kw_only=True)
     user_id: Annotated[str, UUID]  # type: ignore[misc]
     created_at: datetime = field(default_factory=datetime.now, kw_only=True)

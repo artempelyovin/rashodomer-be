@@ -191,8 +191,8 @@ class FileCategoryService(CategoryService, JsonFileMixin):
     def __init__(self) -> None:
         self._categories: dict[str, Category] = self.load()
 
-    async def create(self, user_id: str, name: str, description: str, category_type: CategoryType) -> Category:
-        category = Category(name=name, description=description, type=category_type, user_id=user_id)
+    async def create(self, user_id: str, name: str, description: str, category_type: CategoryType, emoji_icon: str | None) -> Category:
+        category = Category(name=name, description=description, type=category_type, user_id=user_id, emoji_icon=emoji_icon)
         self._categories[category.id] = category
         self.save(self._categories)
         return category
@@ -213,12 +213,13 @@ class FileCategoryService(CategoryService, JsonFileMixin):
         return paginate(user_categories, limit, offset)
 
     async def change_category(
-        self,
-        category_id: str,
-        name: str | None = None,
-        description: str | None = None,
-        category_type: CategoryType | None = None,
-        is_archived: bool | None = None,
+            self,
+            category_id: str,
+            name: str | None = None,
+            description: str | None = None,
+            category_type: CategoryType | None = None,
+            is_archived: bool | None = None,
+            emoji_icon: str | None = None,
     ) -> Category:
         category = self._categories[category_id]
         if name is not None:
@@ -229,6 +230,8 @@ class FileCategoryService(CategoryService, JsonFileMixin):
             category.type = category_type
         if is_archived is not None:
             category.is_archived = is_archived
+        if emoji_icon != category.emoji_icon:
+            category.emoji_icon = emoji_icon
         self.save(self._categories)
         return category
 
