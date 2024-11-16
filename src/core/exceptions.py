@@ -92,3 +92,9 @@ class BudgetAccessDeniedError(BaseCoreError):
 class UnauthorizedError(BaseCoreError):
     def message(self) -> str:
         return _("Authentication failed")
+
+
+@dataclass(frozen=True)
+class EmptyInputError(BaseCoreError):
+    def message(self) -> str:
+        return _("Input cannot be empty. Please provide a valid input")

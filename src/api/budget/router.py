@@ -1,7 +1,7 @@
 # ruff: noqa: B008
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Path
+from fastapi import APIRouter, Depends, Path, Query
 from pydantic import UUID4
 from starlette import status
 
@@ -12,6 +12,7 @@ from core.entities import User
 from core.services import BudgetService
 from core.use_cases.budget_create import CreateBudgetUseCase
 from core.use_cases.budget_delete import DeleteBudgetUseCase
+from core.use_cases.budget_find import FindBudgetUseCase
 from core.use_cases.budget_get import GetBudgetUseCase
 from core.use_cases.budget_list import ListBudgetUseCase
 from core.use_cases.budget_update import UpdateBudgetUseCase
@@ -53,6 +54,26 @@ async def list_budgets(
 ) -> APIResponseList[BudgetSchema]:
     use_case = ListBudgetUseCase(budget_service=budget_service)
     total, budgets = await use_case.list(user_id=user.id, limit=limit, offset=offset)
+    return write_response_list(items=budgets, total=total, limit=limit, offset=offset, schema=BudgetSchema)
+
+
+@router.get(
+    "/v1/budgets/find",
+    status_code=status.HTTP_200_OK,
+    summary="Find budgets",
+    description="Find budgets by name or description",
+    tags=["budgets"],
+)
+async def find_budgets(
+    text: str = Query(..., description="Search text"),
+    limit: int | None = None,
+    offset: int = 0,
+    *,
+    user: User = Depends(authentication_user),
+    budget_service: BudgetService = Depends(budget_service_factory),
+) -> APIResponseList[BudgetSchema]:
+    use_case = FindBudgetUseCase(budget_service=budget_service)
+    total, budgets = await use_case.find(user_id=user.id, text=text, limit=limit, offset=offset)
     return write_response_list(items=budgets, total=total, limit=limit, offset=offset, schema=BudgetSchema)
 
 

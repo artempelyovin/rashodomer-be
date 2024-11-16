@@ -152,6 +152,16 @@ class FileBudgetService(BudgetService, JsonFileMixin):
         budgets = [budget for budget in self._budgets.values() if budget.user_id == user_id and budget.name == name]
         return paginate(budgets, limit, offset)
 
+    async def find_by_text(
+        self, user_id: str, text: str, limit: int | None = None, offset: int = 0
+    ) -> tuple[Total, list[Budget]]:
+        budgets = [
+            budget
+            for budget in self._budgets.values()
+            if budget.user_id == user_id and (text in budget.name or text in budget.description)
+        ]
+        return paginate(budgets, limit, offset)
+
     async def change_budget(
         self,
         budget_id: str,

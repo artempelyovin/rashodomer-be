@@ -65,6 +65,11 @@ class BudgetService(ABC):
     ) -> tuple[Total, list[Budget]]: ...
 
     @abstractmethod
+    async def find_by_text(
+        self, user_id: str, text: str, limit: int | None = None, offset: int = 0
+    ) -> tuple[Total, list[Budget]]: ...
+
+    @abstractmethod
     async def change_budget(
         self,
         budget_id: str,
