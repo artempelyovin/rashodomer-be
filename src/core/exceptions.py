@@ -1,10 +1,10 @@
-from abc import abstractmethod
+from abc import abstractmethod, ABC
 from dataclasses import dataclass
 
 from core.utils import _
 
 
-class BaseCoreError(Exception):
+class BaseCoreError(ABC, Exception):
     @abstractmethod
     def message(self) -> str:
         pass
