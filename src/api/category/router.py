@@ -13,6 +13,7 @@ from core.enums import CategoryType
 from core.services import CategoryService, EmojiService
 from core.use_cases.category.create import CreateCategoryUseCase
 from core.use_cases.category.delete import DeleteCategoryUseCase
+from core.use_cases.category.find import FindCategoryUseCase
 from core.use_cases.category.get import GetCategoryUseCase
 from core.use_cases.category.list import ListCategoryUseCase
 from core.use_cases.category.update import UpdateCategoryUseCase
@@ -65,6 +66,29 @@ async def list_categories(
     use_case = ListCategoryUseCase(category_service=category_service)
     total, categories = await use_case.list(
         user_id=user.id, category_type=category_type, limit=limit, show_archived=show_archived, offset=offset
+    )
+    return write_response_list(items=categories, total=total, limit=limit, offset=offset, schema=CategorySchema)
+
+
+@router.get(
+    "/v1/categories/find",
+    status_code=status.HTTP_200_OK,
+    summary="Find categories",
+    description="Find categories by name or description",
+    tags=["categories"],
+)
+async def find_categories(
+    text: str = Query(..., description="Search text", example="Cash"),
+    case_sensitive: bool = Query(False, description="Case sensitive when searching"),  # noqa: FBT001, FBT003
+    limit: int | None = Query(None, description="Number of categories to return"),
+    offset: int = Query(0, description="Offset of the categories to return"),
+    *,
+    user: User = Depends(authentication_user),
+    category_service: CategoryService = Depends(category_service_factory),
+) -> APIResponseList[CategorySchema]:
+    use_case = FindCategoryUseCase(category_service=category_service)
+    total, categories = await use_case.find(
+        user_id=user.id, text=text, case_sensitive=case_sensitive, limit=limit, offset=offset
     )
     return write_response_list(items=categories, total=total, limit=limit, offset=offset, schema=CategorySchema)
 

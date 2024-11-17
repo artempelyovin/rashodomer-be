@@ -26,5 +26,5 @@ async def success(fake_category: Category) -> None:
 
     assert total == expected_total
     assert len(categories) == len(expected_categories)
-    for category, expected_category in zip(categories, categories, strict=True):
+    for category, expected_category in zip(categories, expected_categories, strict=True):
         assert category == expected_category
