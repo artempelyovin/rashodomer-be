@@ -16,6 +16,7 @@ from core.services import (
     Total,
     UserService,
 )
+from core.utils import UnsetValue, UNSET
 
 
 def paginate[T](items: list[T], limit: int | None = None, offset: int = 0) -> tuple[Total, list[T]]:
@@ -240,22 +241,22 @@ class FileCategoryService(CategoryService, JsonFileMixin):
     async def change_category(
         self,
         category_id: str,
-        name: str | None = None,
-        description: str | None = None,
-        category_type: CategoryType | None = None,
-        is_archived: bool | None = None,
-        emoji_icon: str | None = None,
+        name: str | UnsetValue = UNSET,
+        description: str | UnsetValue = UNSET,
+        category_type: CategoryType | UnsetValue = UNSET,
+        is_archived: bool | UnsetValue = UNSET,
+        emoji_icon: str | None | UnsetValue = UNSET,
     ) -> Category:
         category = self._categories[category_id]
-        if name is not None:
+        if not isinstance(name, UnsetValue):
             category.name = name
-        if description is not None:
+        if not isinstance(description, UnsetValue):
             category.description = description
-        if category_type is not None:
+        if not isinstance(category_type, UnsetValue):
             category.type = category_type
-        if is_archived is not None:
+        if not isinstance(is_archived, UnsetValue):
             category.is_archived = is_archived
-        if emoji_icon != category.emoji_icon:
+        if not isinstance(emoji_icon, UnsetValue):
             category.emoji_icon = emoji_icon
         self.save(self._categories)
         return category

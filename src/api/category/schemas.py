@@ -7,33 +7,43 @@ from pydantic import Field
 from api.base import FromAttributeModel
 from core.enums import CategoryType
 
-IdField = Field(..., description="Unique ID of the category")
-NameField = Field(..., description="The name of the category", examples=["Groceries"])
-DescriptionField = Field(
-    ..., description="The description of the category", examples=["Products purchased in grocery stores"]
-)
-CategoryTypeField = Field(..., description="The type of category", examples=[CategoryType.EXPENSE])
-EmojiIconField = Field(None, description="Emoji icon", examples=["🥦"])
-IsArchivedField = Field(..., description="Is the category archived?", examples=[False])
-UserIDField = Field(..., description="ID of user who created this category")
-CreatedAtField = Field(..., description="Date when category was created")
-UpdatedAtField = Field(..., description="Date when category was updated")
+IdDesc = "Unique ID of the category"
+NameDesc = description = "The name of the category"
+NameExamples = ["Groceries"]
+DescriptionDesc = "The description of the category"
+DescriptionExamples = ["Products purchased in grocery stores"]
+CategoryTypeDesc = "The type of category"
+CategoryTypeExamples = [CategoryType.EXPENSE]
+EmojiIconDesc = "Emoji icon"
+EmojiExamples = ["🥦"]
+IsArchivedDesc = "Is the category archived?"
+UserIDDesc = "ID of user who created this category"
+CreatedAtDesc = "Date when category was created"
+UpdatedAtDesc = "Date when category was updated"
 
 
 class CreateCategorySchema(FromAttributeModel):
-    name: str = NameField
-    description: str = DescriptionField
-    type: CategoryType = CategoryTypeField
-    emoji_icon: str | None = EmojiIconField
+    name: str = Field(..., description=NameDesc, examples=NameExamples)
+    description: str = Field("", description=DescriptionDesc, examples=DescriptionExamples)
+    type: CategoryType = Field(..., description=CategoryTypeDesc, examples=CategoryTypeExamples)
+    emoji_icon: str | None = Field(None, description=EmojiIconDesc, examples=EmojiExamples)
+
+
+class UpdateCategorySchema(FromAttributeModel):
+    name: str | None = Field(None, description=NameDesc, examples=NameExamples)
+    description: str | None = Field(None, description=DescriptionDesc, examples=DescriptionExamples)
+    type: CategoryType | None = Field(None, description=CategoryTypeDesc, examples=CategoryTypeExamples)
+    is_archived: bool | None = Field(None, description=IsArchivedDesc, examples=[True])
+    emoji_icon: str | None = Field(None, description=EmojiIconDesc, examples=EmojiExamples)
 
 
 class CategorySchema(FromAttributeModel):
-    id: Annotated[str, UUID] = IdField
-    name: str = NameField
-    description: str = DescriptionField
-    type: CategoryType = CategoryTypeField
-    emoji_icon: str | None = EmojiIconField
-    is_archived: bool = IsArchivedField
-    user_id: Annotated[str, UUID] = UserIDField
-    created_at: datetime = CreatedAtField
-    updated_at: datetime = UpdatedAtField
+    id: Annotated[str, UUID] = Field(..., description=UserIDDesc)
+    name: str = Field(..., description=NameDesc, examples=NameExamples)
+    description: str = Field(..., description=DescriptionDesc, examples=DescriptionExamples)
+    type: CategoryType = Field(..., description=CategoryTypeDesc, examples=CategoryTypeExamples)
+    emoji_icon: str | None = Field(..., description=EmojiIconDesc, examples=EmojiExamples)
+    is_archived: bool = Field(..., description=IsArchivedDesc, examples=[False])
+    user_id: Annotated[str, UUID] = Field(..., description=UserIDDesc)
+    created_at: datetime = Field(..., description=CreatedAtDesc)
+    updated_at: datetime = Field(..., description=UpdatedAtDesc)
