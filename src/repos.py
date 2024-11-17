@@ -16,7 +16,7 @@ from core.services import (
     Total,
     UserService,
 )
-from core.utils import UnsetValue, UNSET
+from core.utils import UNSET, UnsetValue
 
 
 def paginate[T](items: list[T], limit: int | None = None, offset: int = 0) -> tuple[Total, list[T]]:
@@ -261,9 +261,10 @@ class FileCategoryService(CategoryService, JsonFileMixin):
         self.save(self._categories)
         return category
 
-    async def delete(self, category_id: str) -> None:
-        self._categories.pop(category_id)
+    async def delete(self, category_id: str) -> Category:
+        category = self._categories.pop(category_id)
         self.save(self._categories)
+        return category
 
 
 class FileExpenseService(ExpenseService, JsonFileMixin):
