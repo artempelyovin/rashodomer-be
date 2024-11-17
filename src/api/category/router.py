@@ -12,6 +12,7 @@ from core.entities import User
 from core.enums import CategoryType
 from core.services import CategoryService, EmojiService
 from core.use_cases.category.create import CreateCategoryUseCase
+from core.use_cases.category.delete import DeleteCategoryUseCase
 from core.use_cases.category.get import GetCategoryUseCase
 from core.use_cases.category.list import ListCategoryUseCase
 from core.use_cases.category.update import UpdateCategoryUseCase
@@ -111,4 +112,22 @@ async def update_category(
         is_archived=params.get("is_archived", UNSET),
         emoji_icon=params.get("emoji_icon", UNSET),
     )
+    return write_response(result=category, schema=CategorySchema)
+
+
+@router.delete(
+    "/v1/categories/{category_id}",
+    status_code=status.HTTP_200_OK,
+    summary="Delete category",
+    description="Delete the category by its ID",
+    tags=["categories"],
+)
+async def delete_categories(
+    category_id: Annotated[str, UUID] = Path(..., description="The ID of the category"),
+    *,
+    user: User = Depends(authentication_user),
+    category_service: CategoryService = Depends(category_service_factory),
+) -> APIResponse[CategorySchema]:
+    use_case = DeleteCategoryUseCase(category_service=category_service)
+    category = await use_case.delete(user_id=user.id, category_id=category_id)
     return write_response(result=category, schema=CategorySchema)

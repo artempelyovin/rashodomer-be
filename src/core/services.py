@@ -3,7 +3,7 @@ from datetime import datetime
 
 from core.entities import Budget, Category, Expense, Income, User
 from core.enums import CategoryType
-from core.utils import UnsetValue, UNSET
+from core.utils import UNSET, UnsetValue
 
 type Total = int
 
@@ -130,7 +130,7 @@ class CategoryService(ABC):
     ) -> Category: ...
 
     @abstractmethod
-    async def delete(self, category_id: str) -> None: ...
+    async def delete(self, category_id: str) -> Category: ...
 
 
 class ExpenseService(ABC):
