@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, Path, Query
 from starlette import status
 
 from api.base import APIResponse, APIResponseList, write_response, write_response_list
-from api.category.schemas import CategorySchema, CreateCategorySchema
+from api.category.schemas import CategorySchema, CreateCategorySchema, UpdateCategorySchema
 from api.depends import authentication_user, category_service_factory, emoji_service_factory
 from core.entities import User
 from core.enums import CategoryType
@@ -14,6 +14,8 @@ from core.services import CategoryService, EmojiService
 from core.use_cases.category.create import CreateCategoryUseCase
 from core.use_cases.category.get import GetCategoryUseCase
 from core.use_cases.category.list import ListCategoryUseCase
+from core.use_cases.category.update import UpdateCategoryUseCase
+from core.utils import UNSET
 
 router = APIRouter()
 
@@ -81,4 +83,32 @@ async def get_category(
 ) -> APIResponse[CategorySchema]:
     use_case = GetCategoryUseCase(category_service=category_service)
     category = await use_case.get(user_id=user.id, category_id=category_id)
+    return write_response(result=category, schema=CategorySchema)
+
+
+@router.patch(
+    "/v1/categories/{category_id}",
+    status_code=status.HTTP_200_OK,
+    summary="Update category",
+    description="Update the category by its ID",
+    tags=["categories"],
+)
+async def update_category(
+    body: UpdateCategorySchema,
+    category_id: Annotated[str, UUID] = Path(..., description="The ID of the category"),
+    *,
+    user: User = Depends(authentication_user),
+    category_service: CategoryService = Depends(category_service_factory),
+) -> APIResponse[CategorySchema]:
+    params = body.model_dump(exclude_unset=True)
+    use_case = UpdateCategoryUseCase(category_service=category_service)
+    category = await use_case.update(
+        user_id=user.id,
+        category_id=category_id,
+        name=params.get("name", UNSET),
+        description=params.get("description", UNSET),
+        category_type=params.get("type", UNSET),
+        is_archived=params.get("is_archived", UNSET),
+        emoji_icon=params.get("emoji_icon", UNSET),
+    )
     return write_response(result=category, schema=CategorySchema)

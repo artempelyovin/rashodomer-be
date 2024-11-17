@@ -3,6 +3,7 @@ from datetime import datetime
 
 from core.entities import Budget, Category, Expense, Income, User
 from core.enums import CategoryType
+from core.utils import UnsetValue, UNSET
 
 type Total = int
 
@@ -121,11 +122,11 @@ class CategoryService(ABC):
     async def change_category(
         self,
         category_id: str,
-        name: str | None = None,
-        description: str | None = None,
-        category_type: CategoryType | None = None,
-        is_archived: bool | None = None,
-        emoji_icon: str | None = None,
+        name: str | UnsetValue = UNSET,
+        description: str | UnsetValue = UNSET,
+        category_type: CategoryType | UnsetValue = UNSET,
+        is_archived: bool | UnsetValue = UNSET,
+        emoji_icon: str | None | UnsetValue = UNSET,
     ) -> Category: ...
 
     @abstractmethod
