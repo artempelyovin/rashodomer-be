@@ -81,7 +81,7 @@ class BudgetNotExistsError(BaseCoreError):
 
 class BudgetAccessDeniedError(BaseCoreError):
     def message(self) -> str:
-        return _("Attempt to access another user's budget.")
+        return _("Attempt to access another user's budget")
 
 
 class UnauthorizedError(BaseCoreError):
@@ -118,3 +118,16 @@ class CategoryAlreadyExistsError(BaseCoreError):
         return _("A category with the name '{name}' and type '{category_type}' already exists").format(
             name=self.name, category_type=self.category_type
         )
+
+
+@dataclass(frozen=True)
+class CategoryNotExistsError(BaseCoreError):
+    category_id: str
+
+    def message(self) -> str:
+        return _("Category with ID '{category_id}' does not exist").format(category_id=self.category_id)
+
+
+class CategoryAccessDeniedError(BaseCoreError):
+    def message(self) -> str:
+        return _("Attempt to access another user's category")

@@ -202,7 +202,7 @@ class FileCategoryService(CategoryService, JsonFileMixin):
         return category
 
     async def get(self, category_id: str) -> Category | None:
-        return self._categories[category_id]
+        return self._categories.get(category_id, None)
 
     async def list_(
         self,

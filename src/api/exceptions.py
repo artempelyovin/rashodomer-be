@@ -9,7 +9,9 @@ from core.exceptions import (
     BudgetAccessDeniedError,
     BudgetAlreadyExistsError,
     BudgetNotExistsError,
+    CategoryAccessDeniedError,
     CategoryAlreadyExistsError,
+    CategoryNotExistsError,
     EmptyBudgetTextError,
     EmptyCategoryNameError,
     IncorrectPasswordError,
@@ -38,6 +40,8 @@ CORE_ERROR_TO_HTTP_STATUS_MAPPING: dict[type[BaseCoreError], int] = {
     EmptyCategoryNameError: status.HTTP_400_BAD_REQUEST,
     NotEmojiIconError: status.HTTP_400_BAD_REQUEST,
     CategoryAlreadyExistsError: status.HTTP_400_BAD_REQUEST,
+    CategoryNotExistsError: status.HTTP_404_NOT_FOUND,
+    CategoryAccessDeniedError: status.HTTP_403_FORBIDDEN,
 }
 
 

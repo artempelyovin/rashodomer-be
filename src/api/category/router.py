@@ -1,6 +1,8 @@
 # ruff: noqa: B008
+from typing import Annotated
+from uuid import UUID
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Path, Query
 from starlette import status
 
 from api.base import APIResponse, APIResponseList, write_response, write_response_list
@@ -10,6 +12,7 @@ from core.entities import User
 from core.enums import CategoryType
 from core.services import CategoryService, EmojiService
 from core.use_cases.category.create import CreateCategoryUseCase
+from core.use_cases.category.get import GetCategoryUseCase
 from core.use_cases.category.list import ListCategoryUseCase
 
 router = APIRouter()
@@ -61,3 +64,21 @@ async def list_categories(
         user_id=user.id, category_type=category_type, limit=limit, show_archived=show_archived, offset=offset
     )
     return write_response_list(items=categories, total=total, limit=limit, offset=offset, schema=CategorySchema)
+
+
+@router.get(
+    "/v1/categories/{category_id}",
+    status_code=status.HTTP_200_OK,
+    summary="Get category",
+    description="Returns the category by its ID",
+    tags=["categories"],
+)
+async def get_category(
+    category_id: Annotated[str, UUID] = Path(..., description="The ID of the category"),
+    *,
+    user: User = Depends(authentication_user),
+    category_service: CategoryService = Depends(category_service_factory),
+) -> APIResponse[CategorySchema]:
+    use_case = GetCategoryUseCase(category_service=category_service)
+    category = await use_case.get(user_id=user.id, category_id=category_id)
+    return write_response(result=category, schema=CategorySchema)
