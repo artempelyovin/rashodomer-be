@@ -3,7 +3,7 @@ from unittest.mock import Mock
 import pytest
 
 from core.entities import Category
-from core.enums import CategoryType
+from core.enums import TransactionType
 from core.exceptions import CategoryAccessDeniedError, CategoryNotExistsError
 from core.services import CategoryService
 from core.use_cases.category.update import UpdateCategoryUseCase
@@ -19,7 +19,7 @@ async def test_success(fake_category: Category) -> None:
         user_id=fake_category.user_id,
         name=fake.word(),
         description=fake.sentence(),
-        type=fake.random_element(list(CategoryType)),
+        type=fake.random_element(list(TransactionType)),
         is_archived=fake.pybool(),
         emoji_icon=fake.emoji(),
     )
@@ -31,7 +31,7 @@ async def test_success(fake_category: Category) -> None:
         category_id=fake_category.id,
         name=updated_category.name,
         description=updated_category.description,
-        category_type=updated_category.type,
+        transaction_type=updated_category.type,
         is_archived=updated_category.is_archived,
         emoji_icon=updated_category.emoji_icon,
     )
@@ -54,7 +54,7 @@ async def test_category_not_exists(fake_category: Category) -> None:
             category_id=fake_category.id,
             name=UNSET,
             description=UNSET,
-            category_type=UNSET,
+            transaction_type=UNSET,
             is_archived=UNSET,
             emoji_icon=UNSET,
         )
@@ -71,7 +71,7 @@ async def test_category_access_denied(fake_category: Category) -> None:
             category_id=fake_category.id,
             name=UNSET,
             description=UNSET,
-            category_type=UNSET,
+            transaction_type=UNSET,
             is_archived=UNSET,
             emoji_icon=UNSET,
         )

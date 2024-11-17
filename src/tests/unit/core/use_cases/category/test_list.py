@@ -3,7 +3,7 @@ import random
 from unittest.mock import Mock
 
 from core.entities import Category
-from core.enums import CategoryType
+from core.enums import TransactionType
 from core.services import CategoryService
 from core.use_cases.category.list import ListCategoryUseCase
 from tests.unit.core.conftest import fake
@@ -18,7 +18,7 @@ async def test_success(fake_category: Category) -> None:
 
     total, categories = await use_case.list(
         user_id=fake_category.user_id,
-        category_type=random.choice(list(CategoryType)),
+        transaction_type=random.choice(list(TransactionType)),
         show_archived=fake.pybool(),
         limit=None,
         offset=0,

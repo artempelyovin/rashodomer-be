@@ -8,19 +8,17 @@ from core.services import (
     BudgetService,
     CategoryService,
     EmojiService,
-    ExpenseService,
-    IncomeService,
     PasswordService,
     TokenService,
+    TransactionService,
     UserService,
 )
 from core.use_cases.auth.authenticate import AuthenticationUseCase
 from repos import (
     FileBudgetService,
     FileCategoryService,
-    FileExpenseService,
-    FileIncomeService,
     FileTokenService,
+    FileTransactionService,
     FileUserService,
 )
 from services import EmojiPackageService, PasswordBcryptService
@@ -54,12 +52,8 @@ def category_service_factory() -> CategoryService:
     return FileCategoryService()
 
 
-def expense_service_factory() -> ExpenseService:
-    return FileExpenseService()
-
-
-def income_service_factory() -> IncomeService:
-    return FileIncomeService()
+def expense_service_factory() -> TransactionService:
+    return FileTransactionService()
 
 
 async def authentication_user(

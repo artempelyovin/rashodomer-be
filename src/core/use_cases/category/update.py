@@ -1,5 +1,5 @@
 from core.entities import Category
-from core.enums import CategoryType
+from core.enums import TransactionType
 from core.exceptions import CategoryAccessDeniedError, CategoryNotExistsError
 from core.services import CategoryService
 from core.utils import UnsetValue
@@ -15,7 +15,7 @@ class UpdateCategoryUseCase:
         category_id: str,
         name: str | UnsetValue,
         description: str | UnsetValue,
-        category_type: CategoryType | UnsetValue,
+        transaction_type: TransactionType | UnsetValue,
         is_archived: bool | UnsetValue,
         emoji_icon: str | None | UnsetValue,
     ) -> Category:
@@ -28,8 +28,8 @@ class UpdateCategoryUseCase:
             category_id=category_id,
             name=name,
             description=description,
-            category_type=category_type,
+            transaction_type=transaction_type,
             is_archived=is_archived,
             emoji_icon=emoji_icon,
         )
-        # тут логика по изменению бюджетов, при условии смены `category_type`
+        # тут логика по изменению бюджетов, при условии смены `transaction_type`

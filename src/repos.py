@@ -5,15 +5,14 @@ from typing import Any
 
 import ujson
 
-from core.entities import Budget, Category, Expense, Income, User
-from core.enums import CategoryType
+from core.entities import Budget, Category, Transaction, User
+from core.enums import TransactionType
 from core.services import (
     BudgetService,
     CategoryService,
-    ExpenseService,
-    IncomeService,
     TokenService,
     Total,
+    TransactionService,
     UserService,
 )
 from core.utils import UNSET, UnsetValue
@@ -194,10 +193,10 @@ class FileCategoryService(CategoryService, JsonFileMixin):
         self._categories: dict[str, Category] = self.load()
 
     async def create(
-        self, user_id: str, name: str, description: str, category_type: CategoryType, emoji_icon: str | None
+        self, user_id: str, name: str, description: str, transaction_type: TransactionType, emoji_icon: str | None
     ) -> Category:
         category = Category(
-            name=name, description=description, type=category_type, user_id=user_id, emoji_icon=emoji_icon
+            name=name, description=description, type=transaction_type, user_id=user_id, emoji_icon=emoji_icon
         )
         self._categories[category.id] = category
         self.save(self._categories)
@@ -209,7 +208,7 @@ class FileCategoryService(CategoryService, JsonFileMixin):
     async def list_(
         self,
         user_id: str,
-        category_type: CategoryType,
+        transaction_type: TransactionType,
         *,
         show_archived: bool = False,
         limit: int | None = None,
@@ -218,7 +217,7 @@ class FileCategoryService(CategoryService, JsonFileMixin):
         user_categories = [
             category
             for category in self._categories.values()
-            if category.user_id == user_id and category.type == category_type
+            if category.user_id == user_id and category.type == transaction_type
         ]
         if not show_archived:
             user_categories = [category for category in user_categories if not category.is_archived]
@@ -228,15 +227,15 @@ class FileCategoryService(CategoryService, JsonFileMixin):
         self,
         user_id: str,
         name: str,
-        category_type: CategoryType | None = None,
+        transaction_type: TransactionType | None = None,
         limit: int | None = None,
         offset: int = 0,
     ) -> tuple[Total, list[Category]]:
         user_categories = [
             category for category in self._categories.values() if category.user_id == user_id and category.name == name
         ]
-        if category_type is not None:
-            user_categories = [category for category in user_categories if category.type == category_type]
+        if transaction_type is not None:
+            user_categories = [category for category in user_categories if category.type == transaction_type]
         return paginate(user_categories, limit, offset)
 
     async def find_by_text(
@@ -257,7 +256,7 @@ class FileCategoryService(CategoryService, JsonFileMixin):
         category_id: str,
         name: str | UnsetValue = UNSET,
         description: str | UnsetValue = UNSET,
-        category_type: CategoryType | UnsetValue = UNSET,
+        transaction_type: TransactionType | UnsetValue = UNSET,
         is_archived: bool | UnsetValue = UNSET,
         emoji_icon: str | None | UnsetValue = UNSET,
     ) -> Category:
@@ -266,8 +265,8 @@ class FileCategoryService(CategoryService, JsonFileMixin):
             category.name = name
         if not isinstance(description, UnsetValue):
             category.description = description
-        if not isinstance(category_type, UnsetValue):
-            category.type = category_type
+        if not isinstance(transaction_type, UnsetValue):
+            category.type = transaction_type
         if not isinstance(is_archived, UnsetValue):
             category.is_archived = is_archived
         if not isinstance(emoji_icon, UnsetValue):
@@ -281,36 +280,64 @@ class FileCategoryService(CategoryService, JsonFileMixin):
         return category
 
 
-class FileExpenseService(ExpenseService, JsonFileMixin):
+class FileTransactionService(TransactionService, JsonFileMixin):
     collection = "expenses"
 
     def __init__(self) -> None:
-        self._expenses: dict[str, Expense] = self.load()
+        self._expenses: dict[str, Transaction] = self.load()
 
     async def create(
-        self, amount: float, description: str, category_id: str, user_id: str, timestamp: datetime.datetime
-    ) -> Expense:
-        expense = Expense(
-            amount=amount, description=description, category_id=category_id, user_id=user_id, timestamp=timestamp
+        self,
+        amount: float,
+        description: str,
+        transaction_type: TransactionType,
+        budget_id: str,
+        category_id: str,
+        user_id: str,
+        timestamp: datetime.datetime,
+    ) -> Transaction:
+        expense = Transaction(
+            amount=amount,
+            description=description,
+            type=transaction_type,
+            budget_id=budget_id,
+            category_id=category_id,
+            user_id=user_id,
+            timestamp=timestamp,
         )
         self._expenses[expense.id] = expense
         self.save(self._expenses)
         return expense
 
-    async def get(self, expense_id: str) -> Expense | None:
-        return self._expenses[expense_id]
+    async def get(self, transaction_id: str) -> Transaction | None:
+        return self._expenses.get(transaction_id, None)
 
-    async def list_(self, user_id: str, limit: int | None = None, offset: int = 0) -> tuple[Total, list[Expense]]:
+    async def list_(
+        self,
+        user_id: str,
+        *,
+        type_: TransactionType | UnsetValue = UNSET,
+        budget_id: str | UnsetValue = UNSET,
+        category_id: str | UnsetValue = UNSET,
+        limit: int | None = None,
+        offset: int = 0,
+    ) -> tuple[Total, list[Transaction]]:
         expenses = [expense for expense in self._expenses.values() if expense.user_id == user_id]
+        if not isinstance(type_, UnsetValue):
+            expenses = [e for e in expenses if e.type == type_]
+        if not isinstance(budget_id, UnsetValue):
+            expenses = [e for e in expenses if e.budget_id == budget_id]
+        if not isinstance(category_id, UnsetValue):
+            expenses = [e for e in expenses if e.category_id == category_id]
         return paginate(expenses, limit, offset)
 
-    async def update_expense(
+    async def update(
         self,
         expense_id: str,
         amount: float | UnsetValue = UNSET,
         category_id: str | UnsetValue = UNSET,
         description: str | UnsetValue = UNSET,
-    ) -> Expense:
+    ) -> Transaction:
         expense = self._expenses[expense_id]
         if not isinstance(amount, UnsetValue):
             expense.amount = amount
@@ -321,51 +348,7 @@ class FileExpenseService(ExpenseService, JsonFileMixin):
         self.save(self._expenses)
         return expense
 
-    async def delete(self, expense_id: str) -> None:
-        self._expenses.pop(expense_id)
+    async def delete(self, transaction_id: str) -> Transaction:
+        transaction = self._expenses.pop(transaction_id)
         self.save(self._expenses)
-
-
-class FileIncomeService(IncomeService, JsonFileMixin):
-    collection = "incomes"
-
-    def __init__(self) -> None:
-        self._incomes: dict[str, Income] = self.load()
-
-    async def create(
-        self, amount: float, description: str, category_id: str, user_id: str, timestamp: datetime.datetime
-    ) -> Income:
-        income = Income(
-            amount=amount, description=description, category_id=category_id, user_id=user_id, timestamp=timestamp
-        )
-        self._incomes[income.id] = income
-        self.save(self._incomes)
-        return income
-
-    async def get(self, income_id: str) -> Income | None:
-        return self._incomes[income_id]
-
-    async def list_(self, user_id: str, limit: int | None = None, offset: int = 0) -> tuple[Total, list[Income]]:
-        incomes = [income for income in self._incomes.values() if income.user_id == user_id]
-        return paginate(incomes, limit, offset)
-
-    async def update_income(
-        self,
-        income_id: str,
-        amount: float | UnsetValue = UNSET,
-        category_id: str | UnsetValue = UNSET,
-        description: str | UnsetValue = UNSET,
-    ) -> Income:
-        income = self._incomes[income_id]
-        if not isinstance(amount, UnsetValue):
-            income.amount = amount
-        if not isinstance(category_id, UnsetValue):
-            income.category_id = category_id
-        if not isinstance(description, UnsetValue):
-            income.description = description
-        self.save(self._incomes)
-        return income
-
-    async def delete(self, income_id: str) -> None:
-        self._incomes.pop(income_id)
-        self.save(self._incomes)
+        return transaction

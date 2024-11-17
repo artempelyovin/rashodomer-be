@@ -9,7 +9,7 @@ from api.base import APIResponse, APIResponseList, write_response, write_respons
 from api.category.schemas import CategorySchema, CreateCategorySchema, UpdateCategorySchema
 from api.depends import authentication_user, category_service_factory, emoji_service_factory
 from core.entities import User
-from core.enums import CategoryType
+from core.enums import TransactionType
 from core.services import CategoryService, EmojiService
 from core.use_cases.category.create import CreateCategoryUseCase
 from core.use_cases.category.delete import DeleteCategoryUseCase
@@ -43,7 +43,7 @@ async def create_category(
         user_id=user.id,
         name=body.name,
         description=body.description,
-        category_type=body.type,
+        transaction_type=body.type,
         emoji_icon=body.emoji_icon,
     )
     return write_response(result=category, schema=CategorySchema, status_code=status.HTTP_201_CREATED)
@@ -57,7 +57,7 @@ async def create_category(
     tags=[CATEGORY_TAG],
 )
 async def list_categories(
-    category_type: CategoryType = Query(..., description="The type of category"),
+    transaction_type: TransactionType = Query(..., description="The category transaction type"),
     show_archived: bool = Query(False, description="Include archived categories if `true`"),  # noqa: FBT001, FBT003
     limit: int | None = Query(None, description="Number of categories to return"),
     offset: int = Query(0, description="Offset of the categories to return"),
@@ -67,7 +67,7 @@ async def list_categories(
 ) -> APIResponseList[CategorySchema]:
     use_case = ListCategoryUseCase(category_service=category_service)
     total, categories = await use_case.list(
-        user_id=user.id, category_type=category_type, limit=limit, show_archived=show_archived, offset=offset
+        user_id=user.id, transaction_type=transaction_type, limit=limit, show_archived=show_archived, offset=offset
     )
     return write_response_list(items=categories, total=total, limit=limit, offset=offset, schema=CategorySchema)
 
@@ -134,7 +134,7 @@ async def update_category(
         category_id=category_id,
         name=params.get("name", UNSET),
         description=params.get("description", UNSET),
-        category_type=params.get("type", UNSET),
+        transaction_type=params.get("type", UNSET),
         is_archived=params.get("is_archived", UNSET),
         emoji_icon=params.get("emoji_icon", UNSET),
     )

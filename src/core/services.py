@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 from datetime import datetime
 
-from core.entities import Budget, Category, Expense, Income, User
-from core.enums import CategoryType
+from core.entities import Budget, Category, Transaction, User
+from core.enums import TransactionType
 from core.utils import UNSET, UnsetValue
 
 type Total = int
@@ -91,7 +91,7 @@ class BudgetService(ABC):
 class CategoryService(ABC):
     @abstractmethod
     async def create(
-        self, user_id: str, name: str, description: str, category_type: CategoryType, emoji_icon: str | None
+        self, user_id: str, name: str, description: str, transaction_type: TransactionType, emoji_icon: str | None
     ) -> Category: ...
 
     @abstractmethod
@@ -101,7 +101,7 @@ class CategoryService(ABC):
     async def list_(
         self,
         user_id: str,
-        category_type: CategoryType,
+        transaction_type: TransactionType,
         *,
         show_archived: bool = False,
         limit: int | None = None,
@@ -113,7 +113,7 @@ class CategoryService(ABC):
         self,
         user_id: str,
         name: str,
-        category_type: CategoryType | None = None,
+        transaction_type: TransactionType | None = None,
         limit: int | None = None,
         offset: int = 0,
     ) -> tuple[Total, list[Category]]: ...
@@ -129,7 +129,7 @@ class CategoryService(ABC):
         category_id: str,
         name: str | UnsetValue = UNSET,
         description: str | UnsetValue = UNSET,
-        category_type: CategoryType | UnsetValue = UNSET,
+        transaction_type: TransactionType | UnsetValue = UNSET,
         is_archived: bool | UnsetValue = UNSET,
         emoji_icon: str | None | UnsetValue = UNSET,
     ) -> Category: ...
@@ -138,52 +138,42 @@ class CategoryService(ABC):
     async def delete(self, category_id: str) -> Category: ...
 
 
-class ExpenseService(ABC):
+class TransactionService(ABC):
     @abstractmethod
     async def create(
-        self, amount: float, description: str, category_id: str, user_id: str, timestamp: datetime
-    ) -> Expense: ...
+        self,
+        amount: float,
+        description: str,
+        transaction_type: TransactionType,
+        budget_id: str,
+        category_id: str,
+        user_id: str,
+        timestamp: datetime,
+    ) -> Transaction: ...
 
     @abstractmethod
-    async def get(self, expense_id: str) -> Expense | None: ...
+    async def get(self, transaction_id: str) -> Transaction | None: ...
 
     @abstractmethod
-    async def list_(self, user_id: str, limit: int | None = None, offset: int = 0) -> tuple[Total, list[Expense]]: ...
+    async def list_(
+        self,
+        user_id: str,
+        *,
+        type_: TransactionType | UnsetValue = UNSET,
+        budget_id: str | UnsetValue = UNSET,
+        category_id: str | UnsetValue = UNSET,
+        limit: int | None = None,
+        offset: int = 0,
+    ) -> tuple[Total, list[Transaction]]: ...
 
     @abstractmethod
-    async def update_expense(
+    async def update(
         self,
         expense_id: str,
         amount: float | UnsetValue = UNSET,
         category_id: str | UnsetValue = UNSET,
         description: str | UnsetValue = UNSET,
-    ) -> Expense: ...
+    ) -> Transaction: ...
 
     @abstractmethod
-    async def delete(self, expense_id: str) -> None: ...
-
-
-class IncomeService(ABC):
-    @abstractmethod
-    async def create(
-        self, amount: float, description: str, category_id: str, user_id: str, timestamp: datetime
-    ) -> Income: ...
-
-    @abstractmethod
-    async def get(self, income_id: str) -> Income | None: ...
-
-    @abstractmethod
-    async def list_(self, user_id: str, limit: int | None = None, offset: int = 0) -> tuple[Total, list[Income]]: ...
-
-    @abstractmethod
-    async def update_income(
-        self,
-        income_id: str,
-        amount: float | UnsetValue = UNSET,
-        category_id: str | UnsetValue = UNSET,
-        description: str | UnsetValue = UNSET,
-    ) -> Income:
-        pass
-
-    @abstractmethod
-    async def delete(self, income_id: str) -> None: ...
+    async def delete(self, transaction_id: str) -> Transaction: ...

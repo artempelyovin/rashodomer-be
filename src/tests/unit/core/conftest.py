@@ -2,7 +2,7 @@ import pytest
 from faker import Faker
 
 from core.entities import Budget, Category, User
-from core.enums import CategoryType
+from core.enums import TransactionType
 
 fake = Faker(locale="ru_RU")
 
@@ -34,7 +34,7 @@ def fake_category() -> Category:
     return Category(
         name=fake.word(),
         description=fake.sentence(),
-        type=fake.random_element(list(CategoryType)),
+        type=fake.random_element(list(TransactionType)),
         emoji_icon=fake.random_element([None, fake.emoji()]),
         is_archived=fake.boolean(),
         user_id=str(fake.uuid4()),

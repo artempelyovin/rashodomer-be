@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Annotated
 from uuid import UUID
 
-from core.enums import CategoryType
+from core.enums import TransactionType
 from core.utils import uuid4_str
 
 
@@ -32,7 +32,7 @@ class Category:
     id: str = field(default_factory=uuid4_str, kw_only=True)
     name: str  # type: ignore[misc]
     description: str  # type: ignore[misc]
-    type: CategoryType  # type: ignore[misc]
+    type: TransactionType  # type: ignore[misc]
     emoji_icon: str | None = field(default=None, kw_only=True)
     is_archived: bool = field(default=False, kw_only=True)
     user_id: Annotated[str, UUID]  # type: ignore[misc]
@@ -41,20 +41,12 @@ class Category:
 
 
 @dataclass
-class Expense:
+class Transaction:
     id: str = field(default_factory=uuid4_str, kw_only=True)
     amount: float  # type: ignore[misc]
     description: str  # type: ignore[misc]
-    category_id: str  # type: ignore[misc]
-    user_id: str  # type: ignore[misc]
-    timestamp: datetime  # type: ignore[misc]
-
-
-@dataclass
-class Income:
-    id: str = field(default_factory=uuid4_str, kw_only=True)
-    amount: float  # type: ignore[misc]
-    description: str  # type: ignore[misc]
+    type: TransactionType  # type: ignore[misc]
+    budget_id: str  # type: ignore[misc]
     category_id: str  # type: ignore[misc]
     user_id: str  # type: ignore[misc]
     timestamp: datetime  # type: ignore[misc]

@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
-from core.enums import CategoryType
+from core.enums import TransactionType
 from core.utils import _
 
 
@@ -112,11 +112,11 @@ class NotEmojiIconError(BaseCoreError):
 @dataclass(frozen=True)
 class CategoryAlreadyExistsError(BaseCoreError):
     name: str
-    category_type: CategoryType
+    transaction_type: TransactionType
 
     def message(self) -> str:
-        return _("A category with the name '{name}' and type '{category_type}' already exists").format(
-            name=self.name, category_type=self.category_type
+        return _("A category with the name '{name}' and type '{transaction_type}' already exists").format(
+            name=self.name, transaction_type=self.transaction_type
         )
 
 

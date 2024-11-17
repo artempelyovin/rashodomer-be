@@ -1,5 +1,5 @@
 from core.entities import Category
-from core.enums import CategoryType
+from core.enums import TransactionType
 from core.services import CategoryService, Total
 
 
@@ -8,8 +8,8 @@ class ListCategoryUseCase:
         self._category_service = category_service
 
     async def list(
-        self, user_id: str, category_type: CategoryType, *, show_archived: bool, limit: int | None, offset: int
+        self, user_id: str, transaction_type: TransactionType, *, show_archived: bool, limit: int | None, offset: int
     ) -> tuple[Total, list[Category]]:
         return await self._category_service.list_(
-            user_id=user_id, category_type=category_type, show_archived=show_archived, limit=limit, offset=offset
+            user_id=user_id, transaction_type=transaction_type, show_archived=show_archived, limit=limit, offset=offset
         )

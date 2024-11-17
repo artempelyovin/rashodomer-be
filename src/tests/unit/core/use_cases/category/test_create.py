@@ -5,7 +5,7 @@ from unittest.mock import Mock
 import pytest
 
 from core.entities import Category
-from core.enums import CategoryType
+from core.enums import TransactionType
 from core.exceptions import CategoryAlreadyExistsError, EmptyCategoryNameError, NotEmojiIconError
 from core.services import CategoryService, EmojiService
 from core.use_cases.category.create import CreateCategoryUseCase
@@ -24,7 +24,7 @@ async def test_success(fake_category: Category) -> None:
         user_id=str(fake.uuid4()),
         name=fake.word(),
         description=fake.sentence(),
-        category_type=random.choice(list(CategoryType)),
+        transaction_type=random.choice(list(TransactionType)),
         emoji_icon=random.choice([None, fake.emoji()]),
     )
 
@@ -42,7 +42,7 @@ async def test_empty_category_name() -> None:
             user_id=str(fake.uuid4()),
             name="",  # empty name
             description=fake.sentence(),
-            category_type=random.choice(list(CategoryType)),
+            transaction_type=random.choice(list(TransactionType)),
             emoji_icon=random.choice([None, fake.emoji()]),
         )
 
@@ -60,7 +60,7 @@ async def test_not_emoji_icon(bad_emoji_icon: str) -> None:
             user_id=str(fake.uuid4()),
             name=fake.word(),
             description=fake.sentence(),
-            category_type=random.choice(list(CategoryType)),
+            transaction_type=random.choice(list(TransactionType)),
             emoji_icon=bad_emoji_icon,  # not emoji icon
         )
 
@@ -77,6 +77,6 @@ async def test_category_already_exists(fake_category: Category) -> None:
             user_id=str(fake.uuid4()),
             name=fake.word(),
             description=fake.sentence(),
-            category_type=random.choice(list(CategoryType)),
+            transaction_type=random.choice(list(TransactionType)),
             emoji_icon=random.choice([None, fake.emoji()]),
         )
