@@ -305,11 +305,11 @@ class FileExpenseService(ExpenseService, JsonFileMixin):
         return paginate(expenses, limit, offset)
 
     async def update_expense(
-            self,
-            expense_id: str,
-            amount: float | UnsetValue = UNSET,
-            category_id: str | UnsetValue = UNSET,
-            description: str | UnsetValue = UNSET,
+        self,
+        expense_id: str,
+        amount: float | UnsetValue = UNSET,
+        category_id: str | UnsetValue = UNSET,
+        description: str | UnsetValue = UNSET,
     ) -> Expense:
         expense = self._expenses[expense_id]
         if not isinstance(amount, UnsetValue):
