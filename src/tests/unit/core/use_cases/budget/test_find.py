@@ -16,7 +16,9 @@ async def test_success(fake_budget: Budget) -> None:
     budget_service.find_by_text.return_value = (total, budgets)
     use_case = FindBudgetUseCase(budget_service)
 
-    result_total, result_budgets = await use_case.find(user_id=str(fake.uuid4()), text="наличные", limit=None, offset=0)
+    result_total, result_budgets = await use_case.find(
+        user_id=str(fake.uuid4()), text="наличные", case_sensitive=fake.pybool(), limit=None, offset=0
+    )
 
     assert result_total == total
     assert len(result_budgets) == len(budgets)
@@ -29,4 +31,6 @@ async def test_empty_budget_text() -> None:
     use_case = FindBudgetUseCase(budget_service)
 
     with pytest.raises(EmptySearchTextError):
-        await use_case.find(user_id=str(fake.uuid4()), text="", limit=fake.pyint(), offset=fake.pyint())
+        await use_case.find(
+            user_id=str(fake.uuid4()), text="", case_sensitive=fake.pybool(), limit=fake.pyint(), offset=fake.pyint()
+        )
