@@ -11,13 +11,15 @@ from core.use_cases.auth.register import RegisterUserUseCase
 
 router = APIRouter()
 
+AUTH_TAG = "auth"
+
 
 @router.post(
     "/v1/register",
     status_code=status.HTTP_201_CREATED,
     summary="Register user",
     description="Register a new user",
-    tags=["auth"],
+    tags=[AUTH_TAG],
 )
 async def register(
     body: CreateUserSchema,
@@ -37,7 +39,7 @@ async def register(
     status_code=status.HTTP_200_OK,
     summary="Login user",
     description="Login in an existing user",
-    tags=["auth"],
+    tags=[AUTH_TAG],
 )
 async def login(
     body: UserLoginSchema,

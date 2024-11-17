@@ -19,13 +19,15 @@ from core.use_cases.budget.update import UpdateBudgetUseCase
 
 router = APIRouter()
 
+BUDGET_TAG = "budgets"
+
 
 @router.post(
     "/v1/budgets",
     status_code=status.HTTP_201_CREATED,
     summary="Create budget",
     description="Create a new budget",
-    tags=["budgets"],
+    tags=[BUDGET_TAG],
 )
 async def create_budget(
     body: CreateBudgetSchema,
@@ -43,7 +45,7 @@ async def create_budget(
     status_code=status.HTTP_200_OK,
     summary="List budget",
     description="Returns a list of the user budgets",
-    tags=["budgets"],
+    tags=[BUDGET_TAG],
 )
 async def list_budgets(
     limit: int | None = Query(None, description="Number of budgets to return"),
@@ -62,7 +64,7 @@ async def list_budgets(
     status_code=status.HTTP_200_OK,
     summary="Find budgets",
     description="Find budgets by name or description",
-    tags=["budgets"],
+    tags=[BUDGET_TAG],
 )
 async def find_budgets(
     text: str = Query(..., description="Search text", example="Cash"),
@@ -85,7 +87,7 @@ async def find_budgets(
     status_code=status.HTTP_200_OK,
     summary="Get budget",
     description="Returns the budget by its ID",
-    tags=["budgets"],
+    tags=[BUDGET_TAG],
 )
 async def get_budget(
     budget_id: Annotated[str, UUID] = Path(..., description="The ID of the budget"),
@@ -103,7 +105,7 @@ async def get_budget(
     status_code=status.HTTP_200_OK,
     summary="Update budget",
     description="Update the budget by its ID",
-    tags=["budgets"],
+    tags=[BUDGET_TAG],
 )
 async def update_budget(
     body: UpdateBudgetSchema,
@@ -124,7 +126,7 @@ async def update_budget(
     status_code=status.HTTP_200_OK,
     summary="Delete budget",
     description="Delete the budget by its ID",
-    tags=["budgets"],
+    tags=[BUDGET_TAG],
 )
 async def delete_budget(
     budget_id: Annotated[str, UUID] = Path(..., description="The ID of the budget"),

@@ -21,13 +21,15 @@ from core.utils import UNSET
 
 router = APIRouter()
 
+CATEGORY_TAG = "categories"
+
 
 @router.post(
     "/v1/categories",
     status_code=status.HTTP_201_CREATED,
     summary="Create category",
     description="Create a new category",
-    tags=["categories"],
+    tags=[CATEGORY_TAG],
 )
 async def create_category(
     body: CreateCategorySchema,
@@ -52,7 +54,7 @@ async def create_category(
     status_code=status.HTTP_200_OK,
     summary="List categories",
     description="Returns a list of the user categories",
-    tags=["categories"],
+    tags=[CATEGORY_TAG],
 )
 async def list_categories(
     category_type: CategoryType = Query(..., description="The type of category"),
@@ -75,7 +77,7 @@ async def list_categories(
     status_code=status.HTTP_200_OK,
     summary="Find categories",
     description="Find categories by name or description",
-    tags=["categories"],
+    tags=[CATEGORY_TAG],
 )
 async def find_categories(
     text: str = Query(..., description="Search text", example="Cash"),
@@ -98,7 +100,7 @@ async def find_categories(
     status_code=status.HTTP_200_OK,
     summary="Get category",
     description="Returns the category by its ID",
-    tags=["categories"],
+    tags=[CATEGORY_TAG],
 )
 async def get_category(
     category_id: Annotated[str, UUID] = Path(..., description="The ID of the category"),
@@ -116,7 +118,7 @@ async def get_category(
     status_code=status.HTTP_200_OK,
     summary="Update category",
     description="Update the category by its ID",
-    tags=["categories"],
+    tags=[CATEGORY_TAG],
 )
 async def update_category(
     body: UpdateCategorySchema,
@@ -144,7 +146,7 @@ async def update_category(
     status_code=status.HTTP_200_OK,
     summary="Delete category",
     description="Delete the category by its ID",
-    tags=["categories"],
+    tags=[CATEGORY_TAG],
 )
 async def delete_categories(
     category_id: Annotated[str, UUID] = Path(..., description="The ID of the category"),
