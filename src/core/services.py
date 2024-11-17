@@ -63,7 +63,7 @@ class BudgetService(ABC):
     async def get(self, budget_id: str) -> Budget | None: ...
 
     @abstractmethod
-    async def find(self, user_id: str, limit: int | None = None, offset: int = 0) -> tuple[Total, list[Budget]]: ...
+    async def list_(self, user_id: str, limit: int | None = None, offset: int = 0) -> tuple[Total, list[Budget]]: ...
 
     @abstractmethod
     async def find_by_name(
@@ -76,7 +76,7 @@ class BudgetService(ABC):
     ) -> tuple[Total, list[Budget]]: ...
 
     @abstractmethod
-    async def change_budget(
+    async def update_budget(
         self,
         budget_id: str,
         name: str | None = None,
@@ -109,7 +109,7 @@ class CategoryService(ABC):
     ) -> tuple[Total, list[Category]]: ...
 
     @abstractmethod
-    async def find(
+    async def find_by_name_and_category(
         self,
         user_id: str,
         name: str,
@@ -124,7 +124,7 @@ class CategoryService(ABC):
     ) -> tuple[Total, list[Category]]: ...
 
     @abstractmethod
-    async def change_category(
+    async def update_category(
         self,
         category_id: str,
         name: str | UnsetValue = UNSET,
@@ -148,10 +148,10 @@ class ExpenseService(ABC):
     async def get(self, expense_id: str) -> Expense | None: ...
 
     @abstractmethod
-    async def find(self, user_id: str, limit: int | None = None, offset: int = 0) -> tuple[Total, list[Expense]]: ...
+    async def list_(self, user_id: str, limit: int | None = None, offset: int = 0) -> tuple[Total, list[Expense]]: ...
 
     @abstractmethod
-    async def change_expense(
+    async def update_expense(
         self,
         expense_id: str,
         amount: float | None = None,
@@ -173,10 +173,10 @@ class IncomeService(ABC):
     async def get(self, income_id: str) -> Income | None: ...
 
     @abstractmethod
-    async def find(self, user_id: str, limit: int | None = None, offset: int = 0) -> tuple[Total, list[Income]]: ...
+    async def list_(self, user_id: str, limit: int | None = None, offset: int = 0) -> tuple[Total, list[Income]]: ...
 
     @abstractmethod
-    async def change_income(
+    async def update_income(
         self,
         income_id: str,
         amount: float | None = None,

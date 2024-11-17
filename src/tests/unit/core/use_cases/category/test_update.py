@@ -23,7 +23,7 @@ async def test_success(fake_category: Category) -> None:
         is_archived=fake.pybool(),
         emoji_icon=fake.emoji(),
     )
-    category_service.change_category.return_value = updated_category
+    category_service.update_category.return_value = updated_category
     use_case = UpdateCategoryUseCase(category_service)
 
     updated_category = await use_case.update(

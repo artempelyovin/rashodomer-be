@@ -17,6 +17,6 @@ class UpdateBudgetUseCase:
             raise BudgetAccessDeniedError
         if amount and amount < 0:
             raise AmountMustBePositiveError
-        return await self._budget_repo.change_budget(
+        return await self._budget_repo.update_budget(
             budget_id=budget_id, name=name, description=description, amount=amount
         )

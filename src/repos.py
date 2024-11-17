@@ -141,7 +141,7 @@ class FileBudgetService(BudgetService, JsonFileMixin):
     async def get(self, budget_id: str) -> Budget | None:
         return self._budgets.get(budget_id, None)
 
-    async def find(self, user_id: str, limit: int | None = None, offset: int = 0) -> tuple[Total, list[Budget]]:
+    async def list_(self, user_id: str, limit: int | None = None, offset: int = 0) -> tuple[Total, list[Budget]]:
         budgets = [budget for budget in self._budgets.values() if budget.user_id == user_id]
         if limit is None:
             return len(budgets), budgets[offset:]
@@ -164,7 +164,7 @@ class FileBudgetService(BudgetService, JsonFileMixin):
         budgets = [budget for budget in self._budgets.values() if budget.user_id == user_id and matches_text(budget)]
         return paginate(budgets, limit, offset)
 
-    async def change_budget(
+    async def update_budget(
         self,
         budget_id: str,
         name: str | None = None,
@@ -224,7 +224,7 @@ class FileCategoryService(CategoryService, JsonFileMixin):
             user_categories = [category for category in user_categories if not category.is_archived]
         return paginate(user_categories, limit, offset)
 
-    async def find(
+    async def find_by_name_and_category(
         self,
         user_id: str,
         name: str,
@@ -252,7 +252,7 @@ class FileCategoryService(CategoryService, JsonFileMixin):
         ]
         return paginate(categories, limit, offset)
 
-    async def change_category(
+    async def update_category(
         self,
         category_id: str,
         name: str | UnsetValue = UNSET,
@@ -300,11 +300,11 @@ class FileExpenseService(ExpenseService, JsonFileMixin):
     async def get(self, expense_id: str) -> Expense | None:
         return self._expenses[expense_id]
 
-    async def find(self, user_id: str, limit: int | None = None, offset: int = 0) -> tuple[Total, list[Expense]]:
+    async def list_(self, user_id: str, limit: int | None = None, offset: int = 0) -> tuple[Total, list[Expense]]:
         expenses = [expense for expense in self._expenses.values() if expense.user_id == user_id]
         return paginate(expenses, limit, offset)
 
-    async def change_expense(
+    async def update_expense(
         self,
         expense_id: str,
         amount: float | None = None,
@@ -345,11 +345,11 @@ class FileIncomeService(IncomeService, JsonFileMixin):
     async def get(self, income_id: str) -> Income | None:
         return self._incomes[income_id]
 
-    async def find(self, user_id: str, limit: int | None = None, offset: int = 0) -> tuple[Total, list[Income]]:
+    async def list_(self, user_id: str, limit: int | None = None, offset: int = 0) -> tuple[Total, list[Income]]:
         incomes = [income for income in self._incomes.values() if income.user_id == user_id]
         return paginate(incomes, limit, offset)
 
-    async def change_income(
+    async def update_income(
         self,
         income_id: str,
         amount: float | None = None,

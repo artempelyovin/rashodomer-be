@@ -16,7 +16,7 @@ class CreateCategoryUseCase:
             raise EmptyCategoryNameError
         if emoji_icon is not None and not self._emoji_service.is_emoji(emoji_icon):
             raise NotEmojiIconError(emoji_icon=emoji_icon)
-        total_exist_categories, _ = await self._category_service.find(
+        total_exist_categories, _ = await self._category_service.find_by_name_and_category(
             user_id=user_id, name=name, category_type=category_type
         )
         if total_exist_categories != 0:

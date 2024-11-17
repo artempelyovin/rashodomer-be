@@ -14,7 +14,7 @@ from tests.unit.core.conftest import fake
 
 async def test_success(fake_category: Category) -> None:
     category_service = Mock(spec=CategoryService)
-    category_service.find.return_value = (0, [])
+    category_service.find_by_name_and_category.return_value = (0, [])
     category_service.create.return_value = fake_category
     emoji_service = Mock(spec=EmojiService)
 
@@ -67,7 +67,7 @@ async def test_not_emoji_icon(bad_emoji_icon: str) -> None:
 
 async def test_category_already_exists(fake_category: Category) -> None:
     category_service = Mock(spec=CategoryService)
-    category_service.find.return_value = (1, [fake_category])
+    category_service.find_by_name_and_category.return_value = (1, [fake_category])
     emoji_service = Mock(spec=EmojiService)
 
     use_case = CreateCategoryUseCase(category_service, emoji_service)

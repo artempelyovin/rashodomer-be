@@ -24,7 +24,7 @@ class UpdateCategoryUseCase:
             raise CategoryNotExistsError(category_id=category_id)
         if category.user_id != user_id:
             raise CategoryAccessDeniedError
-        return await self._category_repo.change_category(
+        return await self._category_repo.update_category(
             category_id=category_id,
             name=name,
             description=description,

@@ -9,7 +9,7 @@ from core.use_cases.category.list import ListCategoryUseCase
 from tests.unit.core.conftest import fake
 
 
-async def success(fake_category: Category) -> None:
+async def test_success(fake_category: Category) -> None:
     category_service = Mock(spec=CategoryService)
     expected_categories = [fake_category, fake_category]
     expected_total = len(expected_categories)
