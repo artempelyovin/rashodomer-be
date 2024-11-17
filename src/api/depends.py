@@ -25,7 +25,9 @@ from repos import (
 )
 from services import EmojiPackageService, PasswordBcryptService
 
-header_scheme = APIKeyHeader(name="Authorization", auto_error=False)
+header_scheme = APIKeyHeader(
+    name="Authorization", auto_error=False, description='Token in format: "Authorization": "{TOKEN}"'
+)
 
 
 def password_service_factory() -> PasswordService:
