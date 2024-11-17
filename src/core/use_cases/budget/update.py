@@ -22,7 +22,7 @@ class UpdateBudgetUseCase:
             raise BudgetNotExistsError(budget_id=budget_id)
         if budget.user_id != user_id:
             raise BudgetAccessDeniedError
-        if amount and amount < 0:
+        if not isinstance(amount, UnsetValue) and amount < 0:
             raise AmountMustBePositiveError
         return await self._budget_repo.update_budget(
             budget_id=budget_id, name=name, description=description, amount=amount
