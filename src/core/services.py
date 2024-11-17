@@ -72,7 +72,7 @@ class BudgetService(ABC):
 
     @abstractmethod
     async def find_by_text(
-        self, user_id: str, text: str, limit: int | None = None, offset: int = 0
+        self, user_id: str, text: str, *, case_sensitive: bool = False, limit: int | None = None, offset: int = 0
     ) -> tuple[Total, list[Budget]]: ...
 
     @abstractmethod

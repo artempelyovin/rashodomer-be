@@ -66,6 +66,7 @@ async def list_budgets(
 )
 async def find_budgets(
     text: str = Query(..., description="Search text", example="Cash"),
+    case_sensitive: bool = Query(False, description="Case sensitive when searching"),  # noqa: FBT001, FBT003
     limit: int | None = Query(None, description="Number of budgets to return"),
     offset: int = Query(0, description="Offset of the budgets to return"),
     *,
@@ -73,7 +74,9 @@ async def find_budgets(
     budget_service: BudgetService = Depends(budget_service_factory),
 ) -> APIResponseList[BudgetSchema]:
     use_case = FindBudgetUseCase(budget_service=budget_service)
-    total, budgets = await use_case.find(user_id=user.id, text=text, limit=limit, offset=offset)
+    total, budgets = await use_case.find(
+        user_id=user.id, text=text, case_sensitive=case_sensitive, limit=limit, offset=offset
+    )
     return write_response_list(items=budgets, total=total, limit=limit, offset=offset, schema=BudgetSchema)
 
 

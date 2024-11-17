@@ -154,13 +154,14 @@ class FileBudgetService(BudgetService, JsonFileMixin):
         return paginate(budgets, limit, offset)
 
     async def find_by_text(
-        self, user_id: str, text: str, limit: int | None = None, offset: int = 0
+        self, user_id: str, text: str, *, case_sensitive: bool = False, limit: int | None = None, offset: int = 0
     ) -> tuple[Total, list[Budget]]:
-        budgets = [
-            budget
-            for budget in self._budgets.values()
-            if budget.user_id == user_id and (text in budget.name or text in budget.description)
-        ]
+        def matches_text(budget: Budget) -> bool:
+            if case_sensitive:
+                return text in budget.name or text in budget.description
+            return text.lower() in budget.name.lower() or text.lower() in budget.description.lower()
+
+        budgets = [budget for budget in self._budgets.values() if budget.user_id == user_id and matches_text(budget)]
         return paginate(budgets, limit, offset)
 
     async def change_budget(
