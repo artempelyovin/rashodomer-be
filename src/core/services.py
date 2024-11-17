@@ -97,6 +97,17 @@ class CategoryService(ABC):
     async def get(self, category_id: str) -> Category | None: ...
 
     @abstractmethod
+    async def list_(
+        self,
+        user_id: str,
+        category_type: CategoryType,
+        *,
+        show_archived: bool = False,
+        limit: int | None = None,
+        offset: int = 0,
+    ) -> tuple[Total, list[Category]]: ...
+
+    @abstractmethod
     async def find(
         self,
         user_id: str,

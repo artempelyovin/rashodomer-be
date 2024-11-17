@@ -204,6 +204,24 @@ class FileCategoryService(CategoryService, JsonFileMixin):
     async def get(self, category_id: str) -> Category | None:
         return self._categories[category_id]
 
+    async def list_(
+        self,
+        user_id: str,
+        category_type: CategoryType,
+        *,
+        show_archived: bool = False,
+        limit: int | None = None,
+        offset: int = 0,
+    ) -> tuple[Total, list[Category]]:
+        user_categories = [
+            category
+            for category in self._categories.values()
+            if category.user_id == user_id and category.type == category_type
+        ]
+        if not show_archived:
+            user_categories = [category for category in user_categories if not category.is_archived]
+        return paginate(user_categories, limit, offset)
+
     async def find(
         self,
         user_id: str,
