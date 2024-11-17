@@ -6,7 +6,6 @@ from core.entities import Budget
 from core.exceptions import EmptySearchTextError
 from core.services import BudgetService
 from core.use_cases.budget.find import FindBudgetUseCase
-from core.utils import uuid4_str
 from tests.unit.core.conftest import fake
 
 
@@ -17,7 +16,7 @@ async def test_success(fake_budget: Budget) -> None:
     budget_service.find_by_text.return_value = (total, budgets)
     use_case = FindBudgetUseCase(budget_service)
 
-    result_total, result_budgets = await use_case.find(user_id=uuid4_str(), text="наличные", limit=None, offset=0)
+    result_total, result_budgets = await use_case.find(user_id=str(fake.uuid4()), text="наличные", limit=None, offset=0)
 
     assert result_total == total
     assert len(result_budgets) == len(budgets)
