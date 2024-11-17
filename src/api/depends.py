@@ -52,7 +52,7 @@ def category_service_factory() -> CategoryService:
     return FileCategoryService()
 
 
-def expense_service_factory() -> TransactionService:
+def transaction_service_factory() -> TransactionService:
     return FileTransactionService()
 
 

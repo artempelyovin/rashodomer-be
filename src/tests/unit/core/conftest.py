@@ -1,7 +1,7 @@
 import pytest
 from faker import Faker
 
-from core.entities import Budget, Category, User
+from core.entities import Budget, Category, Transaction, User
 from core.enums import TransactionType
 
 fake = Faker(locale="ru_RU")
@@ -40,4 +40,17 @@ def fake_category() -> Category:
         user_id=str(fake.uuid4()),
         created_at=fake.date_time(),
         updated_at=fake.date_time(),
+    )
+
+
+@pytest.fixture
+def fake_transaction() -> Transaction:
+    return Transaction(
+        amount=fake.pyfloat(positive=True),
+        description=fake.sentence(),
+        type=fake.random_element(list(TransactionType)),
+        budget_id=str(fake.uuid4()),
+        category_id=str(fake.uuid4()),
+        user_id=str(fake.uuid4()),
+        timestamp=fake.date_time(),
     )

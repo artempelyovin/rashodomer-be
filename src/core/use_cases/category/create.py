@@ -22,5 +22,9 @@ class CreateCategoryUseCase:
         if total_exist_categories != 0:
             raise CategoryAlreadyExistsError(name=name, transaction_type=transaction_type)
         return await self._category_service.create(
-            user_id=user_id, name=name, description=description, transaction_type=transaction_type, emoji_icon=emoji_icon
+            user_id=user_id,
+            name=name,
+            description=description,
+            transaction_type=transaction_type,
+            emoji_icon=emoji_icon,
         )

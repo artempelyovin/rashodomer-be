@@ -131,3 +131,11 @@ class CategoryNotExistsError(BaseCoreError):
 class CategoryAccessDeniedError(BaseCoreError):
     def message(self) -> str:
         return _("Attempt to access another user's category")
+
+
+@dataclass(frozen=True)
+class UnsupportedTransactionTypeError(BaseCoreError):
+    transaction_type: TransactionType
+
+    def message(self) -> str:
+        return _("Transaction type {transaction_type} is not supported").format(transaction_type=self.transaction_type)
