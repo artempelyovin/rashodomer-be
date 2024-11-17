@@ -238,6 +238,19 @@ class FileCategoryService(CategoryService, JsonFileMixin):
             user_categories = [category for category in user_categories if category.type == category_type]
         return paginate(user_categories, limit, offset)
 
+    async def find_by_text(
+        self, user_id: str, text: str, *, case_sensitive: bool = False, limit: int | None = None, offset: int = 0
+    ) -> tuple[Total, list[Category]]:
+        def matches_text(category: Category) -> bool:
+            if case_sensitive:
+                return text in category.name or text in category.description
+            return text.lower() in category.name.lower() or text.lower() in category.description.lower()
+
+        categories = [
+            category for category in self._categories.values() if category.user_id == user_id and matches_text(category)
+        ]
+        return paginate(categories, limit, offset)
+
     async def change_category(
         self,
         category_id: str,

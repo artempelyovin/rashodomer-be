@@ -119,6 +119,11 @@ class CategoryService(ABC):
     ) -> tuple[Total, list[Category]]: ...
 
     @abstractmethod
+    async def find_by_text(
+        self, user_id: str, text: str, *, case_sensitive: bool = False, limit: int | None = None, offset: int = 0
+    ) -> tuple[Total, list[Category]]: ...
+
+    @abstractmethod
     async def change_category(
         self,
         category_id: str,
