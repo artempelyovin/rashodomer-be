@@ -1,6 +1,7 @@
 from core.entities import Budget
 from core.exceptions import AmountMustBePositiveError, BudgetAccessDeniedError, BudgetNotExistsError
 from core.services import BudgetService
+from core.utils import UnsetValue
 
 
 class UpdateBudgetUseCase:
@@ -8,7 +9,13 @@ class UpdateBudgetUseCase:
         self._budget_repo = budget_service
 
     async def update(
-        self, user_id: str, budget_id: str, name: str | None, description: str | None, amount: float | None
+        self,
+        user_id: str,
+        budget_id: str,
+        *,
+        name: str | UnsetValue,
+        description: str | UnsetValue,
+        amount: float | UnsetValue,
     ) -> Budget:
         budget = await self._budget_repo.get(budget_id)
         if not budget:

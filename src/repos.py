@@ -167,16 +167,16 @@ class FileBudgetService(BudgetService, JsonFileMixin):
     async def update_budget(
         self,
         budget_id: str,
-        name: str | None = None,
-        description: str | None = None,
-        amount: float | None = None,
+        name: str | UnsetValue = UNSET,
+        description: str | UnsetValue = UNSET,
+        amount: float | UnsetValue = UNSET,
     ) -> Budget:
         budget = self._budgets[budget_id]
-        if name is not None:
+        if not isinstance(name, UnsetValue):
             budget.name = name
-        if description is not None:
+        if not isinstance(description, UnsetValue):
             budget.description = description
-        if amount is not None:
+        if not isinstance(amount, UnsetValue):
             budget.amount = amount
         self.save(self._budgets)
         return budget
@@ -305,18 +305,18 @@ class FileExpenseService(ExpenseService, JsonFileMixin):
         return paginate(expenses, limit, offset)
 
     async def update_expense(
-        self,
-        expense_id: str,
-        amount: float | None = None,
-        category_id: str | None = None,
-        description: str | None = None,
+            self,
+            expense_id: str,
+            amount: float | UnsetValue = UNSET,
+            category_id: str | UnsetValue = UNSET,
+            description: str | UnsetValue = UNSET,
     ) -> Expense:
         expense = self._expenses[expense_id]
-        if amount is not None:
+        if not isinstance(amount, UnsetValue):
             expense.amount = amount
-        if category_id is not None:
+        if not isinstance(category_id, UnsetValue):
             expense.category_id = category_id
-        if description is not None:
+        if not isinstance(description, UnsetValue):
             expense.description = description
         self.save(self._expenses)
         return expense
@@ -352,16 +352,16 @@ class FileIncomeService(IncomeService, JsonFileMixin):
     async def update_income(
         self,
         income_id: str,
-        amount: float | None = None,
-        category_id: str | None = None,
-        description: str | None = None,
+        amount: float | UnsetValue = UNSET,
+        category_id: str | UnsetValue = UNSET,
+        description: str | UnsetValue = UNSET,
     ) -> Income:
         income = self._incomes[income_id]
-        if amount is not None:
+        if not isinstance(amount, UnsetValue):
             income.amount = amount
-        if category_id is not None:
+        if not isinstance(category_id, UnsetValue):
             income.category_id = category_id
-        if description is not None:
+        if not isinstance(description, UnsetValue):
             income.description = description
         self.save(self._incomes)
         return income

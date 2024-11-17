@@ -79,9 +79,9 @@ class BudgetService(ABC):
     async def update_budget(
         self,
         budget_id: str,
-        name: str | None = None,
-        description: str | None = None,
-        amount: float | None = None,
+        name: str | UnsetValue = UNSET,
+        description: str | UnsetValue = UNSET,
+        amount: float | UnsetValue = UNSET,
     ) -> Budget: ...
 
     @abstractmethod
@@ -154,9 +154,9 @@ class ExpenseService(ABC):
     async def update_expense(
         self,
         expense_id: str,
-        amount: float | None = None,
-        category_id: str | None = None,
-        description: str | None = None,
+        amount: float | UnsetValue = UNSET,
+        category_id: str | UnsetValue = UNSET,
+        description: str | UnsetValue = UNSET,
     ) -> Expense: ...
 
     @abstractmethod
@@ -179,9 +179,9 @@ class IncomeService(ABC):
     async def update_income(
         self,
         income_id: str,
-        amount: float | None = None,
-        category_id: str | None = None,
-        description: str | None = None,
+        amount: float | UnsetValue = UNSET,
+        category_id: str | UnsetValue = UNSET,
+        description: str | UnsetValue = UNSET,
     ) -> Income:
         pass
 

@@ -16,6 +16,7 @@ from core.use_cases.budget.find import FindBudgetUseCase
 from core.use_cases.budget.get import GetBudgetUseCase
 from core.use_cases.budget.list import ListBudgetUseCase
 from core.use_cases.budget.update import UpdateBudgetUseCase
+from core.utils import UNSET
 
 router = APIRouter()
 
@@ -114,9 +115,14 @@ async def update_budget(
     user: User = Depends(authentication_user),
     budget_service: BudgetService = Depends(budget_service_factory),
 ) -> APIResponse[BudgetSchema]:
+    params = body.model_dump(exclude_unset=True)
     use_case = UpdateBudgetUseCase(budget_service=budget_service)
     budget = await use_case.update(
-        user_id=user.id, budget_id=budget_id, name=body.name, description=body.description, amount=body.amount
+        user_id=user.id,
+        budget_id=budget_id,
+        name=params.get("name", UNSET),
+        description=params.get("description", UNSET),
+        amount=params.get("amount", UNSET),
     )
     return write_response(result=budget, schema=BudgetSchema)
 

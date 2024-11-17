@@ -6,6 +6,7 @@ from core.entities import Budget
 from core.exceptions import AmountMustBePositiveError, BudgetAccessDeniedError, BudgetNotExistsError
 from core.services import BudgetService
 from core.use_cases.budget.update import UpdateBudgetUseCase
+from core.utils import UNSET
 from tests.unit.core.conftest import fake
 
 
@@ -50,9 +51,9 @@ async def test_budget_not_exists(fake_budget: Budget) -> None:
         await use_case.update(
             user_id=fake_budget.user_id,
             budget_id=fake_budget.id,
-            name=fake.word(),
-            description=fake.sentence(),
-            amount=fake.pyfloat(positive=True),
+            name=UNSET,
+            description=UNSET,
+            amount=UNSET,
         )
 
 
@@ -65,9 +66,9 @@ async def test_budget_access_denied(fake_budget: Budget) -> None:
         await use_case.update(
             user_id=str(fake.uuid4()),  # another user
             budget_id=fake_budget.id,
-            name=fake.word(),
-            description=fake.sentence(),
-            amount=fake.pyfloat(positive=True),
+            name=UNSET,
+            description=UNSET,
+            amount=UNSET,
         )
 
 
