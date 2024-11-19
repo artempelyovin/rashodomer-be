@@ -4,13 +4,14 @@ import pytest
 
 from core.entities import User
 from core.exceptions import IncorrectPasswordError, LoginNotExistsError
-from core.services import PasswordService, TokenService, UserService
+from core.repos import UserRepository
+from core.services import PasswordService, TokenService
 from core.use_cases.auth.login import LoginUserUseCase
 from tests.unit.core.conftest import fake
 
 
 async def test_success(fake_user: User) -> None:
-    user_service = Mock(spec=UserService)
+    user_service = Mock(spec=UserRepository)
     user_service.find_by_login.return_value = fake_user
     password_service = Mock(spec=PasswordService)
     password_service.hash_password.return_value = "hashed_password"
@@ -28,7 +29,7 @@ async def test_success(fake_user: User) -> None:
 
 
 async def test_login_not_exists() -> None:
-    user_service = Mock(spec=UserService)
+    user_service = Mock(spec=UserRepository)
     user_service.find_by_login.return_value = None
     password_service = Mock(spec=PasswordService)
     token_service = Mock(spec=TokenService)
@@ -40,7 +41,7 @@ async def test_login_not_exists() -> None:
 
 
 async def test_incorrect_password(fake_user: User) -> None:
-    user_service = Mock(spec=UserService)
+    user_service = Mock(spec=UserRepository)
     user_service.find_by_login.return_value = fake_user
     password_service = Mock(spec=PasswordService)
     password_service.hash_password.return_value = "hashed_password"

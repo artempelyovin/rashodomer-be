@@ -7,14 +7,9 @@ import ujson
 
 from core.entities import Budget, Category, Expense, Income, User
 from core.enums import CategoryType
+from core.repos import BudgetRepository, CategoryRepository, ExpenseRepository, IncomeRepository, UserRepository
 from core.services import (
-    BudgetService,
-    CategoryService,
-    ExpenseService,
-    IncomeService,
-    TokenService,
-    Total,
-    UserService,
+    Total, TokenService,
 )
 from core.utils import UNSET, UnsetValue
 
@@ -76,7 +71,7 @@ class FileTokenService(TokenService, JsonFileMixin):
         return None
 
 
-class FileUserService(UserService, JsonFileMixin):
+class FileUserRepository(UserRepository, JsonFileMixin):
     collection = "users"
 
     def __init__(self) -> None:
@@ -126,7 +121,7 @@ class FileUserService(UserService, JsonFileMixin):
         self.save(self._users)
 
 
-class FileBudgetService(BudgetService, JsonFileMixin):
+class FileBudgetRepository(BudgetRepository, JsonFileMixin):
     collection = "budgets"
 
     def __init__(self) -> None:
@@ -187,7 +182,7 @@ class FileBudgetService(BudgetService, JsonFileMixin):
         return budget
 
 
-class FileCategoryService(CategoryService, JsonFileMixin):
+class FileCategoryRepository(CategoryRepository, JsonFileMixin):
     collection = "categories"
 
     def __init__(self) -> None:
@@ -281,7 +276,7 @@ class FileCategoryService(CategoryService, JsonFileMixin):
         return category
 
 
-class FileExpenseService(ExpenseService, JsonFileMixin):
+class FileExpenseRepository(ExpenseRepository, JsonFileMixin):
     collection = "expenses"
 
     def __init__(self) -> None:
@@ -326,7 +321,7 @@ class FileExpenseService(ExpenseService, JsonFileMixin):
         self.save(self._expenses)
 
 
-class FileIncomeService(IncomeService, JsonFileMixin):
+class FileIncomeRepository(IncomeRepository, JsonFileMixin):
     collection = "incomes"
 
     def __init__(self) -> None:

@@ -1,10 +1,11 @@
 from core.entities import User
 from core.exceptions import UnauthorizedError, UserNotExistsError
-from core.services import TokenService, UserService
+from core.repos import UserRepository
+from core.services import TokenService
 
 
 class AuthenticationUseCase:
-    def __init__(self, token_service: TokenService, user_service: UserService) -> None:
+    def __init__(self, token_service: TokenService, user_service: UserRepository) -> None:
         self._token_repo = token_service
         self._user_repo = user_service
 

@@ -4,13 +4,13 @@ import pytest
 
 from core.entities import Category
 from core.exceptions import CategoryAccessDeniedError, CategoryNotExistsError
-from core.services import CategoryService
+from core.repos import CategoryRepository
 from core.use_cases.category.get import GetCategoryUseCase
 from tests.unit.core.conftest import fake
 
 
 async def test_success(fake_category: Category) -> None:
-    category_service = AsyncMock(spec=CategoryService)
+    category_service = AsyncMock(spec=CategoryRepository)
     category_service.get.return_value = fake_category
     use_case = GetCategoryUseCase(category_service)
 
@@ -21,7 +21,7 @@ async def test_success(fake_category: Category) -> None:
 
 
 async def test_category_not_exists() -> None:
-    category_service = AsyncMock(spec=CategoryService)
+    category_service = AsyncMock(spec=CategoryRepository)
     category_service.get.return_value = None
     use_case = GetCategoryUseCase(category_service)
 
@@ -30,7 +30,7 @@ async def test_category_not_exists() -> None:
 
 
 async def test_category_access_denied(fake_category: Category) -> None:
-    category_service = AsyncMock(spec=CategoryService)
+    category_service = AsyncMock(spec=CategoryRepository)
     category_service.get.return_value = fake_category
     use_case = GetCategoryUseCase(category_service)
 

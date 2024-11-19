@@ -4,24 +4,19 @@ from fastapi import Depends
 from fastapi.security import APIKeyHeader
 
 from core.entities import User
+from core.repos import BudgetRepository, CategoryRepository, ExpenseRepository, IncomeRepository, UserRepository
 from core.services import (
-    BudgetService,
-    CategoryService,
     EmojiService,
-    ExpenseService,
-    IncomeService,
-    PasswordService,
-    TokenService,
-    UserService,
+    PasswordService, TokenService,
 )
 from core.use_cases.auth.authenticate import AuthenticationUseCase
 from repos import (
-    FileBudgetService,
-    FileCategoryService,
-    FileExpenseService,
-    FileIncomeService,
+    FileBudgetRepository,
+    FileCategoryRepository,
+    FileExpenseRepository,
+    FileIncomeRepository,
     FileTokenService,
-    FileUserService,
+    FileUserRepository,
 )
 from services import EmojiPackageService, PasswordBcryptService
 
@@ -42,29 +37,29 @@ def token_service_factory() -> TokenService:
     return FileTokenService()
 
 
-def user_service_factory() -> UserService:
-    return FileUserService()
+def user_service_factory() -> UserRepository:
+    return FileUserRepository()
 
 
-def budget_service_factory() -> BudgetService:
-    return FileBudgetService()
+def budget_service_factory() -> BudgetRepository:
+    return FileBudgetRepository()
 
 
-def category_service_factory() -> CategoryService:
-    return FileCategoryService()
+def category_service_factory() -> CategoryRepository:
+    return FileCategoryRepository()
 
 
-def expense_service_factory() -> ExpenseService:
-    return FileExpenseService()
+def expense_service_factory() -> ExpenseRepository:
+    return FileExpenseRepository()
 
 
-def income_service_factory() -> IncomeService:
-    return FileIncomeService()
+def income_service_factory() -> IncomeRepository:
+    return FileIncomeRepository()
 
 
 async def authentication_user(
     token: Annotated[str | None, Depends(header_scheme)],
-    user_service: Annotated[UserService, Depends(user_service_factory)],
+    user_service: Annotated[UserRepository, Depends(user_service_factory)],
     token_service: Annotated[TokenService, Depends(token_service_factory)],
 ) -> User:
     use_case = AuthenticationUseCase(token_service=token_service, user_service=user_service)

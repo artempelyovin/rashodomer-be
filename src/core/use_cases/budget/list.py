@@ -1,9 +1,10 @@
 from core.entities import Budget
-from core.services import BudgetService, Total
+from core.repos import BudgetRepository
+from core.services import Total
 
 
 class ListBudgetUseCase:
-    def __init__(self, budget_service: BudgetService) -> None:
+    def __init__(self, budget_service: BudgetRepository) -> None:
         self._budget_repo = budget_service
 
     async def list(self, user_id: str, limit: int | None, offset: int) -> tuple[Total, list[Budget]]:

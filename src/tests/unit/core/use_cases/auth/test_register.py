@@ -4,13 +4,14 @@ import pytest
 
 from core.entities import User
 from core.exceptions import LoginAlreadyExistsError, PasswordMissingSpecialCharacterError, PasswordTooShortError
-from core.services import PasswordService, UserService
+from core.repos import UserRepository
+from core.services import PasswordService
 from core.use_cases.auth.register import RegisterUserUseCase
 from tests.unit.core.conftest import fake
 
 
 async def test_success(fake_user: User) -> None:
-    user_service = Mock(spec=UserService)
+    user_service = Mock(spec=UserRepository)
     user_service.find_by_login.return_value = None  # No existing user
     user_service.create.return_value = fake_user
     password_service = Mock(spec=PasswordService)
@@ -31,7 +32,7 @@ async def test_success(fake_user: User) -> None:
 
 
 async def test_login_already_exists(fake_user: User) -> None:
-    user_service = Mock(spec=UserService)
+    user_service = Mock(spec=UserRepository)
     user_service.find_by_login.return_value = fake_user  # Existing user
     password_service = Mock(spec=PasswordService)
 
@@ -47,7 +48,7 @@ async def test_login_already_exists(fake_user: User) -> None:
 
 
 async def test_password_too_short() -> None:
-    user_service = Mock(spec=UserService)
+    user_service = Mock(spec=UserRepository)
     user_service.find_by_login.return_value = None  # No existing user
     password_service = Mock(spec=PasswordService)
 
@@ -63,7 +64,7 @@ async def test_password_too_short() -> None:
 
 
 async def test_password_missing_special_character() -> None:
-    user_service = Mock(spec=UserService)
+    user_service = Mock(spec=UserRepository)
     user_service.find_by_login.return_value = None  # No existing user
     password_service = Mock(spec=PasswordService)
 

@@ -10,7 +10,8 @@ from api.category.schemas import CategorySchema, CreateCategorySchema, UpdateCat
 from api.depends import authentication_user, category_service_factory, emoji_service_factory
 from core.entities import User
 from core.enums import CategoryType
-from core.services import CategoryService, EmojiService
+from core.repos import CategoryRepository
+from core.services import EmojiService
 from core.use_cases.category.create import CreateCategoryUseCase
 from core.use_cases.category.delete import DeleteCategoryUseCase
 from core.use_cases.category.find import FindCategoryUseCase
@@ -35,7 +36,7 @@ async def create_category(
     body: CreateCategorySchema,
     *,
     user: User = Depends(authentication_user),
-    category_service: CategoryService = Depends(category_service_factory),
+    category_service: CategoryRepository = Depends(category_service_factory),
     emoji_service: EmojiService = Depends(emoji_service_factory),
 ) -> APIResponse[CategorySchema]:
     use_case = CreateCategoryUseCase(category_service=category_service, emoji_service=emoji_service)
@@ -63,7 +64,7 @@ async def list_categories(
     offset: int = Query(0, description="Offset of the categories to return"),
     *,
     user: User = Depends(authentication_user),
-    category_service: CategoryService = Depends(category_service_factory),
+    category_service: CategoryRepository = Depends(category_service_factory),
 ) -> APIResponseList[CategorySchema]:
     use_case = ListCategoryUseCase(category_service=category_service)
     total, categories = await use_case.list(
@@ -86,7 +87,7 @@ async def find_categories(
     offset: int = Query(0, description="Offset of the categories to return"),
     *,
     user: User = Depends(authentication_user),
-    category_service: CategoryService = Depends(category_service_factory),
+    category_service: CategoryRepository = Depends(category_service_factory),
 ) -> APIResponseList[CategorySchema]:
     use_case = FindCategoryUseCase(category_service=category_service)
     total, categories = await use_case.find(
@@ -106,7 +107,7 @@ async def get_category(
     category_id: Annotated[str, UUID] = Path(..., description="The ID of the category"),
     *,
     user: User = Depends(authentication_user),
-    category_service: CategoryService = Depends(category_service_factory),
+    category_service: CategoryRepository = Depends(category_service_factory),
 ) -> APIResponse[CategorySchema]:
     use_case = GetCategoryUseCase(category_service=category_service)
     category = await use_case.get(user_id=user.id, category_id=category_id)
@@ -125,7 +126,7 @@ async def update_category(
     category_id: Annotated[str, UUID] = Path(..., description="The ID of the category"),
     *,
     user: User = Depends(authentication_user),
-    category_service: CategoryService = Depends(category_service_factory),
+    category_service: CategoryRepository = Depends(category_service_factory),
 ) -> APIResponse[CategorySchema]:
     params = body.model_dump(exclude_unset=True)
     use_case = UpdateCategoryUseCase(category_service=category_service)
@@ -152,7 +153,7 @@ async def delete_categories(
     category_id: Annotated[str, UUID] = Path(..., description="The ID of the category"),
     *,
     user: User = Depends(authentication_user),
-    category_service: CategoryService = Depends(category_service_factory),
+    category_service: CategoryRepository = Depends(category_service_factory),
 ) -> APIResponse[CategorySchema]:
     use_case = DeleteCategoryUseCase(category_service=category_service)
     category = await use_case.delete(user_id=user.id, category_id=category_id)

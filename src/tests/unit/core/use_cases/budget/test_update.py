@@ -4,14 +4,14 @@ import pytest
 
 from core.entities import Budget
 from core.exceptions import AmountMustBePositiveError, BudgetAccessDeniedError, BudgetNotExistsError
-from core.services import BudgetService
+from core.repos import BudgetRepository
 from core.use_cases.budget.update import UpdateBudgetUseCase
 from core.utils import UNSET
 from tests.unit.core.conftest import fake
 
 
 async def test_success(fake_budget: Budget) -> None:
-    budget_service = Mock(spec=BudgetService)
+    budget_service = Mock(spec=BudgetRepository)
     expected_budget = Budget(
         id=fake_budget.id,
         user_id=fake_budget.user_id,
@@ -43,7 +43,7 @@ async def test_success(fake_budget: Budget) -> None:
 
 
 async def test_budget_not_exists(fake_budget: Budget) -> None:
-    budget_service = Mock(spec=BudgetService)
+    budget_service = Mock(spec=BudgetRepository)
     budget_service.get.return_value = None
     use_case = UpdateBudgetUseCase(budget_service)
 
@@ -58,7 +58,7 @@ async def test_budget_not_exists(fake_budget: Budget) -> None:
 
 
 async def test_budget_access_denied(fake_budget: Budget) -> None:
-    budget_service = Mock(spec=BudgetService)
+    budget_service = Mock(spec=BudgetRepository)
     budget_service.get.return_value = fake_budget
     use_case = UpdateBudgetUseCase(budget_service)
 
@@ -73,7 +73,7 @@ async def test_budget_access_denied(fake_budget: Budget) -> None:
 
 
 async def test_amount_must_be_positive(fake_budget: Budget) -> None:
-    budget_service = Mock(spec=BudgetService)
+    budget_service = Mock(spec=BudgetRepository)
     budget_service.get.return_value = fake_budget
     use_case = UpdateBudgetUseCase(budget_service)
 

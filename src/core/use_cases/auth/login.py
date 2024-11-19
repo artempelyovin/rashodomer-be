@@ -1,12 +1,13 @@
 from datetime import UTC, datetime
 
 from core.exceptions import IncorrectPasswordError, LoginNotExistsError
-from core.services import PasswordService, TokenService, UserService
+from core.repos import UserRepository
+from core.services import PasswordService, TokenService
 
 
 class LoginUserUseCase:
     def __init__(
-        self, user_service: UserService, password_service: PasswordService, token_service: TokenService
+        self, user_service: UserRepository, password_service: PasswordService, token_service: TokenService
     ) -> None:
         self._user_repo = user_service
         self._password_service = password_service

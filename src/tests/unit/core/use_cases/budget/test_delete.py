@@ -4,13 +4,13 @@ import pytest
 
 from core.entities import Budget
 from core.exceptions import BudgetAccessDeniedError, BudgetNotExistsError
-from core.services import BudgetService
+from core.repos import BudgetRepository
 from core.use_cases.budget.delete import DeleteBudgetUseCase
 from tests.unit.core.conftest import fake
 
 
 async def test_success(fake_budget: Budget) -> None:
-    budget_service = Mock(spec=BudgetService)
+    budget_service = Mock(spec=BudgetRepository)
     budget_service.get.return_value = fake_budget
     budget_service.delete.return_value = fake_budget
     use_case = DeleteBudgetUseCase(budget_service)
@@ -23,7 +23,7 @@ async def test_success(fake_budget: Budget) -> None:
 
 
 async def test_budget_not_exists() -> None:
-    budget_service = Mock(spec=BudgetService)
+    budget_service = Mock(spec=BudgetRepository)
     budget_service.get.return_value = None
     use_case = DeleteBudgetUseCase(budget_service)
 
@@ -32,7 +32,7 @@ async def test_budget_not_exists() -> None:
 
 
 async def test_budget_access_denied(fake_budget: Budget) -> None:
-    budget_service = Mock(spec=BudgetService)
+    budget_service = Mock(spec=BudgetRepository)
     budget_service.get.return_value = fake_budget
     use_case = DeleteBudgetUseCase(budget_service)
 

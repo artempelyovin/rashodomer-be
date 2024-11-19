@@ -1,12 +1,12 @@
 from core.entities import Category
 from core.enums import CategoryType
 from core.exceptions import CategoryAccessDeniedError, CategoryNotExistsError
-from core.services import CategoryService
+from core.repos import CategoryRepository
 from core.utils import UnsetValue
 
 
 class UpdateCategoryUseCase:
-    def __init__(self, category_service: CategoryService) -> None:
+    def __init__(self, category_service: CategoryRepository) -> None:
         self._category_repo = category_service
 
     async def update(

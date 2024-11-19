@@ -1,10 +1,11 @@
 from core.entities import Category
 from core.exceptions import EmptySearchTextError
-from core.services import CategoryService, Total
+from core.repos import CategoryRepository
+from core.services import Total
 
 
 class FindCategoryUseCase:
-    def __init__(self, category_service: CategoryService) -> None:
+    def __init__(self, category_service: CategoryRepository) -> None:
         self._category_repo = category_service
 
     async def find(

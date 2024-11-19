@@ -1,11 +1,12 @@
 from core.entities import Category
 from core.enums import CategoryType
 from core.exceptions import CategoryAlreadyExistsError, EmptyCategoryNameError, NotEmojiIconError
-from core.services import CategoryService, EmojiService
+from core.repos import CategoryRepository
+from core.services import EmojiService
 
 
 class CreateCategoryUseCase:
-    def __init__(self, category_service: CategoryService, emoji_service: EmojiService) -> None:
+    def __init__(self, category_service: CategoryRepository, emoji_service: EmojiService) -> None:
         self._category_service = category_service
         self._emoji_service = emoji_service
 
