@@ -10,12 +10,12 @@ from core.exceptions import (
     CategoryNotExistsError,
     UnsupportedTransactionTypeError,
 )
-from core.services import BudgetService, CategoryService, TransactionService
+from core.repos import BudgetRepository, CategoryRepository, TransactionRepository
 
 
 class CreateTransactionUseCase:
     def __init__(
-        self, budget_service: BudgetService, category_service: CategoryService, transaction_service: TransactionService
+        self, budget_service: BudgetRepository, category_service: CategoryRepository, transaction_service: TransactionRepository
     ) -> None:
         self._category_repo = category_service
         self._budget_repo = budget_service

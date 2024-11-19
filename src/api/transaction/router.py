@@ -11,7 +11,7 @@ from api.depends import (
 )
 from api.transaction.schemas import CreateTransactionSchema, TransactionSchema
 from core.entities import User
-from core.services import BudgetService, CategoryService, TransactionService
+from core.repos import BudgetRepository, CategoryRepository, TransactionRepository
 from core.use_cases.transaction.create import CreateTransactionUseCase
 
 router = APIRouter()
@@ -30,9 +30,9 @@ async def create_transaction(
     body: CreateTransactionSchema,
     *,
     user: User = Depends(authentication_user),
-    budget_service: BudgetService = Depends(budget_service_factory),
-    category_service: CategoryService = Depends(category_service_factory),
-    transaction_service: TransactionService = Depends(transaction_service_factory),
+    budget_service: BudgetRepository = Depends(budget_service_factory),
+    category_service: CategoryRepository = Depends(category_service_factory),
+    transaction_service: TransactionRepository = Depends(transaction_service_factory),
 ) -> APIResponse[TransactionSchema]:
     use_case = CreateTransactionUseCase(
         budget_service=budget_service, category_service=category_service, transaction_service=transaction_service

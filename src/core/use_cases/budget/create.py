@@ -1,10 +1,10 @@
 from core.entities import Budget
 from core.exceptions import AmountMustBePositiveError, BudgetAlreadyExistsError
-from core.services import BudgetService
+from core.repos import BudgetRepository
 
 
 class CreateBudgetUseCase:
-    def __init__(self, budget_service: BudgetService) -> None:
+    def __init__(self, budget_service: BudgetRepository) -> None:
         self._budget_repo = budget_service
 
     async def create(self, name: str, description: str, amount: float, user_id: str) -> Budget:

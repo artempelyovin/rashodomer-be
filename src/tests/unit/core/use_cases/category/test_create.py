@@ -7,13 +7,14 @@ import pytest
 from core.entities import Category
 from core.enums import TransactionType
 from core.exceptions import CategoryAlreadyExistsError, EmptyCategoryNameError, NotEmojiIconError
-from core.services import CategoryService, EmojiService
+from core.services import EmojiService
+from core.repos import CategoryRepository
 from core.use_cases.category.create import CreateCategoryUseCase
 from tests.unit.core.conftest import fake
 
 
 async def test_success(fake_category: Category) -> None:
-    category_service = Mock(spec=CategoryService)
+    category_service = Mock(spec=CategoryRepository)
     category_service.find_by_name_and_category.return_value = (0, [])
     category_service.create.return_value = fake_category
     emoji_service = Mock(spec=EmojiService)
@@ -32,7 +33,7 @@ async def test_success(fake_category: Category) -> None:
 
 
 async def test_empty_category_name() -> None:
-    category_service = Mock(spec=CategoryService)
+    category_service = Mock(spec=CategoryRepository)
     emoji_service = Mock(spec=EmojiService)
 
     use_case = CreateCategoryUseCase(category_service, emoji_service)
@@ -49,7 +50,7 @@ async def test_empty_category_name() -> None:
 
 @pytest.mark.parametrize("bad_emoji_icon", ["🍿s", "not emodj", "s", ""])
 async def test_not_emoji_icon(bad_emoji_icon: str) -> None:
-    category_service = Mock(spec=CategoryService)
+    category_service = Mock(spec=CategoryRepository)
     emoji_service = Mock(spec=EmojiService)
     emoji_service.is_emoji.return_value = False
 
@@ -66,7 +67,7 @@ async def test_not_emoji_icon(bad_emoji_icon: str) -> None:
 
 
 async def test_category_already_exists(fake_category: Category) -> None:
-    category_service = Mock(spec=CategoryService)
+    category_service = Mock(spec=CategoryRepository)
     category_service.find_by_name_and_category.return_value = (1, [fake_category])
     emoji_service = Mock(spec=EmojiService)
 

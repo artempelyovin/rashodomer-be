@@ -1,12 +1,12 @@
 from unittest.mock import Mock
 
 from core.entities import Budget
-from core.services import BudgetService
+from core.repos import BudgetRepository
 from core.use_cases.budget.list import ListBudgetUseCase
 
 
 async def test_success(fake_budget: Budget) -> None:
-    budget_service = Mock(spec=BudgetService)
+    budget_service = Mock(spec=BudgetRepository)
     expected_budgets = [fake_budget, fake_budget]
     expected_total = len(expected_budgets)
     budget_service.list_.return_value = (expected_total, expected_budgets)

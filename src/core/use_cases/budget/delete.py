@@ -1,10 +1,10 @@
 from core.entities import Budget
 from core.exceptions import BudgetAccessDeniedError, BudgetNotExistsError
-from core.services import BudgetService
+from core.repos import BudgetRepository
 
 
 class DeleteBudgetUseCase:
-    def __init__(self, budget_service: BudgetService) -> None:
+    def __init__(self, budget_service: BudgetRepository) -> None:
         self._budget_repo = budget_service
 
     async def delete(self, user_id: str, budget_id: str) -> Budget:

@@ -1,10 +1,10 @@
 from core.entities import Category
 from core.exceptions import CategoryAccessDeniedError, CategoryNotExistsError
-from core.services import CategoryService
+from core.repos import CategoryRepository
 
 
 class GetCategoryUseCase:
-    def __init__(self, category_service: CategoryService) -> None:
+    def __init__(self, category_service: CategoryRepository) -> None:
         self._category_repo = category_service
 
     async def get(self, user_id: str, category_id: str) -> Category:

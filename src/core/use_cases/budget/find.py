@@ -1,10 +1,11 @@
 from core.entities import Budget
 from core.exceptions import EmptySearchTextError
-from core.services import BudgetService, Total
+from core.services import Total
+from core.repos import BudgetRepository
 
 
 class FindBudgetUseCase:
-    def __init__(self, budget_service: BudgetService) -> None:
+    def __init__(self, budget_service: BudgetRepository) -> None:
         self._budget_repo = budget_service
 
     async def find(

@@ -1,10 +1,11 @@
 from core.entities import Category
 from core.enums import TransactionType
-from core.services import CategoryService, Total
+from core.services import Total
+from core.repos import CategoryRepository
 
 
 class ListCategoryUseCase:
-    def __init__(self, category_service: CategoryService) -> None:
+    def __init__(self, category_service: CategoryRepository) -> None:
         self._category_service = category_service
 
     async def list(

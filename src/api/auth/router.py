@@ -5,7 +5,8 @@ from starlette import status
 from api.auth.schemas import CreateUserSchema, TokenSchema, UserLoginSchema, UserSchema
 from api.base import APIResponse, write_response
 from api.depends import password_service_factory, token_service_factory, user_service_factory
-from core.services import PasswordService, TokenService, UserService
+from core.services import PasswordService, TokenService
+from core.repos import UserRepository
 from core.use_cases.auth.login import LoginUserUseCase
 from core.use_cases.auth.register import RegisterUserUseCase
 
@@ -24,7 +25,7 @@ AUTH_TAG = "auth"
 async def register(
     body: CreateUserSchema,
     *,
-    user_service: UserService = Depends(user_service_factory),
+    user_service: UserRepository = Depends(user_service_factory),
     password_service: PasswordService = Depends(password_service_factory),
 ) -> APIResponse[UserSchema]:
     use_case = RegisterUserUseCase(user_service=user_service, password_service=password_service)
@@ -44,7 +45,7 @@ async def register(
 async def login(
     body: UserLoginSchema,
     *,
-    user_service: UserService = Depends(user_service_factory),
+    user_service: UserRepository = Depends(user_service_factory),
     password_service: PasswordService = Depends(password_service_factory),
     token_service: TokenService = Depends(token_service_factory),
 ) -> APIResponse[TokenSchema]:

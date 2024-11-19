@@ -4,13 +4,13 @@ import pytest
 
 from core.entities import Budget
 from core.exceptions import EmptySearchTextError
-from core.services import BudgetService
+from core.repos import BudgetRepository
 from core.use_cases.budget.find import FindBudgetUseCase
 from tests.unit.core.conftest import fake
 
 
 async def test_success(fake_budget: Budget) -> None:
-    budget_service = Mock(spec=BudgetService)
+    budget_service = Mock(spec=BudgetRepository)
     budgets = [fake_budget]
     total = len(budgets)
     budget_service.find_by_text.return_value = (total, budgets)
@@ -27,7 +27,7 @@ async def test_success(fake_budget: Budget) -> None:
 
 
 async def test_empty_budget_text() -> None:
-    budget_service = Mock(spec=BudgetService)
+    budget_service = Mock(spec=BudgetRepository)
     use_case = FindBudgetUseCase(budget_service)
 
     with pytest.raises(EmptySearchTextError):

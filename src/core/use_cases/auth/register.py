@@ -2,13 +2,14 @@ import string
 
 from core.entities import User
 from core.exceptions import LoginAlreadyExistsError, PasswordMissingSpecialCharacterError, PasswordTooShortError
-from core.services import PasswordService, UserService
+from core.services import PasswordService
+from core.repos import UserRepository
 
 
 class RegisterUserUseCase:
     MIN_PASSWORD_LENGTH = 8
 
-    def __init__(self, user_service: UserService, password_service: PasswordService) -> None:
+    def __init__(self, user_service: UserRepository, password_service: PasswordService) -> None:
         self._user_repo = user_service
         self._password_service = password_service
 

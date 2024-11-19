@@ -4,13 +4,13 @@ import pytest
 
 from core.entities import Category
 from core.exceptions import EmptySearchTextError
-from core.services import CategoryService
+from core.repos import CategoryRepository
 from core.use_cases.category.find import FindCategoryUseCase
 from tests.unit.core.conftest import fake
 
 
 async def test_success(fake_category: Category) -> None:
-    category_service = Mock(spec=CategoryService)
+    category_service = Mock(spec=CategoryRepository)
     categories = [fake_category]
     total = len(categories)
     category_service.find_by_text.return_value = (total, categories)
@@ -31,7 +31,7 @@ async def test_success(fake_category: Category) -> None:
 
 
 async def test_empty_category_text() -> None:
-    category_service = Mock(spec=CategoryService)
+    category_service = Mock(spec=CategoryRepository)
     use_case = FindCategoryUseCase(category_service)
 
     with pytest.raises(EmptySearchTextError):
