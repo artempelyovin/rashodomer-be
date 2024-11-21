@@ -1,7 +1,7 @@
 from core.entities import Category
 from core.enums import TransactionType
-from core.services import Total
 from core.repos import CategoryRepository
+from core.services import Total
 
 
 class ListCategoryUseCase:

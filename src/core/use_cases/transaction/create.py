@@ -15,7 +15,10 @@ from core.repos import BudgetRepository, CategoryRepository, TransactionReposito
 
 class CreateTransactionUseCase:
     def __init__(
-        self, budget_service: BudgetRepository, category_service: CategoryRepository, transaction_service: TransactionRepository
+        self,
+        budget_service: BudgetRepository,
+        category_service: CategoryRepository,
+        transaction_service: TransactionRepository,
     ) -> None:
         self._category_repo = category_service
         self._budget_repo = budget_service
@@ -43,21 +46,22 @@ class CreateTransactionUseCase:
             raise CategoryNotExistsError(category_id=category_id)
         if category.user_id != user_id:
             raise CategoryAccessDeniedError
-        transaction = await self._transaction_repo.create(
+        transaction = Transaction(
             amount=amount,
             description=description,
-            transaction_type=transaction_type,
+            type=transaction_type,
             budget_id=budget_id,
             category_id=category_id,
             user_id=user_id,
             timestamp=timestamp,
         )
+        transaction = await self._transaction_repo.create(transaction)
         match transaction_type:
             case TransactionType.EXPENSE:
-                new_budget_amount = budget.amount - transaction.amount
-            case TransactionType.EXPENSE:
-                new_budget_amount = budget.amount - transaction.amount
+                budget.amount -= transaction.amount
+            case TransactionType.INCOME:
+                budget.amount += transaction.amount
             case _:
                 raise UnsupportedTransactionTypeError(transaction_type=transaction_type)
-        await self._budget_repo.update_budget(budget_id=budget_id, amount=new_budget_amount)
+        await self._budget_repo.update(budget)
         return transaction

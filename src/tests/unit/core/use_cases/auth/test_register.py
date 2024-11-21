@@ -4,8 +4,8 @@ import pytest
 
 from core.entities import User
 from core.exceptions import LoginAlreadyExistsError, PasswordMissingSpecialCharacterError, PasswordTooShortError
-from core.services import PasswordService
 from core.repos import UserRepository
+from core.services import PasswordService
 from core.use_cases.auth.register import RegisterUserUseCase
 from tests.unit.core.conftest import fake
 

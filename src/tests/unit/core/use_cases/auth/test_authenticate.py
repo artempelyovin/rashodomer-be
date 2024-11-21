@@ -4,8 +4,8 @@ import pytest
 
 from core.entities import User
 from core.exceptions import UnauthorizedError, UserNotExistsError
-from core.services import TokenService
 from core.repos import UserRepository
+from core.services import TokenService
 from core.use_cases.auth.authenticate import AuthenticationUseCase
 from tests.unit.core.conftest import fake
 

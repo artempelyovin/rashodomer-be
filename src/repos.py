@@ -1,4 +1,3 @@
-import datetime
 import uuid
 from pathlib import Path
 from typing import Any
@@ -7,11 +6,11 @@ import ujson
 
 from core.entities import Budget, Category, Transaction, User
 from core.enums import TransactionType
+from core.repos import BudgetRepository, CategoryRepository, TransactionRepository, UserRepository
 from core.services import (
     TokenService,
     Total,
 )
-from core.repos import UserRepository, BudgetRepository, CategoryRepository, TransactionRepository
 from core.utils import UNSET, UnsetValue
 
 
@@ -78,9 +77,21 @@ class FileUserRepository(UserRepository, JsonFileMixin):
     def __init__(self) -> None:
         self._users: dict[str, User] = self.load()
 
-    async def create(self, first_name: str, last_name: str, login: str, password_hash: str) -> User:
-        user = User(first_name=first_name, last_name=last_name, login=login, password_hash=password_hash)
-        self._users[user.id] = user
+    async def create(self, entity: User) -> User:
+        self._users[entity.id] = entity
+        self.save(self._users)
+        return entity
+
+    async def update(self, updated_entity: User) -> User:
+        self._users[updated_entity.id] = updated_entity
+        self.save(self._users)
+        return updated_entity
+
+    async def get(self, entity_id: str) -> User | None:
+        return self._users.get(entity_id, None)
+
+    async def delete(self, entity_id: str) -> User:
+        user = self._users.pop(entity_id)
         self.save(self._users)
         return user
 
@@ -90,37 +101,6 @@ class FileUserRepository(UserRepository, JsonFileMixin):
                 return user
         return None
 
-    async def get(self, user_id: str) -> User | None:
-        return self._users.get(user_id, None)
-
-    async def update_first_name(self, user_id: str, first_name: str) -> User:
-        user = self._users[user_id]
-        user.first_name = first_name
-        self.save(self._users)
-        return user
-
-    async def update_last_name(self, user_id: str, last_name: str) -> User:
-        user = self._users[user_id]
-        user.last_name = last_name
-        self.save(self._users)
-        return user
-
-    async def update_last_login(self, user_id: str, last_login: datetime.datetime) -> User:
-        user = self._users[user_id]
-        user.last_login = last_login
-        self.save(self._users)
-        return user
-
-    async def change_password_hash(self, user_id: str, password_hash: str) -> User:
-        user = self._users[user_id]
-        user.password_hash = password_hash
-        self.save(self._users)
-        return user
-
-    async def delete(self, user_id: str) -> None:
-        self._users.pop(user_id)
-        self.save(self._users)
-
 
 class FileBudgetRepository(BudgetRepository, JsonFileMixin):
     collection = "budgets"
@@ -128,26 +108,33 @@ class FileBudgetRepository(BudgetRepository, JsonFileMixin):
     def __init__(self) -> None:
         self._budgets: dict[str, Budget] = self.load()
 
-    async def create(self, name: str, description: str, amount: float, user_id: str) -> Budget:
-        budget = Budget(name=name, description=description, amount=amount, user_id=user_id)
-        self._budgets[budget.id] = budget
+    async def create(self, entity: Budget) -> Budget:
+        self._budgets[entity.id] = entity
+        self.save(self._budgets)
+        return entity
+
+    async def update(self, updated_entity: Budget) -> Budget:
+        self._budgets[updated_entity.id] = updated_entity
+        self.save(self._budgets)
+        return updated_entity
+
+    async def get(self, entity_id: str) -> Budget | None:
+        return self._budgets.get(entity_id, None)
+
+    async def delete(self, entity_id: str) -> Budget:
+        budget = self._budgets.pop(entity_id)
         self.save(self._budgets)
         return budget
 
-    async def get(self, budget_id: str) -> Budget | None:
-        return self._budgets.get(budget_id, None)
-
-    async def list_(self, user_id: str, limit: int | None = None, offset: int = 0) -> tuple[Total, list[Budget]]:
+    async def list_(
+        self, user_id: str, *, name: str | UnsetValue = UNSET, limit: int | None = None, offset: int = 0
+    ) -> tuple[Total, list[Budget]]:
         budgets = [budget for budget in self._budgets.values() if budget.user_id == user_id]
+        if not isinstance(name, UnsetValue):
+            budgets = [budget for budget in budgets if budget.name == name]
         if limit is None:
             return len(budgets), budgets[offset:]
         return len(budgets), budgets[offset : offset + limit]
-
-    async def find_by_name(
-        self, user_id: str, name: str, limit: int | None = None, offset: int = 0
-    ) -> tuple[Total, list[Budget]]:
-        budgets = [budget for budget in self._budgets.values() if budget.user_id == user_id and budget.name == name]
-        return paginate(budgets, limit, offset)
 
     async def find_by_text(
         self, user_id: str, text: str, *, case_sensitive: bool = False, limit: int | None = None, offset: int = 0
@@ -160,28 +147,6 @@ class FileBudgetRepository(BudgetRepository, JsonFileMixin):
         budgets = [budget for budget in self._budgets.values() if budget.user_id == user_id and matches_text(budget)]
         return paginate(budgets, limit, offset)
 
-    async def update_budget(
-        self,
-        budget_id: str,
-        name: str | UnsetValue = UNSET,
-        description: str | UnsetValue = UNSET,
-        amount: float | UnsetValue = UNSET,
-    ) -> Budget:
-        budget = self._budgets[budget_id]
-        if not isinstance(name, UnsetValue):
-            budget.name = name
-        if not isinstance(description, UnsetValue):
-            budget.description = description
-        if not isinstance(amount, UnsetValue):
-            budget.amount = amount
-        self.save(self._budgets)
-        return budget
-
-    async def delete(self, budget_id: str) -> Budget:
-        budget = self._budgets.pop(budget_id)
-        self.save(self._budgets)
-        return budget
-
 
 class FileCategoryRepository(CategoryRepository, JsonFileMixin):
     collection = "categories"
@@ -189,18 +154,23 @@ class FileCategoryRepository(CategoryRepository, JsonFileMixin):
     def __init__(self) -> None:
         self._categories: dict[str, Category] = self.load()
 
-    async def create(
-        self, user_id: str, name: str, description: str, transaction_type: TransactionType, emoji_icon: str | None
-    ) -> Category:
-        category = Category(
-            name=name, description=description, type=transaction_type, user_id=user_id, emoji_icon=emoji_icon
-        )
-        self._categories[category.id] = category
+    async def create(self, entity: Category) -> Category:
+        self._categories[entity.id] = entity
+        self.save(self._categories)
+        return entity
+
+    async def update(self, updated_entity: Category) -> Category:
+        self._categories[updated_entity.id] = updated_entity
+        self.save(self._categories)
+        return updated_entity
+
+    async def get(self, entity_id: str) -> Category | None:
+        return self._categories.get(entity_id, None)
+
+    async def delete(self, entity_id: str) -> Category:
+        category = self._categories.pop(entity_id)
         self.save(self._categories)
         return category
-
-    async def get(self, category_id: str) -> Category | None:
-        return self._categories.get(category_id, None)
 
     async def list_(
         self,
@@ -208,6 +178,7 @@ class FileCategoryRepository(CategoryRepository, JsonFileMixin):
         transaction_type: TransactionType,
         *,
         show_archived: bool = False,
+        name: str | UnsetValue = UNSET,
         limit: int | None = None,
         offset: int = 0,
     ) -> tuple[Total, list[Category]]:
@@ -218,21 +189,8 @@ class FileCategoryRepository(CategoryRepository, JsonFileMixin):
         ]
         if not show_archived:
             user_categories = [category for category in user_categories if not category.is_archived]
-        return paginate(user_categories, limit, offset)
-
-    async def find_by_name_and_category(
-        self,
-        user_id: str,
-        name: str,
-        transaction_type: TransactionType | None = None,
-        limit: int | None = None,
-        offset: int = 0,
-    ) -> tuple[Total, list[Category]]:
-        user_categories = [
-            category for category in self._categories.values() if category.user_id == user_id and category.name == name
-        ]
-        if transaction_type is not None:
-            user_categories = [category for category in user_categories if category.type == transaction_type]
+        if not isinstance(name, UnsetValue):
+            user_categories = [category for category in user_categories if category.name == name]
         return paginate(user_categories, limit, offset)
 
     async def find_by_text(
@@ -248,66 +206,30 @@ class FileCategoryRepository(CategoryRepository, JsonFileMixin):
         ]
         return paginate(categories, limit, offset)
 
-    async def update_category(
-        self,
-        category_id: str,
-        name: str | UnsetValue = UNSET,
-        description: str | UnsetValue = UNSET,
-        transaction_type: TransactionType | UnsetValue = UNSET,
-        is_archived: bool | UnsetValue = UNSET,
-        emoji_icon: str | None | UnsetValue = UNSET,
-    ) -> Category:
-        category = self._categories[category_id]
-        if not isinstance(name, UnsetValue):
-            category.name = name
-        if not isinstance(description, UnsetValue):
-            category.description = description
-        if not isinstance(transaction_type, UnsetValue):
-            category.type = transaction_type
-        if not isinstance(is_archived, UnsetValue):
-            category.is_archived = is_archived
-        if not isinstance(emoji_icon, UnsetValue):
-            category.emoji_icon = emoji_icon
-        self.save(self._categories)
-        return category
-
-    async def delete(self, category_id: str) -> Category:
-        category = self._categories.pop(category_id)
-        self.save(self._categories)
-        return category
-
 
 class FileTransactionRepository(TransactionRepository, JsonFileMixin):
-    collection = "expenses"
+    collection = "transactions"
 
     def __init__(self) -> None:
-        self._expenses: dict[str, Transaction] = self.load()
+        self._transactions: dict[str, Transaction] = self.load()
 
-    async def create(
-        self,
-        amount: float,
-        description: str,
-        transaction_type: TransactionType,
-        budget_id: str,
-        category_id: str,
-        user_id: str,
-        timestamp: datetime.datetime,
-    ) -> Transaction:
-        expense = Transaction(
-            amount=amount,
-            description=description,
-            type=transaction_type,
-            budget_id=budget_id,
-            category_id=category_id,
-            user_id=user_id,
-            timestamp=timestamp,
-        )
-        self._expenses[expense.id] = expense
-        self.save(self._expenses)
-        return expense
+    async def create(self, entity: Transaction) -> Transaction:
+        self._transactions[entity.id] = entity
+        self.save(self._transactions)
+        return entity
 
-    async def get(self, transaction_id: str) -> Transaction | None:
-        return self._expenses.get(transaction_id, None)
+    async def update(self, updated_entity: Transaction) -> Transaction:
+        self._transactions[updated_entity.id] = updated_entity
+        self.save(self._transactions)
+        return updated_entity
+
+    async def get(self, entity_id: str) -> Transaction | None:
+        return self._transactions.get(entity_id, None)
+
+    async def delete(self, entity_id: str) -> Transaction:
+        transaction = self._transactions.pop(entity_id)
+        self.save(self._transactions)
+        return transaction
 
     async def list_(
         self,
@@ -319,7 +241,7 @@ class FileTransactionRepository(TransactionRepository, JsonFileMixin):
         limit: int | None = None,
         offset: int = 0,
     ) -> tuple[Total, list[Transaction]]:
-        expenses = [expense for expense in self._expenses.values() if expense.user_id == user_id]
+        expenses = [expense for expense in self._transactions.values() if expense.user_id == user_id]
         if not isinstance(type_, UnsetValue):
             expenses = [e for e in expenses if e.type == type_]
         if not isinstance(budget_id, UnsetValue):
@@ -327,25 +249,3 @@ class FileTransactionRepository(TransactionRepository, JsonFileMixin):
         if not isinstance(category_id, UnsetValue):
             expenses = [e for e in expenses if e.category_id == category_id]
         return paginate(expenses, limit, offset)
-
-    async def update(
-        self,
-        expense_id: str,
-        amount: float | UnsetValue = UNSET,
-        category_id: str | UnsetValue = UNSET,
-        description: str | UnsetValue = UNSET,
-    ) -> Transaction:
-        expense = self._expenses[expense_id]
-        if not isinstance(amount, UnsetValue):
-            expense.amount = amount
-        if not isinstance(category_id, UnsetValue):
-            expense.category_id = category_id
-        if not isinstance(description, UnsetValue):
-            expense.description = description
-        self.save(self._expenses)
-        return expense
-
-    async def delete(self, transaction_id: str) -> Transaction:
-        transaction = self._expenses.pop(transaction_id)
-        self.save(self._expenses)
-        return transaction

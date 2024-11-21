@@ -1,8 +1,8 @@
 from datetime import UTC, datetime
 
 from core.exceptions import IncorrectPasswordError, LoginNotExistsError
-from core.services import PasswordService, TokenService
 from core.repos import UserRepository
+from core.services import PasswordService, TokenService
 
 
 class LoginUserUseCase:
@@ -20,5 +20,6 @@ class LoginUserUseCase:
         password_hash = self._password_service.hash_password(password)
         if not self._password_service.check_password(password=password, password_hash=password_hash):
             raise IncorrectPasswordError
-        await self._user_repo.update_last_login(user_id=user.id, last_login=datetime.now(tz=UTC))
+        user.last_login = datetime.now(tz=UTC)
+        await self._user_repo.update(user)
         return await self._token_service.create_new_token(user_id=user.id)

@@ -4,8 +4,8 @@ import pytest
 
 from core.entities import User
 from core.exceptions import IncorrectPasswordError, LoginNotExistsError
-from core.services import PasswordService, TokenService
 from core.repos import UserRepository
+from core.services import PasswordService, TokenService
 from core.use_cases.auth.login import LoginUserUseCase
 from tests.unit.core.conftest import fake
 
@@ -25,7 +25,7 @@ async def test_success(fake_user: User) -> None:
     token = await use_case.login(login=fake_user.login, password=fake.password())
 
     assert token == new_token
-    user_service.update_last_login.assert_called_once()
+    user_service.update.assert_called_once()
 
 
 async def test_login_not_exists() -> None:

@@ -1,8 +1,8 @@
 from core.entities import Category
 from core.enums import TransactionType
 from core.exceptions import CategoryAlreadyExistsError, EmptyCategoryNameError, NotEmojiIconError
-from core.services import EmojiService
 from core.repos import CategoryRepository
+from core.services import EmojiService
 
 
 class CreateCategoryUseCase:
@@ -17,15 +17,12 @@ class CreateCategoryUseCase:
             raise EmptyCategoryNameError
         if emoji_icon is not None and not self._emoji_service.is_emoji(emoji_icon):
             raise NotEmojiIconError(emoji_icon=emoji_icon)
-        total_exist_categories, _ = await self._category_service.find_by_name_and_category(
-            user_id=user_id, name=name, transaction_type=transaction_type
+        total_exist_categories, _ = await self._category_service.list_(
+            user_id=user_id, transaction_type=transaction_type, name=name
         )
         if total_exist_categories != 0:
             raise CategoryAlreadyExistsError(name=name, transaction_type=transaction_type)
-        return await self._category_service.create(
-            user_id=user_id,
-            name=name,
-            description=description,
-            transaction_type=transaction_type,
-            emoji_icon=emoji_icon,
+        category = Category(
+            user_id=user_id, name=name, description=description, type=transaction_type, emoji_icon=emoji_icon
         )
+        return await self._category_service.create(category)

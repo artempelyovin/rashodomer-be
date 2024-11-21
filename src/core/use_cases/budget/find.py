@@ -1,7 +1,7 @@
 from core.entities import Budget
 from core.exceptions import EmptySearchTextError
-from core.services import Total
 from core.repos import BudgetRepository
+from core.services import Total
 
 
 class FindBudgetUseCase:

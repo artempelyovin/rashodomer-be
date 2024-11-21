@@ -10,8 +10,8 @@ from api.category.schemas import CategorySchema, CreateCategorySchema, UpdateCat
 from api.depends import authentication_user, category_service_factory, emoji_service_factory
 from core.entities import User
 from core.enums import TransactionType
-from core.services import EmojiService
 from core.repos import CategoryRepository
+from core.services import EmojiService
 from core.use_cases.category.create import CreateCategoryUseCase
 from core.use_cases.category.delete import DeleteCategoryUseCase
 from core.use_cases.category.find import FindCategoryUseCase

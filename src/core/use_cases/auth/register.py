@@ -2,8 +2,8 @@ import string
 
 from core.entities import User
 from core.exceptions import LoginAlreadyExistsError, PasswordMissingSpecialCharacterError, PasswordTooShortError
-from core.services import PasswordService
 from core.repos import UserRepository
+from core.services import PasswordService
 
 
 class RegisterUserUseCase:
@@ -19,9 +19,8 @@ class RegisterUserUseCase:
             raise LoginAlreadyExistsError(login=login)
         self._validate_password(password)
         password_hash = self._password_service.hash_password(password)
-        return await self._user_repo.create(
-            first_name=first_name, last_name=last_name, login=login, password_hash=password_hash
-        )
+        user = User(first_name=first_name, last_name=last_name, login=login, password_hash=password_hash)
+        return await self._user_repo.create(user)
 
     def _validate_password(self, password: str) -> None:
         if len(password) < self.MIN_PASSWORD_LENGTH:

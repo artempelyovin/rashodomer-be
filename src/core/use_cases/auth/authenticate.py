@@ -1,7 +1,7 @@
 from core.entities import User
 from core.exceptions import UnauthorizedError, UserNotExistsError
-from core.services import TokenService
 from core.repos import UserRepository
+from core.services import TokenService
 
 
 class AuthenticationUseCase:

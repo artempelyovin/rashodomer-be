@@ -22,7 +22,7 @@ async def test_success(fake_budget: Budget) -> None:
     )
 
     budget_service.get.return_value = fake_budget
-    budget_service.update_budget.return_value = expected_budget
+    budget_service.update.return_value = expected_budget
     use_case = UpdateBudgetUseCase(budget_service)
 
     updated_budget = await use_case.update(

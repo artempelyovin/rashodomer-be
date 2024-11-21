@@ -10,7 +10,8 @@ class CreateBudgetUseCase:
     async def create(self, name: str, description: str, amount: float, user_id: str) -> Budget:
         if amount < 0:
             raise AmountMustBePositiveError
-        _, exist_budgets = await self._budget_repo.find_by_name(user_id=user_id, name=name)
-        if exist_budgets:
+        total_exist_budgets, _ = await self._budget_repo.list_(user_id=user_id, name=name)
+        if total_exist_budgets:
             raise BudgetAlreadyExistsError(name=name)
-        return await self._budget_repo.create(name=name, description=description, amount=amount, user_id=user_id)
+        budget = Budget(name=name, description=description, amount=amount, user_id=user_id)
+        return await self._budget_repo.create(budget)

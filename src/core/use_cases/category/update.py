@@ -24,12 +24,15 @@ class UpdateCategoryUseCase:
             raise CategoryNotExistsError(category_id=category_id)
         if category.user_id != user_id:
             raise CategoryAccessDeniedError
-        return await self._category_repo.update_category(
-            category_id=category_id,
-            name=name,
-            description=description,
-            transaction_type=transaction_type,
-            is_archived=is_archived,
-            emoji_icon=emoji_icon,
-        )
+        if not isinstance(name, UnsetValue):
+            category.name = name
+        if not isinstance(description, UnsetValue):
+            category.description = description
+        if not isinstance(transaction_type, UnsetValue):
+            category.type = transaction_type
+        if not isinstance(is_archived, UnsetValue):
+            category.is_archived = is_archived
+        if not isinstance(emoji_icon, UnsetValue):
+            category.emoji_icon = emoji_icon
+        return await self._category_repo.update(category)
         # тут логика по изменению бюджетов, при условии смены `transaction_type`

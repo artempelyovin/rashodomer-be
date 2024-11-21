@@ -11,7 +11,7 @@ from tests.unit.core.conftest import fake
 
 async def test_success(fake_budget: Budget) -> None:
     budget_service = Mock(spec=BudgetRepository)
-    budget_service.find_by_name.return_value = (0, [])
+    budget_service.list_.return_value = (0, [])
     budget_service.create.return_value = fake_budget
     use_case = CreateBudgetUseCase(budget_service)
 
@@ -22,10 +22,7 @@ async def test_success(fake_budget: Budget) -> None:
         user_id=fake_budget.user_id,
     )
 
-    assert budget.name == fake_budget.name
-    assert budget.description == fake_budget.description
-    assert budget.amount == fake_budget.amount
-    assert budget.user_id == fake_budget.user_id
+    assert budget == fake_budget
 
 
 async def test_amount_must_be_positive(fake_budget: Budget) -> None:
@@ -43,7 +40,7 @@ async def test_amount_must_be_positive(fake_budget: Budget) -> None:
 
 async def test_budget_already_exist(fake_budget: Budget) -> None:
     budget_service = Mock(spec=BudgetRepository)
-    budget_service.find_by_name.return_value = (1, [fake_budget])
+    budget_service.list_.return_value = (1, [fake_budget])
     use_case = CreateBudgetUseCase(budget_service)
 
     with pytest.raises(BudgetAlreadyExistsError):

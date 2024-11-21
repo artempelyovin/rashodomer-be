@@ -1,7 +1,7 @@
 from core.entities import Category
 from core.exceptions import EmptySearchTextError
-from core.services import Total
 from core.repos import CategoryRepository
+from core.services import Total
 
 
 class FindCategoryUseCase:
