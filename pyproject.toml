@@ -15,6 +15,7 @@ fastapi = "^0.115.5"
 uvicorn = "^0.32.0"
 ujson = "^5.10.0"
 emoji = "^2.14.0"
+httpx = "^0.28.1"
 
 
 [tool.poetry.group.dev.dependencies]

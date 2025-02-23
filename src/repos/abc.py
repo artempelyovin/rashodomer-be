@@ -12,14 +12,6 @@ from utils import UNSET, UnsetValue
 type Total = int
 
 
-class PasswordService(ABC):
-    @abstractmethod
-    def hash_password(self, password: str) -> str: ...
-
-    @abstractmethod
-    def check_password(self, password: str, password_hash: str) -> bool: ...
-
-
 class TokenRepo(ABC):
     @abstractmethod
     async def create_new_token(self, user_id: str) -> str: ...

@@ -21,12 +21,12 @@ from utils import UNSET
 
 
 @pytest.fixture
-def category_repo():
+def category_repo() -> Mock:
     return Mock(spec=CategoryRepo)
 
 
 class TestCategoryManagerCreate:
-    async def test_success(self, category_repo, fake_category: CategorySchema) -> None:
+    async def test_success(self, category_repo: Mock, fake_category: CategorySchema) -> None:
         category_repo.find_by_name_and_category.return_value = (0, [])
         category_repo.add.return_value = fake_category
         manager = CategoryManager(category_repo=category_repo)
@@ -43,7 +43,7 @@ class TestCategoryManagerCreate:
 
         assert created_category == fake_category
 
-    async def test_empty_category_name(self, category_repo) -> None:
+    async def test_empty_category_name(self, category_repo: Mock) -> None:
         manager = CategoryManager(category_repo=category_repo)
 
         with pytest.raises(EmptyCategoryNameError):
@@ -58,7 +58,7 @@ class TestCategoryManagerCreate:
             )
 
     @pytest.mark.parametrize("bad_emoji_icon", ["🍿s", "not emodj", "s", ""])
-    async def test_not_emoji_icon(self, category_repo, bad_emoji_icon: str) -> None:
+    async def test_not_emoji_icon(self, category_repo: Mock, bad_emoji_icon: str) -> None:
         manager = CategoryManager(category_repo=category_repo)
 
         with pytest.raises(NotEmojiIconError):
@@ -72,7 +72,7 @@ class TestCategoryManagerCreate:
                 ),
             )
 
-    async def test_category_already_exists(self, category_repo, fake_category: CategorySchema) -> None:
+    async def test_category_already_exists(self, category_repo: Mock, fake_category: CategorySchema) -> None:
         category_repo.find_by_name_and_category.return_value = (1, [fake_category])
         manager = CategoryManager(category_repo)
 
@@ -89,7 +89,7 @@ class TestCategoryManagerCreate:
 
 
 class TestCategoryManagerGet:
-    async def test_success(self, category_repo, fake_category: CategorySchema) -> None:
+    async def test_success(self, category_repo: Mock, fake_category: CategorySchema) -> None:
         category_repo.get.return_value = fake_category
         manager = CategoryManager(category_repo=category_repo)
 
@@ -98,14 +98,14 @@ class TestCategoryManagerGet:
         assert category == fake_category
         category_repo.get.assert_called_once_with(fake_category.id)
 
-    async def test_category_not_exists(self, category_repo) -> None:
+    async def test_category_not_exists(self, category_repo: Mock) -> None:
         category_repo.get.return_value = None
         manager = CategoryManager(category_repo=category_repo)
 
         with pytest.raises(CategoryNotExistsError):
             await manager.get(user_id=str(fake.uuid4()), category_id=str(fake.uuid4()))
 
-    async def test_category_access_denied(self, category_repo, fake_category: CategorySchema) -> None:
+    async def test_category_access_denied(self, category_repo: Mock, fake_category: CategorySchema) -> None:
         category_repo.get.return_value = fake_category
         manager = CategoryManager(category_repo=category_repo)
 
@@ -117,7 +117,7 @@ class TestCategoryManagerGet:
 
 
 class TestCategoryManagerList:
-    async def test_success(self, category_repo, fake_category: CategorySchema) -> None:
+    async def test_success(self, category_repo: Mock, fake_category: CategorySchema) -> None:
         expected_categories = [fake_category, fake_category]
         expected_total = len(expected_categories)
         category_repo.list_.return_value = (expected_total, expected_categories)
@@ -138,7 +138,7 @@ class TestCategoryManagerList:
 
 
 class TestCategoryManagerUpdate:
-    async def test_success(self, category_repo, fake_category: CategorySchema) -> None:
+    async def test_success(self, category_repo: Mock, fake_category: CategorySchema) -> None:
         category_repo.get.return_value = fake_category
         updated_category = CategorySchema(
             id=fake_category.id,
@@ -168,7 +168,7 @@ class TestCategoryManagerUpdate:
         # changed
         assert updated_category != fake_category
 
-    async def test_category_not_exists(self, category_repo, fake_category: CategorySchema) -> None:
+    async def test_category_not_exists(self, category_repo: Mock, fake_category: CategorySchema) -> None:
         category_repo.get.return_value = None
         manager = CategoryManager(category_repo=category_repo)
 
@@ -183,7 +183,7 @@ class TestCategoryManagerUpdate:
                 emoji_icon=UNSET,
             )
 
-    async def test_category_access_denied(self, category_repo, fake_category: CategorySchema) -> None:
+    async def test_category_access_denied(self, category_repo: Mock, fake_category: CategorySchema) -> None:
         category_repo.get.return_value = fake_category
         manager = CategoryManager(category_repo=category_repo)
 
@@ -200,7 +200,7 @@ class TestCategoryManagerUpdate:
 
 
 class TestCategoryManagerDelete:
-    async def test_success(self, category_repo, fake_category: CategorySchema) -> None:
+    async def test_success(self, category_repo: Mock, fake_category: CategorySchema) -> None:
         category_repo.get.return_value = fake_category
         category_repo.delete.return_value = fake_category
         manager = CategoryManager(category_repo=category_repo)
@@ -209,7 +209,7 @@ class TestCategoryManagerDelete:
 
         assert deleted_category == fake_category
 
-    async def test_category_not_exists(self, category_repo) -> None:
+    async def test_category_not_exists(self, category_repo: Mock) -> None:
         category_repo.get.return_value = None
 
         manager = CategoryManager(category_repo=category_repo)
@@ -217,7 +217,7 @@ class TestCategoryManagerDelete:
         with pytest.raises(CategoryNotExistsError):
             await manager.delete(user_id=str(fake.uuid4()), category_id=str(fake.uuid4()))
 
-    async def test_category_access_denied(self, category_repo, fake_category: CategorySchema) -> None:
+    async def test_category_access_denied(self, category_repo: Mock, fake_category: CategorySchema) -> None:
         category_repo.get.return_value = fake_category
 
         manager = CategoryManager(category_repo=category_repo)
@@ -230,7 +230,7 @@ class TestCategoryManagerDelete:
 
 
 class TestCategoryManagerFind:
-    async def test_success(self, category_repo, fake_category: CategorySchema) -> None:
+    async def test_success(self, category_repo: Mock, fake_category: CategorySchema) -> None:
         categories = [fake_category]
         total = len(categories)
         category_repo.find_by_text.return_value = (total, categories)
@@ -249,7 +249,7 @@ class TestCategoryManagerFind:
         for category, expected_category in zip(result_categories, categories, strict=True):
             assert category == expected_category
 
-    async def test_empty_category_text(self, category_repo) -> None:
+    async def test_empty_category_text(self, category_repo: Mock) -> None:
         manager = CategoryManager(category_repo=category_repo)
 
         with pytest.raises(EmptySearchTextError):

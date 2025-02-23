@@ -6,8 +6,8 @@ from fastapi import APIRouter, Depends, Path, Query
 from starlette import status
 
 from base import APIResponse, APIResponseList, write_response, write_response_list
-from enums import CategoryType
 from depends import authentication_user, category_repo_factory
+from enums import CategoryType
 from managers.category import CategoryManager
 from repos.abc import CategoryRepo
 from schemas.category import CategorySchema, CreateCategorySchema, UpdateCategorySchema

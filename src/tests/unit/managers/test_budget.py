@@ -17,12 +17,12 @@ from utils import UNSET
 
 
 @pytest.fixture
-def budget_repo():
+def budget_repo() -> Mock:
     return Mock(spec=BudgetRepo)
 
 
 class TestBudgetManagerCreate:
-    async def test_success(self, budget_repo, fake_budget: BudgetSchema) -> None:
+    async def test_success(self, budget_repo: Mock, fake_budget: BudgetSchema) -> None:
         budget_repo.find_by_name.return_value = (0, [])
         budget_repo.add.return_value = fake_budget
         manager = BudgetManager(budget_repo=budget_repo)
@@ -41,7 +41,7 @@ class TestBudgetManagerCreate:
         assert budget.amount == fake_budget.amount
         assert budget.user_id == fake_budget.user_id
 
-    async def test_amount_must_be_positive(self, budget_repo, fake_budget: BudgetSchema) -> None:
+    async def test_amount_must_be_positive(self, budget_repo: Mock, fake_budget: BudgetSchema) -> None:
         manager = BudgetManager(budget_repo=budget_repo)
 
         with pytest.raises(AmountMustBePositiveError):
@@ -54,7 +54,7 @@ class TestBudgetManagerCreate:
                 ),
             )
 
-    async def test_budget_already_exist(self, budget_repo, fake_budget: BudgetSchema) -> None:
+    async def test_budget_already_exist(self, budget_repo: Mock, fake_budget: BudgetSchema) -> None:
         budget_repo.find_by_name.return_value = (1, [fake_budget])
         manager = BudgetManager(budget_repo=budget_repo)
 
@@ -70,7 +70,7 @@ class TestBudgetManagerCreate:
 
 
 class TestBudgetManagerGet:
-    async def test_success(self, budget_repo, fake_budget: BudgetSchema) -> None:
+    async def test_success(self, budget_repo: Mock, fake_budget: BudgetSchema) -> None:
         budget_repo.get.return_value = fake_budget
         manager = BudgetManager(budget_repo=budget_repo)
 
@@ -81,14 +81,14 @@ class TestBudgetManagerGet:
         assert budget.amount == fake_budget.amount
         assert budget.user_id == fake_budget.user_id
 
-    async def test_budget_not_exists(self, budget_repo) -> None:
+    async def test_budget_not_exists(self, budget_repo: Mock) -> None:
         budget_repo.get.return_value = None
         manager = BudgetManager(budget_repo=budget_repo)
 
         with pytest.raises(BudgetNotExistsError):
             await manager.get(user_id=str(fake.uuid4()), budget_id=str(fake.uuid4()))
 
-    async def test_budget_access_denied(self, budget_repo, fake_budget: BudgetSchema) -> None:
+    async def test_budget_access_denied(self, budget_repo: Mock, fake_budget: BudgetSchema) -> None:
         budget_repo.get.return_value = fake_budget
         manager = BudgetManager(budget_repo=budget_repo)
 
@@ -100,7 +100,7 @@ class TestBudgetManagerGet:
 
 
 class TestBudgetManagerList:
-    async def test_success(self, budget_repo, fake_budget: BudgetSchema) -> None:
+    async def test_success(self, budget_repo: Mock, fake_budget: BudgetSchema) -> None:
         expected_budgets = [fake_budget, fake_budget]
         expected_total = len(expected_budgets)
         budget_repo.list_.return_value = (expected_total, expected_budgets)
@@ -115,7 +115,7 @@ class TestBudgetManagerList:
 
 
 class TestBudgetManagerUpdate:
-    async def test_success(self, budget_repo, fake_budget: BudgetSchema) -> None:
+    async def test_success(self, budget_repo: Mock, fake_budget: BudgetSchema) -> None:
         expected_budget = BudgetSchema(
             id=fake_budget.id,
             user_id=fake_budget.user_id,
@@ -145,7 +145,7 @@ class TestBudgetManagerUpdate:
         assert updated_budget.description == expected_budget.description
         assert updated_budget.amount == expected_budget.amount
 
-    async def test_budget_not_exists(self, budget_repo, fake_budget: BudgetSchema) -> None:
+    async def test_budget_not_exists(self, budget_repo: Mock, fake_budget: BudgetSchema) -> None:
         budget_repo.get.return_value = None
         manager = BudgetManager(budget_repo=budget_repo)
 
@@ -158,7 +158,7 @@ class TestBudgetManagerUpdate:
                 amount=UNSET,
             )
 
-    async def test_budget_access_denied(self, budget_repo, fake_budget: BudgetSchema) -> None:
+    async def test_budget_access_denied(self, budget_repo: Mock, fake_budget: BudgetSchema) -> None:
         budget_repo.get.return_value = fake_budget
         manager = BudgetManager(budget_repo=budget_repo)
 
@@ -171,7 +171,7 @@ class TestBudgetManagerUpdate:
                 amount=UNSET,
             )
 
-    async def test_amount_must_be_positive(self, budget_repo, fake_budget: BudgetSchema) -> None:
+    async def test_amount_must_be_positive(self, budget_repo: Mock, fake_budget: BudgetSchema) -> None:
         budget_repo.get.return_value = fake_budget
         manager = BudgetManager(budget_repo=budget_repo)
 
@@ -186,7 +186,7 @@ class TestBudgetManagerUpdate:
 
 
 class TestBudgetManagerDelete:
-    async def test_success(self, budget_repo, fake_budget: BudgetSchema) -> None:
+    async def test_success(self, budget_repo: Mock, fake_budget: BudgetSchema) -> None:
         budget_repo.get.return_value = fake_budget
         budget_repo.delete.return_value = fake_budget
         manager = BudgetManager(budget_repo=budget_repo)
@@ -197,14 +197,14 @@ class TestBudgetManagerDelete:
         assert deleted_budget.name == fake_budget.name
         assert deleted_budget.description == fake_budget.description
 
-    async def test_budget_not_exists(self, budget_repo) -> None:
+    async def test_budget_not_exists(self, budget_repo: Mock) -> None:
         budget_repo.get.return_value = None
         manager = BudgetManager(budget_repo=budget_repo)
 
         with pytest.raises(BudgetNotExistsError):
             await manager.delete(user_id=str(fake.uuid4()), budget_id=str(fake.uuid4()))
 
-    async def test_budget_access_denied(self, budget_repo, fake_budget: BudgetSchema) -> None:
+    async def test_budget_access_denied(self, budget_repo: Mock, fake_budget: BudgetSchema) -> None:
         budget_repo.get.return_value = fake_budget
         manager = BudgetManager(budget_repo=budget_repo)
 
@@ -216,7 +216,7 @@ class TestBudgetManagerDelete:
 
 
 class TestBudgetManagerFind:
-    async def test_success(self, budget_repo, fake_budget: BudgetSchema) -> None:
+    async def test_success(self, budget_repo: Mock, fake_budget: BudgetSchema) -> None:
         budgets = [fake_budget]
         total = len(budgets)
         budget_repo.find_by_text.return_value = (total, budgets)
@@ -231,7 +231,7 @@ class TestBudgetManagerFind:
         for budget in budgets:
             assert budget in result_budgets
 
-    async def test_empty_budget_text(self, budget_repo) -> None:
+    async def test_empty_budget_text(self, budget_repo: Mock) -> None:
         manager = BudgetManager(budget_repo=budget_repo)
 
         with pytest.raises(EmptySearchTextError):

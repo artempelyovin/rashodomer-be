@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import Annotated
-from uuid import UUID, uuid4
+from uuid import UUID
 
 from pydantic import Field
 
@@ -22,14 +22,17 @@ CreatedAtDesc = "Date when user was created"
 LastLoginDesc = "Date when user was last login"
 
 
-class UserSchema(FromAttributeModel):
+class RegisterSchema(FromAttributeModel):
     id: Annotated[str, UUID] = Field(default_factory=uuid4_str, description=IdDesc)
     first_name: str = Field(..., description=FirstNameDesc, examples=FirstNameExamples)
     last_name: str = Field(..., description=LastNameDesc, examples=LastNameExamples)
     login: str = Field(..., description=LoginDesc, examples=LoginExamples)
+    created_at: datetime = Field(default_factory=datetime.now, description=CreatedAtDesc)
+    last_login: datetime = Field(default_factory=datetime.now, description=LastLoginDesc)
+
+
+class UserSchema(RegisterSchema):
     password_hash: str = Field(..., description=PasswordHashDesc, examples=PasswordHashExamples)
-    created_at: datetime = Field(datetime.now, description=CreatedAtDesc)
-    last_login: datetime = Field(datetime.now, description=LastLoginDesc)
 
 
 class CreateUserSchema(FromAttributeModel):

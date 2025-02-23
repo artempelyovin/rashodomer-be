@@ -29,7 +29,7 @@ class CategorySchema(FromAttributeModel):
     description: str = Field(..., description=DescriptionDesc, examples=DescriptionExamples)
     type: CategoryType = Field(..., description=CategoryTypeDesc, examples=CategoryTypeExamples)
     emoji_icon: str | None = Field(..., description=EmojiIconDesc, examples=EmojiExamples)
-    is_archived: bool = Field(False, description=IsArchivedDesc)
+    is_archived: bool = Field(False, description=IsArchivedDesc) # noqa: FBT003
     user_id: Annotated[str, UUID] = Field(..., description=UserIDDesc)
     created_at: datetime = Field(default_factory=datetime.now, description=CreatedAtDesc)
     updated_at: datetime = Field(default_factory=datetime.now, description=UpdatedAtDesc)
@@ -46,5 +46,5 @@ class UpdateCategorySchema(FromAttributeModel):
     name: str | None = Field(None, description=NameDesc, examples=NameExamples)
     description: str | None = Field(None, description=DescriptionDesc, examples=DescriptionExamples)
     type: CategoryType | None = Field(None, description=CategoryTypeDesc, examples=CategoryTypeExamples)
-    is_archived: bool | None = Field(False, description=IsArchivedDesc)
+    is_archived: bool | None = Field(False, description=IsArchivedDesc) # noqa: FBT003
     emoji_icon: str | None = Field(None, description=EmojiIconDesc, examples=EmojiExamples)

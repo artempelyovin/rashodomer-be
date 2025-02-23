@@ -33,6 +33,7 @@ class CategoryManager:
             description=data.description,
             type=data.type,
             emoji_icon=data.emoji_icon,
+            is_archived=False,
             user_id=user_id,
         )
         return await self.repo.add(category)

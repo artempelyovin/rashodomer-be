@@ -6,7 +6,7 @@ from base import APIResponse, write_response
 from depends import token_repo_factory, user_repo_factory
 from managers.auth import AuthManager
 from repos.abc import TokenRepo, UserRepo
-from schemas.user import CreateUserSchema, TokenSchema, UserLoginSchema, UserSchema
+from schemas.user import CreateUserSchema, RegisterSchema, TokenSchema, UserLoginSchema
 
 router = APIRouter()
 
@@ -25,10 +25,10 @@ async def register(
     *,
     user_repo: UserRepo = Depends(user_repo_factory),
     token_repo: TokenRepo = Depends(token_repo_factory),
-) -> APIResponse[UserSchema]:
+) -> APIResponse[RegisterSchema]:
     manager = AuthManager(user_repo=user_repo, token_repo=token_repo)
     user = await manager.register(data=body)
-    return write_response(result=user, schema=UserSchema, status_code=status.HTTP_201_CREATED)
+    return write_response(result=user, schema=RegisterSchema, status_code=status.HTTP_201_CREATED)
 
 
 @router.post(
