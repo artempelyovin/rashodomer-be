@@ -6,12 +6,12 @@ from fastapi import APIRouter, Depends, Path, Query
 from starlette import status
 
 from base import APIResponse, APIResponseList, write_response, write_response_list
-from enums import CategoryType
 from depends import authentication_user, category_repo_factory
+from enums import CategoryType
 from managers.category import CategoryManager
 from repos.abc import CategoryRepo
 from schemas.category import CategorySchema, CreateCategorySchema, UpdateCategorySchema
-from schemas.user import UserSchema
+from schemas.user import DetailedUserSchema
 from utils import UNSET
 
 router = APIRouter()
@@ -29,7 +29,7 @@ CATEGORY_TAG = "categories"
 async def create_category(
     body: CreateCategorySchema,
     *,
-    user: UserSchema = Depends(authentication_user),
+    user: DetailedUserSchema = Depends(authentication_user),
     category_repo: CategoryRepo = Depends(category_repo_factory),
 ) -> APIResponse[CategorySchema]:
     manager = CategoryManager(category_repo=category_repo)
@@ -50,7 +50,7 @@ async def list_categories(
     limit: int | None = Query(None, description="Number of categories to return"),
     offset: int = Query(0, description="Offset of the categories to return"),
     *,
-    user: UserSchema = Depends(authentication_user),
+    user: DetailedUserSchema = Depends(authentication_user),
     category_repo: CategoryRepo = Depends(category_repo_factory),
 ) -> APIResponseList[CategorySchema]:
     manager = CategoryManager(category_repo=category_repo)
@@ -73,7 +73,7 @@ async def find_categories(
     limit: int | None = Query(None, description="Number of categories to return"),
     offset: int = Query(0, description="Offset of the categories to return"),
     *,
-    user: UserSchema = Depends(authentication_user),
+    user: DetailedUserSchema = Depends(authentication_user),
     category_repo: CategoryRepo = Depends(category_repo_factory),
 ) -> APIResponseList[CategorySchema]:
     manager = CategoryManager(category_repo=category_repo)
@@ -93,7 +93,7 @@ async def find_categories(
 async def get_category(
     category_id: Annotated[str, UUID] = Path(..., description="The ID of the category"),
     *,
-    user: UserSchema = Depends(authentication_user),
+    user: DetailedUserSchema = Depends(authentication_user),
     category_repo: CategoryRepo = Depends(category_repo_factory),
 ) -> APIResponse[CategorySchema]:
     manager = CategoryManager(category_repo=category_repo)
@@ -112,7 +112,7 @@ async def update_category(
     body: UpdateCategorySchema,
     category_id: Annotated[str, UUID] = Path(..., description="The ID of the category"),
     *,
-    user: UserSchema = Depends(authentication_user),
+    user: DetailedUserSchema = Depends(authentication_user),
     category_repo: CategoryRepo = Depends(category_repo_factory),
 ) -> APIResponse[CategorySchema]:
     params = body.model_dump(exclude_unset=True)
@@ -140,7 +140,7 @@ async def update_category(
 async def delete_categories(
     category_id: Annotated[str, UUID] = Path(..., description="The ID of the category"),
     *,
-    user: UserSchema = Depends(authentication_user),
+    user: DetailedUserSchema = Depends(authentication_user),
     category_repo: CategoryRepo = Depends(category_repo_factory),
 ) -> APIResponse[CategorySchema]:
     manager = CategoryManager(category_repo=category_repo)

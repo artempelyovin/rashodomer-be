@@ -1,3 +1,5 @@
+from datetime import UTC, datetime
+
 from exceptions import (
     AmountMustBePositiveError,
     BudgetAccessDeniedError,
@@ -50,7 +52,15 @@ class BudgetManager:
             raise BudgetAccessDeniedError
         if not isinstance(amount, UnsetValue) and amount < 0:
             raise AmountMustBePositiveError
-        return await self.repo.update_budget(budget_id=budget_id, name=name, description=description, amount=amount)
+
+        if not isinstance(name, UnsetValue):
+            budget.name = name
+        if not isinstance(description, UnsetValue):
+            budget.description = description
+        if not isinstance(amount, UnsetValue):
+            budget.amount = amount
+        budget.updated_at = datetime.now(tz=UTC)
+        return await self.repo.update_budget(budget)
 
     async def delete(self, user_id: str, budget_id: str) -> BudgetSchema:
         budget = await self.repo.get(budget_id)

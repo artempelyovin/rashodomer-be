@@ -10,7 +10,7 @@ from depends import authentication_user, budget_repo_factory
 from managers.budget import BudgetManager
 from repos.abc import BudgetRepo
 from schemas.budget import BudgetSchema, CreateBudgetSchema, UpdateBudgetSchema
-from schemas.user import UserSchema
+from schemas.user import DetailedUserSchema
 from utils import UNSET
 
 router = APIRouter()
@@ -28,7 +28,7 @@ BUDGET_TAG = "budgets"
 async def create_budget(
     body: CreateBudgetSchema,
     *,
-    user: UserSchema = Depends(authentication_user),
+    user: DetailedUserSchema = Depends(authentication_user),
     budget_repo: BudgetRepo = Depends(budget_repo_factory),
 ) -> APIResponse[BudgetSchema]:
     manager = BudgetManager(budget_repo=budget_repo)
@@ -47,7 +47,7 @@ async def list_budgets(
     limit: int | None = Query(None, description="Number of budgets to return"),
     offset: int = Query(0, description="Offset of the budgets to return"),
     *,
-    user: UserSchema = Depends(authentication_user),
+    user: DetailedUserSchema = Depends(authentication_user),
     budget_repo: BudgetRepo = Depends(budget_repo_factory),
 ) -> APIResponseList[BudgetSchema]:
     manager = BudgetManager(budget_repo=budget_repo)
@@ -68,7 +68,7 @@ async def find_budgets(
     limit: int | None = Query(None, description="Number of budgets to return"),
     offset: int = Query(0, description="Offset of the budgets to return"),
     *,
-    user: UserSchema = Depends(authentication_user),
+    user: DetailedUserSchema = Depends(authentication_user),
     budget_repo: BudgetRepo = Depends(budget_repo_factory),
 ) -> APIResponseList[BudgetSchema]:
     manager = BudgetManager(budget_repo=budget_repo)
@@ -88,7 +88,7 @@ async def find_budgets(
 async def get_budget(
     budget_id: Annotated[str, UUID] = Path(..., description="The ID of the budget"),
     *,
-    user: UserSchema = Depends(authentication_user),
+    user: DetailedUserSchema = Depends(authentication_user),
     budget_repo: BudgetRepo = Depends(budget_repo_factory),
 ) -> APIResponse[BudgetSchema]:
     manager = BudgetManager(budget_repo=budget_repo)
@@ -107,7 +107,7 @@ async def update_budget(
     body: UpdateBudgetSchema,
     budget_id: Annotated[str, UUID] = Path(..., description="The ID of the budget"),
     *,
-    user: UserSchema = Depends(authentication_user),
+    user: DetailedUserSchema = Depends(authentication_user),
     budget_repo: BudgetRepo = Depends(budget_repo_factory),
 ) -> APIResponse[BudgetSchema]:
     params = body.model_dump(exclude_unset=True)
@@ -132,7 +132,7 @@ async def update_budget(
 async def delete_budget(
     budget_id: Annotated[str, UUID] = Path(..., description="The ID of the budget"),
     *,
-    user: UserSchema = Depends(authentication_user),
+    user: DetailedUserSchema = Depends(authentication_user),
     budget_repo: BudgetRepo = Depends(budget_repo_factory),
 ) -> APIResponse[BudgetSchema]:
     manager = BudgetManager(budget_repo=budget_repo)

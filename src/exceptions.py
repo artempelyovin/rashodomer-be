@@ -129,7 +129,7 @@ class NotEmojiIconError(BaseCoreError):
     status_code: int = HTTP_400_BAD_REQUEST
 
     def message(self) -> str:
-        return _("The provided icon in text format '{emoji_icon}' is not a valid emoji.").format(
+        return _("The provided icon in text format '{emoji_icon}' is not a valid emoji").format(
             emoji_icon=self.emoji_icon
         )
 

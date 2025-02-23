@@ -5,7 +5,7 @@ from enums import CategoryType
 from managers.auth import AuthManager
 from schemas.budget import BudgetSchema
 from schemas.category import CategorySchema
-from schemas.user import UserSchema
+from schemas.user import DetailedUserSchema
 
 fake = Faker(locale="ru_RU")
 
@@ -21,10 +21,10 @@ def fake_budget() -> BudgetSchema:
 
 
 @pytest.fixture
-def fake_user() -> UserSchema:
+def fake_user() -> DetailedUserSchema:
     password = fake.password()
     password_hash = AuthManager.hash_password(password)
-    return UserSchema(
+    return DetailedUserSchema(
         first_name=fake.first_name(),
         last_name=fake.last_name(),
         login=fake.user_name(),

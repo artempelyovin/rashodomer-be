@@ -1,3 +1,5 @@
+from datetime import UTC, datetime
+
 import emoji
 
 from enums import CategoryType
@@ -33,6 +35,7 @@ class CategoryManager:
             description=data.description,
             type=data.type,
             emoji_icon=data.emoji_icon,
+            is_archived=False,
             user_id=user_id,
         )
         return await self.repo.add(category)
@@ -67,14 +70,19 @@ class CategoryManager:
             raise CategoryNotExistsError(category_id=category_id)
         if category.user_id != user_id:
             raise CategoryAccessDeniedError
-        return await self.repo.update_category(
-            category_id=category_id,
-            name=name,
-            description=description,
-            category_type=category_type,
-            is_archived=is_archived,
-            emoji_icon=emoji_icon,
-        )
+
+        if not isinstance(name, UnsetValue):
+            category.name = name
+        if not isinstance(description, UnsetValue):
+            category.description = description
+        if not isinstance(category_type, UnsetValue):
+            category.type = category_type
+        if not isinstance(is_archived, UnsetValue):
+            category.is_archived = is_archived
+        if not isinstance(emoji_icon, UnsetValue):
+            category.emoji_icon = emoji_icon
+        category.updated_at = datetime.now(tz=UTC)
+        return await self.repo.update_category(category)
         # тут логика по изменению бюджетов, при условии смены `category_type`
 
     async def delete(self, user_id: str, category_id: str) -> CategorySchema:

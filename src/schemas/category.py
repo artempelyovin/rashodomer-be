@@ -4,7 +4,7 @@ from uuid import UUID
 
 from pydantic import Field
 
-from base import FromAttributeModel
+from base import CustomModel
 from enums import CategoryType
 from utils import uuid4_str
 
@@ -23,28 +23,28 @@ CreatedAtDesc = "Date when category was created"
 UpdatedAtDesc = "Date when category was updated"
 
 
-class CategorySchema(FromAttributeModel):
+class CategorySchema(CustomModel):
     id: Annotated[str, UUID] = Field(default_factory=uuid4_str, description=UserIDDesc)
     name: str = Field(..., description=NameDesc, examples=NameExamples)
     description: str = Field(..., description=DescriptionDesc, examples=DescriptionExamples)
     type: CategoryType = Field(..., description=CategoryTypeDesc, examples=CategoryTypeExamples)
     emoji_icon: str | None = Field(..., description=EmojiIconDesc, examples=EmojiExamples)
-    is_archived: bool = Field(False, description=IsArchivedDesc)
+    is_archived: bool = Field(False, description=IsArchivedDesc)  # noqa: FBT003
     user_id: Annotated[str, UUID] = Field(..., description=UserIDDesc)
     created_at: datetime = Field(default_factory=datetime.now, description=CreatedAtDesc)
     updated_at: datetime = Field(default_factory=datetime.now, description=UpdatedAtDesc)
 
 
-class CreateCategorySchema(FromAttributeModel):
+class CreateCategorySchema(CustomModel):
     name: str = Field(..., description=NameDesc, examples=NameExamples)
     description: str = Field("", description=DescriptionDesc, examples=DescriptionExamples)
     type: CategoryType = Field(..., description=CategoryTypeDesc, examples=CategoryTypeExamples)
     emoji_icon: str | None = Field(None, description=EmojiIconDesc, examples=EmojiExamples)
 
 
-class UpdateCategorySchema(FromAttributeModel):
+class UpdateCategorySchema(CustomModel):
     name: str | None = Field(None, description=NameDesc, examples=NameExamples)
     description: str | None = Field(None, description=DescriptionDesc, examples=DescriptionExamples)
     type: CategoryType | None = Field(None, description=CategoryTypeDesc, examples=CategoryTypeExamples)
-    is_archived: bool | None = Field(False, description=IsArchivedDesc)
+    is_archived: bool | None = Field(False, description=IsArchivedDesc)  # noqa: FBT003
     emoji_icon: str | None = Field(None, description=EmojiIconDesc, examples=EmojiExamples)

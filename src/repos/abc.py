@@ -6,18 +6,10 @@ from schemas.budget import BudgetSchema
 from schemas.category import CategorySchema
 from schemas.expense import ExpenseSchema
 from schemas.income import IncomeSchema
-from schemas.user import UserSchema
+from schemas.user import DetailedUserSchema
 from utils import UNSET, UnsetValue
 
 type Total = int
-
-
-class PasswordService(ABC):
-    @abstractmethod
-    def hash_password(self, password: str) -> str: ...
-
-    @abstractmethod
-    def check_password(self, password: str, password_hash: str) -> bool: ...
 
 
 class TokenRepo(ABC):
@@ -30,25 +22,25 @@ class TokenRepo(ABC):
 
 class UserRepo(ABC):
     @abstractmethod
-    async def add(self, user: UserSchema) -> UserSchema: ...
+    async def add(self, user: DetailedUserSchema) -> DetailedUserSchema: ...
 
     @abstractmethod
-    async def find_by_login(self, login: str) -> UserSchema | None: ...
+    async def find_by_login(self, login: str) -> DetailedUserSchema | None: ...
 
     @abstractmethod
-    async def get(self, user_id: str) -> UserSchema | None: ...
+    async def get(self, user_id: str) -> DetailedUserSchema | None: ...
 
     @abstractmethod
-    async def update_first_name(self, user_id: str, first_name: str) -> UserSchema: ...
+    async def update_first_name(self, user_id: str, first_name: str) -> DetailedUserSchema: ...
 
     @abstractmethod
-    async def update_last_name(self, user_id: str, last_name: str) -> UserSchema: ...
+    async def update_last_name(self, user_id: str, last_name: str) -> DetailedUserSchema: ...
 
     @abstractmethod
-    async def update_last_login(self, user_id: str, last_login: datetime) -> UserSchema: ...
+    async def update_last_login(self, user_id: str, last_login: datetime) -> DetailedUserSchema: ...
 
     @abstractmethod
-    async def change_password_hash(self, user_id: str, password_hash: str) -> UserSchema: ...
+    async def change_password_hash(self, user_id: str, password_hash: str) -> DetailedUserSchema: ...
 
     @abstractmethod
     async def delete(self, user_id: str) -> None: ...
@@ -77,13 +69,7 @@ class BudgetRepo(ABC):
     ) -> tuple[Total, list[BudgetSchema]]: ...
 
     @abstractmethod
-    async def update_budget(
-        self,
-        budget_id: str,
-        name: str | UnsetValue = UNSET,
-        description: str | UnsetValue = UNSET,
-        amount: float | UnsetValue = UNSET,
-    ) -> BudgetSchema: ...
+    async def update_budget(self, budget: BudgetSchema) -> BudgetSchema: ...
 
     @abstractmethod
     async def delete(self, budget_id: str) -> BudgetSchema: ...
@@ -123,15 +109,7 @@ class CategoryRepo(ABC):
     ) -> tuple[Total, list[CategorySchema]]: ...
 
     @abstractmethod
-    async def update_category(
-        self,
-        category_id: str,
-        name: str | UnsetValue = UNSET,
-        description: str | UnsetValue = UNSET,
-        category_type: CategoryType | UnsetValue = UNSET,
-        is_archived: bool | UnsetValue = UNSET,
-        emoji_icon: str | None | UnsetValue = UNSET,
-    ) -> CategorySchema: ...
+    async def update_category(self, category: CategorySchema) -> CategorySchema: ...
 
     @abstractmethod
     async def delete(self, category_id: str) -> CategorySchema: ...

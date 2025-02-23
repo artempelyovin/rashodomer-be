@@ -1,10 +1,10 @@
 from datetime import datetime
 from typing import Annotated
-from uuid import UUID, uuid4
+from uuid import UUID
 
 from pydantic import Field
 
-from base import FromAttributeModel
+from base import CustomModel
 from utils import uuid4_str
 
 IdDesc = "Unique ID of the user"
@@ -22,27 +22,30 @@ CreatedAtDesc = "Date when user was created"
 LastLoginDesc = "Date when user was last login"
 
 
-class UserSchema(FromAttributeModel):
+class UserSchema(CustomModel):
     id: Annotated[str, UUID] = Field(default_factory=uuid4_str, description=IdDesc)
     first_name: str = Field(..., description=FirstNameDesc, examples=FirstNameExamples)
     last_name: str = Field(..., description=LastNameDesc, examples=LastNameExamples)
     login: str = Field(..., description=LoginDesc, examples=LoginExamples)
+    created_at: datetime = Field(default_factory=datetime.now, description=CreatedAtDesc)
+    last_login: datetime = Field(default_factory=datetime.now, description=LastLoginDesc)
+
+
+class DetailedUserSchema(UserSchema):
     password_hash: str = Field(..., description=PasswordHashDesc, examples=PasswordHashExamples)
-    created_at: datetime = Field(datetime.now, description=CreatedAtDesc)
-    last_login: datetime = Field(datetime.now, description=LastLoginDesc)
 
 
-class CreateUserSchema(FromAttributeModel):
+class CreateUserSchema(CustomModel):
     first_name: str = Field(..., description=FirstNameDesc, examples=FirstNameExamples)
     last_name: str = Field(..., description=LastNameDesc, examples=LastNameExamples)
     login: str = Field(..., description=LoginDesc, examples=LoginExamples)
     password: str = Field(..., description=PasswordDesc, examples=PasswordExamples)
 
 
-class UserLoginSchema(FromAttributeModel):
+class UserLoginSchema(CustomModel):
     login: str = Field(..., description=LoginDesc, examples=LoginExamples)
     password: str = Field(..., description=PasswordDesc, examples=PasswordExamples)
 
 
-class TokenSchema(FromAttributeModel):
+class TokenSchema(CustomModel):
     token: str = Field(..., description="Authentication token", examples=["2ba2eb37-7c80-49d0-8ff1-9f66cf6e977e"])

@@ -20,7 +20,7 @@ from repos.files import (
     FileTokenRepo,
     FileUserRepo,
 )
-from schemas.user import UserSchema
+from schemas.user import DetailedUserSchema
 
 header_scheme = APIKeyHeader(
     name="Authorization", auto_error=False, description='Token in format: "Authorization": "{TOKEN}"'
@@ -55,6 +55,6 @@ async def authentication_user(
     token: Annotated[str | None, Depends(header_scheme)],
     user_repo: Annotated[UserRepo, Depends(user_repo_factory)],
     token_repo: Annotated[TokenRepo, Depends(token_repo_factory)],
-) -> UserSchema:
+) -> DetailedUserSchema:
     manager = AuthManager(user_repo=user_repo, token_repo=token_repo)
     return await manager.authenticate(token=token)

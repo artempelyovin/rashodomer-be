@@ -1,15 +1,23 @@
 from collections.abc import Iterable
+from datetime import datetime
 from typing import Any, Generic, TypeVar
 
 from pydantic import BaseModel, ConfigDict, Field
 from starlette import status
 
-
-class FromAttributeModel(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
+ISO_TIMEZONE_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
 
 
-PydanticSchema = TypeVar("PydanticSchema", bound=FromAttributeModel)
+class CustomModel(BaseModel):
+    model_config = ConfigDict(
+        from_attributes=True,
+        json_encoders={
+            datetime: lambda v: v.strftime(ISO_TIMEZONE_FORMAT),  # all dates as ISO with TIMEZONE
+        },
+    )
+
+
+PydanticSchema = TypeVar("PydanticSchema", bound=CustomModel)
 
 
 class ErrorSchema(BaseModel):

@@ -19,7 +19,7 @@ from schemas.budget import BudgetSchema
 from schemas.category import CategorySchema
 from schemas.expense import ExpenseSchema
 from schemas.income import IncomeSchema
-from schemas.user import UserSchema
+from schemas.user import DetailedUserSchema
 from utils import UNSET, UnsetValue
 
 
@@ -34,11 +34,11 @@ class JsonFileMixin:
     collection: str
 
     @staticmethod
-    def to_dict(content: dict[str, UserSchema]) -> dict[str, Any]:
+    def to_dict(content: dict[str, DetailedUserSchema]) -> dict[str, Any]:
         return {k: repr(v) for k, v in content.items()}
 
     @staticmethod
-    def from_dict(content: dict[str, Any]) -> dict[str, UserSchema]:
+    def from_dict(content: dict[str, Any]) -> dict[str, DetailedUserSchema]:
         return {k: eval(v) for k, v in content.items()}  # noqa: S307
 
     def load(self) -> dict[str, Any]:
@@ -84,41 +84,41 @@ class FileUserRepo(UserRepo, JsonFileMixin):
     collection = "users"
 
     def __init__(self) -> None:
-        self._users: dict[str, UserSchema] = self.load()
+        self._users: dict[str, DetailedUserSchema] = self.load()
 
-    async def add(self, user: UserSchema) -> UserSchema:
+    async def add(self, user: DetailedUserSchema) -> DetailedUserSchema:
         self._users[user.id] = user
         self.save(self._users)
         return user
 
-    async def find_by_login(self, login: str) -> UserSchema | None:
+    async def find_by_login(self, login: str) -> DetailedUserSchema | None:
         for user in self._users.values():
             if user.login == login:
                 return user
         return None
 
-    async def get(self, user_id: str) -> UserSchema | None:
+    async def get(self, user_id: str) -> DetailedUserSchema | None:
         return self._users.get(user_id, None)
 
-    async def update_first_name(self, user_id: str, first_name: str) -> UserSchema:
+    async def update_first_name(self, user_id: str, first_name: str) -> DetailedUserSchema:
         user = self._users[user_id]
         user.first_name = first_name
         self.save(self._users)
         return user
 
-    async def update_last_name(self, user_id: str, last_name: str) -> UserSchema:
+    async def update_last_name(self, user_id: str, last_name: str) -> DetailedUserSchema:
         user = self._users[user_id]
         user.last_name = last_name
         self.save(self._users)
         return user
 
-    async def update_last_login(self, user_id: str, last_login: datetime.datetime) -> UserSchema:
+    async def update_last_login(self, user_id: str, last_login: datetime.datetime) -> DetailedUserSchema:
         user = self._users[user_id]
         user.last_login = last_login
         self.save(self._users)
         return user
 
-    async def change_password_hash(self, user_id: str, password_hash: str) -> UserSchema:
+    async def change_password_hash(self, user_id: str, password_hash: str) -> DetailedUserSchema:
         user = self._users[user_id]
         user.password_hash = password_hash
         self.save(self._users)
@@ -166,20 +166,8 @@ class FileBudgetRepo(BudgetRepo, JsonFileMixin):
         budgets = [budget for budget in self._budgets.values() if budget.user_id == user_id and matches_text(budget)]
         return paginate(budgets, limit, offset)
 
-    async def update_budget(
-        self,
-        budget_id: str,
-        name: str | UnsetValue = UNSET,
-        description: str | UnsetValue = UNSET,
-        amount: float | UnsetValue = UNSET,
-    ) -> BudgetSchema:
-        budget = self._budgets[budget_id]
-        if not isinstance(name, UnsetValue):
-            budget.name = name
-        if not isinstance(description, UnsetValue):
-            budget.description = description
-        if not isinstance(amount, UnsetValue):
-            budget.amount = amount
+    async def update_budget(self, budget: BudgetSchema) -> BudgetSchema:
+        self._budgets[budget.id] = budget
         self.save(self._budgets)
         return budget
 
@@ -249,26 +237,8 @@ class FileCategoryRepo(CategoryRepo, JsonFileMixin):
         ]
         return paginate(categories, limit, offset)
 
-    async def update_category(
-        self,
-        category_id: str,
-        name: str | UnsetValue = UNSET,
-        description: str | UnsetValue = UNSET,
-        category_type: CategoryType | UnsetValue = UNSET,
-        is_archived: bool | UnsetValue = UNSET,
-        emoji_icon: str | None | UnsetValue = UNSET,
-    ) -> CategorySchema:
-        category = self._categories[category_id]
-        if not isinstance(name, UnsetValue):
-            category.name = name
-        if not isinstance(description, UnsetValue):
-            category.description = description
-        if not isinstance(category_type, UnsetValue):
-            category.type = category_type
-        if not isinstance(is_archived, UnsetValue):
-            category.is_archived = is_archived
-        if not isinstance(emoji_icon, UnsetValue):
-            category.emoji_icon = emoji_icon
+    async def update_category(self, category: CategorySchema) -> CategorySchema:
+        self._categories[category.id] = category
         self.save(self._categories)
         return category
 
