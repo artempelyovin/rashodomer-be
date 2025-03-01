@@ -82,7 +82,7 @@ class CategoryManager:
         if not isinstance(emoji_icon, UnsetValue):
             category.emoji_icon = emoji_icon
         category.updated_at = datetime.now(tz=UTC)
-        return await self.repo.update_category(category)
+        return await self.repo.update(category)
         # тут логика по изменению бюджетов, при условии смены `category_type`
 
     async def delete(self, user_id: str, category_id: str) -> CategorySchema:

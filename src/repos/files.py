@@ -9,18 +9,15 @@ from enums import CategoryType
 from repos.abc import (
     BudgetRepo,
     CategoryRepo,
-    ExpenseRepo,
-    IncomeRepo,
     TokenRepo,
     Total,
+    TransactionRepo,
     UserRepo,
 )
 from schemas.budget import BudgetSchema
 from schemas.category import CategorySchema
-from schemas.expense import ExpenseSchema
-from schemas.income import IncomeSchema
+from schemas.transaction import TransactionSchema
 from schemas.user import DetailedUserSchema
-from utils import UNSET, UnsetValue
 
 
 def paginate[T](items: list[T], limit: int | None = None, offset: int = 0) -> tuple[Total, list[T]]:
@@ -166,7 +163,7 @@ class FileBudgetRepo(BudgetRepo, JsonFileMixin):
         budgets = [budget for budget in self._budgets.values() if budget.user_id == user_id and matches_text(budget)]
         return paginate(budgets, limit, offset)
 
-    async def update_budget(self, budget: BudgetSchema) -> BudgetSchema:
+    async def update(self, budget: BudgetSchema) -> BudgetSchema:
         self._budgets[budget.id] = budget
         self.save(self._budgets)
         return budget
@@ -237,7 +234,7 @@ class FileCategoryRepo(CategoryRepo, JsonFileMixin):
         ]
         return paginate(categories, limit, offset)
 
-    async def update_category(self, category: CategorySchema) -> CategorySchema:
+    async def update(self, category: CategorySchema) -> CategorySchema:
         self._categories[category.id] = category
         self.save(self._categories)
         return category
@@ -248,91 +245,37 @@ class FileCategoryRepo(CategoryRepo, JsonFileMixin):
         return category
 
 
-class FileExpenseRepo(ExpenseRepo, JsonFileMixin):
-    collection = "expenses"
-
-    def __init__(self) -> None:
-        self._expenses: dict[str, ExpenseSchema] = self.load()
-
-    async def create(
-        self, amount: float, description: str, category_id: str, user_id: str, timestamp: datetime.datetime
-    ) -> ExpenseSchema:
-        expense = ExpenseSchema(
-            amount=amount, description=description, category_id=category_id, user_id=user_id, timestamp=timestamp
-        )
-        self._expenses[expense.id] = expense
-        self.save(self._expenses)
-        return expense
-
-    async def get(self, expense_id: str) -> ExpenseSchema | None:
-        return self._expenses[expense_id]
-
-    async def list_(self, user_id: str, limit: int | None = None, offset: int = 0) -> tuple[Total, list[ExpenseSchema]]:
-        expenses = [expense for expense in self._expenses.values() if expense.user_id == user_id]
-        return paginate(expenses, limit, offset)
-
-    async def update_expense(
-        self,
-        expense_id: str,
-        amount: float | UnsetValue = UNSET,
-        category_id: str | UnsetValue = UNSET,
-        description: str | UnsetValue = UNSET,
-    ) -> ExpenseSchema:
-        expense = self._expenses[expense_id]
-        if not isinstance(amount, UnsetValue):
-            expense.amount = amount
-        if not isinstance(category_id, UnsetValue):
-            expense.category_id = category_id
-        if not isinstance(description, UnsetValue):
-            expense.description = description
-        self.save(self._expenses)
-        return expense
-
-    async def delete(self, expense_id: str) -> None:
-        self._expenses.pop(expense_id)
-        self.save(self._expenses)
-
-
-class FileIncomeRepo(IncomeRepo, JsonFileMixin):
+class FileTransactionRepo(TransactionRepo, JsonFileMixin):
     collection = "incomes"
 
     def __init__(self) -> None:
-        self._incomes: dict[str, IncomeSchema] = self.load()
+        self._transactions: dict[str, TransactionSchema] = self.load()
 
-    async def create(
-        self, amount: float, description: str, category_id: str, user_id: str, timestamp: datetime.datetime
-    ) -> IncomeSchema:
-        income = IncomeSchema(
-            amount=amount, description=description, category_id=category_id, user_id=user_id, timestamp=timestamp
-        )
-        self._incomes[income.id] = income
-        self.save(self._incomes)
-        return income
+    async def add(self, transaction: TransactionSchema) -> TransactionSchema:
+        self._transactions[transaction.id] = transaction
+        self.save(self._transactions)
+        return transaction
 
-    async def get(self, income_id: str) -> IncomeSchema | None:
-        return self._incomes[income_id]
+    async def get(self, transaction_id: str) -> TransactionSchema | None:
+        return self._transactions[transaction_id]
 
-    async def list_(self, user_id: str, limit: int | None = None, offset: int = 0) -> tuple[Total, list[IncomeSchema]]:
-        incomes = [income for income in self._incomes.values() if income.user_id == user_id]
+    async def list_(
+        self, user_id: str, limit: int | None = None, offset: int = 0
+    ) -> tuple[Total, list[TransactionSchema]]:
+        incomes = [transaction for transaction in self._transactions.values() if transaction.user_id == user_id]
         return paginate(incomes, limit, offset)
 
-    async def update_income(
-        self,
-        income_id: str,
-        amount: float | UnsetValue = UNSET,
-        category_id: str | UnsetValue = UNSET,
-        description: str | UnsetValue = UNSET,
-    ) -> IncomeSchema:
-        income = self._incomes[income_id]
-        if not isinstance(amount, UnsetValue):
-            income.amount = amount
-        if not isinstance(category_id, UnsetValue):
-            income.category_id = category_id
-        if not isinstance(description, UnsetValue):
-            income.description = description
-        self.save(self._incomes)
-        return income
+    async def update(self, transaction: TransactionSchema) -> TransactionSchema:
+        self._transactions[transaction.id] = transaction
+        # if not isinstance(amount, UnsetValue):
+        #     income.amount = amount
+        # if not isinstance(category_id, UnsetValue):
+        #     income.category_id = category_id
+        # if not isinstance(description, UnsetValue):
+        #     income.description = description
+        self.save(self._transactions)
+        return transaction
 
     async def delete(self, income_id: str) -> None:
-        self._incomes.pop(income_id)
-        self.save(self._incomes)
+        self._transactions.pop(income_id)
+        self.save(self._transactions)

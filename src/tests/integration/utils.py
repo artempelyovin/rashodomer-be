@@ -1,9 +1,13 @@
+from datetime import datetime
+
 from starlette import status
 from starlette.testclient import TestClient
 
+from base import ISO_TIMEZONE_FORMAT
 from enums import CategoryType
 from schemas.budget import BudgetSchema
 from schemas.category import CategorySchema
+from schemas.transaction import TransactionSchema
 from schemas.user import TokenSchema, UserSchema
 
 
@@ -53,3 +57,16 @@ def create_category(
         response.status_code == status.HTTP_201_CREATED
     ), f"Create category error ({response.status_code} status code): {response.text}"
     return CategorySchema(**response.json()["result"])
+
+
+def create_transaction(
+    client: TestClient, amount: float, description: str, category_id: str, timestamp: datetime
+) -> TransactionSchema:
+    response = client.post(
+        "/v1/transactions",
+        json={"amount": amount, "description": description, "category_id": category_id, "timestamp": timestamp.strftime(ISO_TIMEZONE_FORMAT)},
+    )
+    assert (
+        response.status_code == status.HTTP_201_CREATED
+    ), f"Create transaction error ({response.status_code} status code): {response.text}"
+    return TransactionSchema(**response.json()["result"])

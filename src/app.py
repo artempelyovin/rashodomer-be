@@ -8,6 +8,7 @@ from exceptions import BaseCoreError
 from routers.auth import router as auth_router
 from routers.budget import router as budget_router
 from routers.category import router as category_router
+from routers.transaction import router as transaction_router
 
 
 def exception_handler(_: Request, core_error: BaseCoreError) -> JSONResponse:
@@ -28,6 +29,7 @@ fast_api = FastAPI()
 fast_api.include_router(auth_router)
 fast_api.include_router(budget_router)
 fast_api.include_router(category_router)
+fast_api.include_router(transaction_router)
 fast_api.add_exception_handler(
     exc_class_or_status_code=BaseCoreError,
     handler=exception_handler,  # type: ignore[arg-type]
