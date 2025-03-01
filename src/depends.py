@@ -7,17 +7,15 @@ from managers.auth import AuthManager
 from repos.abc import (
     BudgetRepo,
     CategoryRepo,
-    ExpenseRepo,
-    IncomeRepo,
     TokenRepo,
+    TransactionRepo,
     UserRepo,
 )
 from repos.files import (
     FileBudgetRepo,
     FileCategoryRepo,
-    FileExpenseRepo,
-    FileIncomeRepo,
     FileTokenRepo,
+    FileTransactionRepo,
     FileUserRepo,
 )
 from schemas.user import DetailedUserSchema
@@ -43,12 +41,8 @@ def category_repo_factory() -> CategoryRepo:
     return FileCategoryRepo()
 
 
-def expense_repo_factory() -> ExpenseRepo:
-    return FileExpenseRepo()
-
-
-def income_repo_factory() -> IncomeRepo:
-    return FileIncomeRepo()
+def transaction_repo_factory() -> TransactionRepo:
+    return FileTransactionRepo()
 
 
 async def authentication_user(

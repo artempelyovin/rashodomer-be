@@ -5,7 +5,7 @@ from uuid import UUID
 from pydantic import Field
 
 from base import CustomModel
-from utils import uuid4_str
+from utils import utc_now, uuid4_str
 
 IdDesc = "Unique ID of the user"
 FirstNameDesc = "User's first name for personalization"
@@ -27,8 +27,8 @@ class UserSchema(CustomModel):
     first_name: str = Field(..., description=FirstNameDesc, examples=FirstNameExamples)
     last_name: str = Field(..., description=LastNameDesc, examples=LastNameExamples)
     login: str = Field(..., description=LoginDesc, examples=LoginExamples)
-    created_at: datetime = Field(default_factory=datetime.now, description=CreatedAtDesc)
-    last_login: datetime = Field(default_factory=datetime.now, description=LastLoginDesc)
+    created_at: datetime = Field(default_factory=utc_now, description=CreatedAtDesc)
+    last_login: datetime = Field(default_factory=utc_now, description=LastLoginDesc)
 
 
 class DetailedUserSchema(UserSchema):

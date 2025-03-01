@@ -4,10 +4,8 @@ from datetime import datetime
 from enums import CategoryType
 from schemas.budget import BudgetSchema
 from schemas.category import CategorySchema
-from schemas.expense import ExpenseSchema
-from schemas.income import IncomeSchema
+from schemas.transaction import TransactionSchema
 from schemas.user import DetailedUserSchema
-from utils import UNSET, UnsetValue
 
 type Total = int
 
@@ -69,7 +67,7 @@ class BudgetRepo(ABC):
     ) -> tuple[Total, list[BudgetSchema]]: ...
 
     @abstractmethod
-    async def update_budget(self, budget: BudgetSchema) -> BudgetSchema: ...
+    async def update(self, budget: BudgetSchema) -> BudgetSchema: ...
 
     @abstractmethod
     async def delete(self, budget_id: str) -> BudgetSchema: ...
@@ -109,62 +107,32 @@ class CategoryRepo(ABC):
     ) -> tuple[Total, list[CategorySchema]]: ...
 
     @abstractmethod
-    async def update_category(self, category: CategorySchema) -> CategorySchema: ...
+    async def update(self, category: CategorySchema) -> CategorySchema: ...
 
     @abstractmethod
     async def delete(self, category_id: str) -> CategorySchema: ...
 
 
-class ExpenseRepo(ABC):
+class TransactionRepo(ABC):
     @abstractmethod
-    async def create(
-        self, amount: float, description: str, category_id: str, user_id: str, timestamp: datetime
-    ) -> ExpenseSchema: ...
+    async def add(self, transaction: TransactionSchema) -> TransactionSchema: ...
 
     @abstractmethod
-    async def get(self, expense_id: str) -> ExpenseSchema | None: ...
-
-    @abstractmethod
-    async def list_(
-        self, user_id: str, limit: int | None = None, offset: int = 0
-    ) -> tuple[Total, list[ExpenseSchema]]: ...
-
-    @abstractmethod
-    async def update_expense(
-        self,
-        expense_id: str,
-        amount: float | UnsetValue = UNSET,
-        category_id: str | UnsetValue = UNSET,
-        description: str | UnsetValue = UNSET,
-    ) -> ExpenseSchema: ...
-
-    @abstractmethod
-    async def delete(self, expense_id: str) -> None: ...
-
-
-class IncomeRepo(ABC):
-    @abstractmethod
-    async def create(
-        self, amount: float, description: str, category_id: str, user_id: str, timestamp: datetime
-    ) -> IncomeSchema: ...
-
-    @abstractmethod
-    async def get(self, income_id: str) -> IncomeSchema | None: ...
+    async def get(self, transaction_id: str) -> TransactionSchema | None: ...
 
     @abstractmethod
     async def list_(
         self, user_id: str, limit: int | None = None, offset: int = 0
-    ) -> tuple[Total, list[IncomeSchema]]: ...
+    ) -> tuple[Total, list[TransactionSchema]]: ...
 
     @abstractmethod
-    async def update_income(
-        self,
-        income_id: str,
-        amount: float | UnsetValue = UNSET,
-        category_id: str | UnsetValue = UNSET,
-        description: str | UnsetValue = UNSET,
-    ) -> IncomeSchema:
+    async def find_by_text(
+        self, user_id: str, text: str, *, case_sensitive: bool = False, limit: int | None = None, offset: int = 0
+    ) -> tuple[Total, list[TransactionSchema]]: ...
+
+    @abstractmethod
+    async def update(self, transaction: TransactionSchema) -> TransactionSchema:
         pass
 
     @abstractmethod
-    async def delete(self, income_id: str) -> None: ...
+    async def delete(self, income_id: str) -> TransactionSchema: ...

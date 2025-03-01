@@ -11,8 +11,9 @@ from enums import CategoryType
 from repos.files import JsonFileMixin
 from schemas.budget import BudgetSchema
 from schemas.category import CategorySchema
+from schemas.transaction import TransactionSchema
 from schemas.user import UserSchema
-from tests.integration.utils import authenticate, create_budget, create_category, register
+from tests.integration.utils import authenticate, create_budget, create_category, create_transaction, register
 
 fake = Faker(locale="ru_RU")
 
@@ -53,24 +54,13 @@ def created_category(client: TestClient, created_user: UserSchema) -> CategorySc
 
 
 @pytest.fixture
-def created_expense_category(client: TestClient, created_user: UserSchema) -> CategorySchema:
-    return create_category(
+def created_transaction(client: TestClient, created_category: CategorySchema) -> TransactionSchema:
+    return create_transaction(
         client=client,
-        name=fake.word(),
+        amount=fake.pyfloat(positive=True),
         description=fake.sentence(),
-        category_type=CategoryType.EXPENSE,
-        emoji_icon=fake.random_element([None, fake.emoji()]),
-    )
-
-
-@pytest.fixture
-def created_income_category(client: TestClient, created_user: UserSchema) -> CategorySchema:
-    return create_category(
-        client=client,
-        name=fake.word(),
-        description=fake.sentence(),
-        category_type=CategoryType.INCOME,
-        emoji_icon=fake.random_element([None, fake.emoji()]),
+        category_id=created_category.id,
+        timestamp=fake.date_time_this_year(after_now=False),
     )
 
 

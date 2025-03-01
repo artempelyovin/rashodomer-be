@@ -60,7 +60,7 @@ class BudgetManager:
         if not isinstance(amount, UnsetValue):
             budget.amount = amount
         budget.updated_at = datetime.now(tz=UTC)
-        return await self.repo.update_budget(budget)
+        return await self.repo.update(budget)
 
     async def delete(self, user_id: str, budget_id: str) -> BudgetSchema:
         budget = await self.repo.get(budget_id)

@@ -2,11 +2,11 @@ from datetime import datetime
 from typing import Annotated
 from uuid import UUID
 
-from pydantic import Field
+from pydantic import AwareDatetime, Field
 
 from base import CustomModel
 from enums import CategoryType
-from utils import uuid4_str
+from utils import utc_now, uuid4_str
 
 IdDesc = "Unique ID of the category"
 NameDesc = description = "The name of the category"
@@ -31,8 +31,8 @@ class CategorySchema(CustomModel):
     emoji_icon: str | None = Field(..., description=EmojiIconDesc, examples=EmojiExamples)
     is_archived: bool = Field(False, description=IsArchivedDesc)  # noqa: FBT003
     user_id: Annotated[str, UUID] = Field(..., description=UserIDDesc)
-    created_at: datetime = Field(default_factory=datetime.now, description=CreatedAtDesc)
-    updated_at: datetime = Field(default_factory=datetime.now, description=UpdatedAtDesc)
+    created_at: Annotated[datetime, AwareDatetime] = Field(default_factory=utc_now, description=CreatedAtDesc)
+    updated_at: Annotated[datetime, AwareDatetime] = Field(default_factory=utc_now, description=UpdatedAtDesc)
 
 
 class CreateCategorySchema(CustomModel):

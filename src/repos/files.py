@@ -3,24 +3,22 @@ import uuid
 from pathlib import Path
 from typing import Any
 
-import ujson
+from pydantic_core import from_json, to_json
 
+from base import CustomModel
 from enums import CategoryType
 from repos.abc import (
     BudgetRepo,
     CategoryRepo,
-    ExpenseRepo,
-    IncomeRepo,
     TokenRepo,
     Total,
+    TransactionRepo,
     UserRepo,
 )
 from schemas.budget import BudgetSchema
 from schemas.category import CategorySchema
-from schemas.expense import ExpenseSchema
-from schemas.income import IncomeSchema
+from schemas.transaction import TransactionSchema
 from schemas.user import DetailedUserSchema
-from utils import UNSET, UnsetValue
 
 
 def paginate[T](items: list[T], limit: int | None = None, offset: int = 0) -> tuple[Total, list[T]]:
@@ -33,33 +31,24 @@ class JsonFileMixin:
     filename: str = "data.json"
     collection: str
 
-    @staticmethod
-    def to_dict(content: dict[str, DetailedUserSchema]) -> dict[str, Any]:
-        return {k: repr(v) for k, v in content.items()}
-
-    @staticmethod
-    def from_dict(content: dict[str, Any]) -> dict[str, DetailedUserSchema]:
-        return {k: eval(v) for k, v in content.items()}  # noqa: S307
-
-    def load(self) -> dict[str, Any]:
-        all_collections: dict[str, Any] = {}
+    def load(self, model: type[CustomModel] | None = None) -> dict[str, Any]:
         try:
             with Path(self.filename).open() as file:
-                all_collections = ujson.load(file)
+                all_collections = from_json(file.read())
+                collection = all_collections.get(self.collection, {})
         except FileNotFoundError:
-            pass
-        return self.from_dict(all_collections.get(self.collection, {}))
+            return {}
+        return {k: model(**v) for k, v in collection.items()} if model else collection
 
     def save(self, content: dict[str, Any]) -> None:
-        all_collections: dict[str, Any] = {}
         try:
             with Path(self.filename).open() as file:
-                all_collections = ujson.load(file)
+                all_collections = from_json(file.read())
         except FileNotFoundError:
-            pass
-        all_collections[self.collection] = self.to_dict(content)
+            all_collections: dict[str, Any] = {}  # type: ignore[no-redef]
+        all_collections[self.collection] = content
         with Path(self.filename).open("w") as file:
-            ujson.dump(all_collections, file, indent=4, ensure_ascii=False)
+            file.write(to_json(all_collections, indent=2).decode("utf-8"))
 
 
 class FileTokenRepo(TokenRepo, JsonFileMixin):
@@ -84,7 +73,7 @@ class FileUserRepo(UserRepo, JsonFileMixin):
     collection = "users"
 
     def __init__(self) -> None:
-        self._users: dict[str, DetailedUserSchema] = self.load()
+        self._users: dict[str, DetailedUserSchema] = self.load(model=DetailedUserSchema)
 
     async def add(self, user: DetailedUserSchema) -> DetailedUserSchema:
         self._users[user.id] = user
@@ -133,7 +122,7 @@ class FileBudgetRepo(BudgetRepo, JsonFileMixin):
     collection = "budgets"
 
     def __init__(self) -> None:
-        self._budgets: dict[str, BudgetSchema] = self.load()
+        self._budgets: dict[str, BudgetSchema] = self.load(model=BudgetSchema)
 
     async def add(self, budget: BudgetSchema) -> BudgetSchema:
         self._budgets[budget.id] = budget
@@ -166,7 +155,7 @@ class FileBudgetRepo(BudgetRepo, JsonFileMixin):
         budgets = [budget for budget in self._budgets.values() if budget.user_id == user_id and matches_text(budget)]
         return paginate(budgets, limit, offset)
 
-    async def update_budget(self, budget: BudgetSchema) -> BudgetSchema:
+    async def update(self, budget: BudgetSchema) -> BudgetSchema:
         self._budgets[budget.id] = budget
         self.save(self._budgets)
         return budget
@@ -181,7 +170,7 @@ class FileCategoryRepo(CategoryRepo, JsonFileMixin):
     collection = "categories"
 
     def __init__(self) -> None:
-        self._categories: dict[str, CategorySchema] = self.load()
+        self._categories: dict[str, CategorySchema] = self.load(model=CategorySchema)
 
     async def add(self, category: CategorySchema) -> CategorySchema:
         self._categories[category.id] = category
@@ -237,7 +226,7 @@ class FileCategoryRepo(CategoryRepo, JsonFileMixin):
         ]
         return paginate(categories, limit, offset)
 
-    async def update_category(self, category: CategorySchema) -> CategorySchema:
+    async def update(self, category: CategorySchema) -> CategorySchema:
         self._categories[category.id] = category
         self.save(self._categories)
         return category
@@ -248,91 +237,47 @@ class FileCategoryRepo(CategoryRepo, JsonFileMixin):
         return category
 
 
-class FileExpenseRepo(ExpenseRepo, JsonFileMixin):
-    collection = "expenses"
-
-    def __init__(self) -> None:
-        self._expenses: dict[str, ExpenseSchema] = self.load()
-
-    async def create(
-        self, amount: float, description: str, category_id: str, user_id: str, timestamp: datetime.datetime
-    ) -> ExpenseSchema:
-        expense = ExpenseSchema(
-            amount=amount, description=description, category_id=category_id, user_id=user_id, timestamp=timestamp
-        )
-        self._expenses[expense.id] = expense
-        self.save(self._expenses)
-        return expense
-
-    async def get(self, expense_id: str) -> ExpenseSchema | None:
-        return self._expenses[expense_id]
-
-    async def list_(self, user_id: str, limit: int | None = None, offset: int = 0) -> tuple[Total, list[ExpenseSchema]]:
-        expenses = [expense for expense in self._expenses.values() if expense.user_id == user_id]
-        return paginate(expenses, limit, offset)
-
-    async def update_expense(
-        self,
-        expense_id: str,
-        amount: float | UnsetValue = UNSET,
-        category_id: str | UnsetValue = UNSET,
-        description: str | UnsetValue = UNSET,
-    ) -> ExpenseSchema:
-        expense = self._expenses[expense_id]
-        if not isinstance(amount, UnsetValue):
-            expense.amount = amount
-        if not isinstance(category_id, UnsetValue):
-            expense.category_id = category_id
-        if not isinstance(description, UnsetValue):
-            expense.description = description
-        self.save(self._expenses)
-        return expense
-
-    async def delete(self, expense_id: str) -> None:
-        self._expenses.pop(expense_id)
-        self.save(self._expenses)
-
-
-class FileIncomeRepo(IncomeRepo, JsonFileMixin):
+class FileTransactionRepo(TransactionRepo, JsonFileMixin):
     collection = "incomes"
 
     def __init__(self) -> None:
-        self._incomes: dict[str, IncomeSchema] = self.load()
+        self._transactions: dict[str, TransactionSchema] = self.load(model=TransactionSchema)
 
-    async def create(
-        self, amount: float, description: str, category_id: str, user_id: str, timestamp: datetime.datetime
-    ) -> IncomeSchema:
-        income = IncomeSchema(
-            amount=amount, description=description, category_id=category_id, user_id=user_id, timestamp=timestamp
-        )
-        self._incomes[income.id] = income
-        self.save(self._incomes)
-        return income
+    async def add(self, transaction: TransactionSchema) -> TransactionSchema:
+        self._transactions[transaction.id] = transaction
+        self.save(self._transactions)
+        return transaction
 
-    async def get(self, income_id: str) -> IncomeSchema | None:
-        return self._incomes[income_id]
+    async def get(self, transaction_id: str) -> TransactionSchema | None:
+        return self._transactions.get(transaction_id, None)
 
-    async def list_(self, user_id: str, limit: int | None = None, offset: int = 0) -> tuple[Total, list[IncomeSchema]]:
-        incomes = [income for income in self._incomes.values() if income.user_id == user_id]
+    async def list_(
+        self, user_id: str, limit: int | None = None, offset: int = 0
+    ) -> tuple[Total, list[TransactionSchema]]:
+        incomes = [transaction for transaction in self._transactions.values() if transaction.user_id == user_id]
         return paginate(incomes, limit, offset)
 
-    async def update_income(
-        self,
-        income_id: str,
-        amount: float | UnsetValue = UNSET,
-        category_id: str | UnsetValue = UNSET,
-        description: str | UnsetValue = UNSET,
-    ) -> IncomeSchema:
-        income = self._incomes[income_id]
-        if not isinstance(amount, UnsetValue):
-            income.amount = amount
-        if not isinstance(category_id, UnsetValue):
-            income.category_id = category_id
-        if not isinstance(description, UnsetValue):
-            income.description = description
-        self.save(self._incomes)
-        return income
+    async def find_by_text(
+        self, user_id: str, text: str, *, case_sensitive: bool = False, limit: int | None = None, offset: int = 0
+    ) -> tuple[Total, list[TransactionSchema]]:
+        def matches_text(transaction: TransactionSchema) -> bool:
+            if case_sensitive:
+                return text in transaction.description
+            return text.lower() in transaction.description.lower()
 
-    async def delete(self, income_id: str) -> None:
-        self._incomes.pop(income_id)
-        self.save(self._incomes)
+        transactions = [
+            transaction
+            for transaction in self._transactions.values()
+            if transaction.user_id == user_id and matches_text(transaction)
+        ]
+        return paginate(transactions, limit, offset)
+
+    async def update(self, transaction: TransactionSchema) -> TransactionSchema:
+        self._transactions[transaction.id] = transaction
+        self.save(self._transactions)
+        return transaction
+
+    async def delete(self, transaction_id: str) -> TransactionSchema:
+        transaction = self._transactions.pop(transaction_id)
+        self.save(self._transactions)
+        return transaction

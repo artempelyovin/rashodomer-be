@@ -2,10 +2,10 @@ from datetime import datetime
 from typing import Annotated
 from uuid import UUID
 
-from pydantic import Field
+from pydantic import AwareDatetime, Field
 
 from base import CustomModel
-from utils import uuid4_str
+from utils import utc_now, uuid4_str
 
 IdDesc = "Unique ID of the budget"
 NameDesc = "The name of the budget"
@@ -25,8 +25,8 @@ class BudgetSchema(CustomModel):
     description: str = Field(..., description=DescriptionDesc, examples=DescriptionExamples)
     amount: float = Field(..., description=AmountDesc, examples=AmountExamples)
     user_id: Annotated[str, UUID] = Field(..., description=UserIDDesc)
-    created_at: datetime = Field(default_factory=datetime.now, description=CreatedAtDesc)
-    updated_at: datetime = Field(default_factory=datetime.now, description=UpdatedAtDesc)
+    created_at: Annotated[datetime, AwareDatetime] = Field(default_factory=utc_now, description=CreatedAtDesc)
+    updated_at: Annotated[datetime, AwareDatetime] = Field(default_factory=utc_now, description=UpdatedAtDesc)
 
 
 class CreateBudgetSchema(CustomModel):
