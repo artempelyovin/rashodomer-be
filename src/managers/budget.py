@@ -9,11 +9,12 @@ from exceptions import (
 )
 from repos.abc import BudgetRepo, Total
 from schemas.budget import BudgetSchema, CreateBudgetSchema
+from settings import settings
 from utils import UnsetValue
 
 
 class BudgetManager:
-    def __init__(self, budget_repo: BudgetRepo) -> None:
+    def __init__(self, budget_repo: BudgetRepo = settings.budget_repo) -> None:
         self.repo = budget_repo
 
     async def create(self, user_id: str, data: CreateBudgetSchema) -> BudgetSchema:

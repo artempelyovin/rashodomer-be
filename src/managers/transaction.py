@@ -11,11 +11,16 @@ from exceptions import (
 )
 from repos.abc import CategoryRepo, Total, TransactionRepo
 from schemas.transaction import CreateTransactionSchema, TransactionSchema
+from settings import settings
 from utils import UnsetValue
 
 
 class TransactionManager:
-    def __init__(self, transaction_repo: TransactionRepo, category_repo: CategoryRepo) -> None:
+    def __init__(
+        self,
+        transaction_repo: TransactionRepo = settings.transaction_repo,
+        category_repo: CategoryRepo = settings.category_repo,
+    ) -> None:
         self.transaction_repo = transaction_repo
         self.category_repo = category_repo
 
