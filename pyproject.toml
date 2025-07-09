@@ -1,33 +1,32 @@
-[tool.poetry]
+[project]
 name = "rashodomer"
-version = "0.0.1"
-description = ""
-authors = ["artempelevin <artempelevin@list.ru>"]
+version = "0.1.0"
+description = ""  # TODO: add
 readme = "README.md"
-packages = [{ include = "src" }]
+authors = [
+    { name = "artempelevin", email = "artempelevin@list.ru" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "emoji>=2.14.1",
+    "nicegui>=2.21.0",
+    "pydantic>=2.11.7",
+    "pydantic-settings>=2.10.1",
+    "ujson>=5.10.0",
+]
+
+[dependency-groups]
+dev = [
+    "faker>=37.4.0",
+    "mypy>=1.16.1",
+    "pre-commit>=4.2.0",
+    "pytest>=8.4.1",
+    "pytest-asyncio>=1.0.0",
+    "ruff>=0.12.2",
+    "types-ujson>=5.10.0.20250326",
+]
 
 
-[tool.poetry.dependencies]
-python = "^3.12"
-pydantic = "^2.9.2"
-bcrypt = "^4.2.0"
-fastapi = "^0.115.5"
-uvicorn = "^0.32.0"
-ujson = "^5.10.0"
-emoji = "^2.14.0"
-httpx = "^0.28.1"
-nicegui = "^2.20.0"
-pydantic-settings = "^2.10.0"
-
-
-[tool.poetry.group.dev.dependencies]
-ruff = "0.7.1"  # we update it with our hands because all rules are enabled
-mypy = "^1.13.0"
-pre-commit = "^4.0.1"
-types-ujson = "^5.10.0.20240515"
-pytest = "^8.3.3"
-pytest-asyncio = "^0.24.0"
-faker = "^33.0.0"
 
 
 [tool.ruff]
@@ -76,8 +75,3 @@ strict = true
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
-
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"

@@ -1,2 +1,4 @@
+.venv
+.nicegui
 .idea
 data.json
