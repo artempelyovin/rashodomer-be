@@ -16,17 +16,17 @@ def register(client: TestClient, first_name: str, last_name: str, login: str, pa
         "/v1/register",
         json={"first_name": first_name, "last_name": last_name, "login": login, "password": password},
     )
-    assert (
-        response.status_code == status.HTTP_201_CREATED
-    ), f"Register error ({response.status_code} status code): {response.text}"
+    assert response.status_code == status.HTTP_201_CREATED, (
+        f"Register error ({response.status_code} status code): {response.text}"
+    )
     return UserSchema(**response.json()["result"])
 
 
 def authenticate(client: TestClient, login: str, password: str) -> str:
     response = client.post("/v1/login", json={"login": login, "password": password})
-    assert (
-        response.status_code == status.HTTP_200_OK
-    ), f"Authenticate error ({response.status_code} status code): {response.text}"
+    assert response.status_code == status.HTTP_200_OK, (
+        f"Authenticate error ({response.status_code} status code): {response.text}"
+    )
     return TokenSchema(**response.json()["result"]).token
 
 
@@ -44,9 +44,9 @@ def create_budget(
     response = client.post(
         "/v1/budgets", json={"name": name, "description": description, "amount": amount}, headers=headers
     )
-    assert (
-        response.status_code == status.HTTP_201_CREATED
-    ), f"Create budget error ({response.status_code} status code): {response.text}"
+    assert response.status_code == status.HTTP_201_CREATED, (
+        f"Create budget error ({response.status_code} status code): {response.text}"
+    )
     return BudgetSchema(**response.json()["result"])
 
 
@@ -63,9 +63,9 @@ def create_category(
         json={"name": name, "description": description, "type": category_type.name, "emoji_icon": emoji_icon},
         headers=headers,
     )
-    assert (
-        response.status_code == status.HTTP_201_CREATED
-    ), f"Create category error ({response.status_code} status code): {response.text}"
+    assert response.status_code == status.HTTP_201_CREATED, (
+        f"Create category error ({response.status_code} status code): {response.text}"
+    )
     return CategorySchema(**response.json()["result"])
 
 
@@ -87,7 +87,7 @@ def create_transaction(
         },
         headers=headers,
     )
-    assert (
-        response.status_code == status.HTTP_201_CREATED
-    ), f"Create transaction error ({response.status_code} status code): {response.text}"
+    assert response.status_code == status.HTTP_201_CREATED, (
+        f"Create transaction error ({response.status_code} status code): {response.text}"
+    )
     return TransactionSchema(**response.json()["result"])
