@@ -56,7 +56,8 @@ async def register():
                 )
             )
         except BaseCoreError as e:
-            ui.notify(e.message, type="negative")
+            ui.notify(e.message(), type="negative")
+            return
 
         logger.info(f"User ({first_name.value=}, {last_name_.value=}, {login_.value=}) registered successfully")
         ui.navigate.to("/login")
