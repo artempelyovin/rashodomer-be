@@ -2,6 +2,8 @@ import gettext
 import uuid
 from datetime import UTC, datetime
 
+from base import ISO_TIMEZONE_FORMAT
+
 _ = gettext.gettext
 
 
@@ -27,3 +29,7 @@ def uuid4_str() -> str:
 
 def utc_now() -> datetime:
     return datetime.now(tz=UTC)
+
+
+def datetime_to_text(datetime_: datetime) -> str:
+    return datetime_.strftime("%Y-%m-%d %H:%M")
