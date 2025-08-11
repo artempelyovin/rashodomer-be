@@ -31,11 +31,11 @@ async def list_budgets(request: Request, page: int = 1, limit: int = 1):
         ui.navigate.to("/budgets")
 
     user: DetailedUserSchema = request.state.user
-    logging.info(f"Show /budgets page for user {user.id} with {page=}, {limit=}")
+    logger.info(f"Show /budgets page for user {user.id} with {page=}, {limit=}")
 
     offset = (page - 1) * limit
     total, budgets = await BudgetManager().list_(user_id=user.id, limit=limit, offset=offset)
-    logging.debug(f"Get {len(budgets)} budgets, {total=}")
+    logger.debug(f"Get {len(budgets)} budgets, {total=}")
 
     pages = ceil(total / limit)
 
@@ -109,7 +109,7 @@ async def create_budgets(request: Request):
 @router.page("/budgets/{budget_id}")
 async def update_budget(request: Request, budget_id: str):
     user: DetailedUserSchema = request.state.user
-    logging.info(f"Show /budgets/{budget_id} page for user {user.id}")
+    logger.info(f"Show /budgets/{budget_id} page for user {user.id}")
 
     budget = await BudgetManager().get(user_id=user.id, budget_id=budget_id)
 
