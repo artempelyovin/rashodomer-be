@@ -7,9 +7,15 @@ from exceptions import UnauthorizedError, UserNotExistsError
 from managers.auth import AuthManager
 
 
+NO_AUTH_PATHS = (
+    '/login',
+    '/register',
+    '/_nicegui'  # needed for work nicegui
+)
+
 class AuthMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
-        if request.url.path.startswith("/login"):
+        if any(request.url.path.startswith(path) for path in NO_AUTH_PATHS):
             return await call_next(request)
 
         try:
@@ -17,4 +23,4 @@ class AuthMiddleware(BaseHTTPMiddleware):
             request.state.user = user
             return await call_next(request)
         except (UnauthorizedError, UserNotExistsError):
-            return RedirectResponse("/login?unauthorized=True")
+            return RedirectResponse("/login?unauthorized=True", status_code=303)
