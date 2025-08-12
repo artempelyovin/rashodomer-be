@@ -11,7 +11,7 @@ from exceptions import (
     EmptySearchTextError,
     NotEmojiIconError,
 )
-from models.category import CategorySchema, CreateCategorySchema
+from models.category import CategorySchema
 from repos.abc import CategoryRepo, Total
 from settings import settings
 from utils import UnsetValue
@@ -21,21 +21,28 @@ class CategoryManager:
     def __init__(self, category_repo: CategoryRepo = settings.category_repo) -> None:
         self.repo = category_repo
 
-    async def create(self, user_id: str, data: CreateCategorySchema) -> CategorySchema:
-        if len(data.name) == 0:
+    async def create(
+        self,
+        user_id: str,
+        name: str,
+        category_type: CategoryType,
+        description: str | None = "",
+        emoji_icon: str | None = None,
+    ) -> CategorySchema:
+        if len(name) == 0:
             raise EmptyCategoryNameError
-        if data.emoji_icon is not None and not emoji.is_emoji(data.emoji_icon):
-            raise NotEmojiIconError(emoji_icon=data.emoji_icon)
+        if emoji_icon is not None and not emoji.is_emoji(emoji_icon):
+            raise NotEmojiIconError(emoji_icon=emoji_icon)
         total_exist_categories, _ = await self.repo.find_by_name_and_category(
-            user_id=user_id, name=data.name, category_type=data.type
+            user_id=user_id, name=name, category_type=category_type
         )
         if total_exist_categories != 0:
-            raise CategoryAlreadyExistsError(name=data.name, category_type=data.type)
+            raise CategoryAlreadyExistsError(name=name, category_type=category_type)
         category = CategorySchema(
-            name=data.name,
-            description=data.description,
-            type=data.type,
-            emoji_icon=data.emoji_icon,
+            name=name,
+            description=description,
+            type=category_type,
+            emoji_icon=emoji_icon,
             is_archived=False,
             user_id=user_id,
         )
