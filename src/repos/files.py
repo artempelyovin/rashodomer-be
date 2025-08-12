@@ -7,6 +7,10 @@ from pydantic_core import from_json, to_json
 
 from base import CustomModel
 from enums import CategoryType
+from models.budget import BudgetSchema
+from models.category import CategorySchema
+from models.transaction import TransactionSchema
+from models.user import DetailedUserSchema
 from repos.abc import (
     BudgetRepo,
     CategoryRepo,
@@ -15,10 +19,6 @@ from repos.abc import (
     TransactionRepo,
     UserRepo,
 )
-from schemas.budget import BudgetSchema
-from schemas.category import CategorySchema
-from schemas.transaction import TransactionSchema
-from schemas.user import DetailedUserSchema
 
 
 def paginate[T](items: list[T], limit: int | None = None, offset: int = 0) -> tuple[Total, list[T]]:

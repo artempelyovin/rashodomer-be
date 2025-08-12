@@ -5,7 +5,7 @@ from nicegui.elements.input import Input
 
 from exceptions import BaseCoreError, IncorrectPasswordError, LoginAlreadyExistsError, LoginNotExistsError
 from managers.auth import AuthManager
-from schemas.user import CreateUserSchema
+from models.user import CreateUserSchema
 
 logger = logging.getLogger(__name__)
 router = APIRouter()

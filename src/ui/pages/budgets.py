@@ -8,10 +8,8 @@ from nicegui.elements.number import Number
 from nicegui.elements.textarea import Textarea
 from starlette.requests import Request
 
-from exceptions import BaseCoreError
 from managers.budget import BudgetManager
-from schemas.budget import CreateBudgetSchema
-from schemas.user import DetailedUserSchema
+from models.user import DetailedUserSchema
 from ui.components.buttons import DeleteButtonWithConfirmation
 from ui.components.labels import amount_with_gradient, id_with_copy
 
@@ -88,8 +86,7 @@ async def create_budgets(request: Request):
         if not name.value:
             return ui.notify("Заполните название", type="negative")
         await BudgetManager().create(
-            user_id=user.id,
-            data=CreateBudgetSchema(name=name.value, description=description.value, amount=amount.value),
+            user_id=user.id, name=name.value, description=description.value, amount=amount.value
         )
         ui.navigate.to("/budgets")
 

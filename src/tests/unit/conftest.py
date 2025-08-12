@@ -3,9 +3,9 @@ from faker import Faker
 
 from enums import CategoryType
 from managers.auth import AuthManager
-from schemas.budget import BudgetSchema
-from schemas.category import CategorySchema
-from schemas.user import DetailedUserSchema
+from models.budget import BudgetSchema
+from models.category import CategorySchema
+from models.user import DetailedUserSchema
 
 fake = Faker(locale="ru_RU")
 

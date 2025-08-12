@@ -11,8 +11,8 @@ from exceptions import (
     EmptySearchTextError,
     NotEmojiIconError,
 )
+from models.category import CategorySchema, CreateCategorySchema
 from repos.abc import CategoryRepo, Total
-from schemas.category import CategorySchema, CreateCategorySchema
 from settings import settings
 from utils import UnsetValue
 

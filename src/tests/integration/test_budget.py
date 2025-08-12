@@ -5,8 +5,8 @@ from starlette import status
 from starlette.testclient import TestClient
 
 from base import ISO_TIMEZONE_FORMAT
-from schemas.budget import BudgetSchema
-from schemas.user import UserSchema
+from models.budget import BudgetSchema
+from models.user import UserSchema
 from tests.integration.conftest import fake
 from tests.integration.utils import create_budget, register_and_authenticate
 

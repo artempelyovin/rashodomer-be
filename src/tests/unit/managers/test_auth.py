@@ -8,8 +8,8 @@ from exceptions import (
     UserNotExistsError,
 )
 from managers.auth import AuthManager
+from models.user import DetailedUserSchema
 from repos.abc import TokenRepo, UserRepo
-from schemas.user import DetailedUserSchema
 from tests.unit.conftest import fake
 
 

@@ -2,10 +2,10 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 
 from enums import CategoryType
-from schemas.budget import BudgetSchema
-from schemas.category import CategorySchema
-from schemas.transaction import TransactionSchema
-from schemas.user import DetailedUserSchema
+from models.budget import BudgetSchema
+from models.category import CategorySchema
+from models.transaction import TransactionSchema
+from models.user import DetailedUserSchema
 
 type Total = int
 

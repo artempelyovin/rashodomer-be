@@ -4,6 +4,7 @@ from fastapi import Depends
 from fastapi.security import APIKeyHeader
 
 from managers.auth import AuthManager
+from models.user import DetailedUserSchema
 from repos.abc import (
     BudgetRepo,
     CategoryRepo,
@@ -18,7 +19,6 @@ from repos.files import (
     FileTransactionRepo,
     FileUserRepo,
 )
-from schemas.user import DetailedUserSchema
 
 header_scheme = APIKeyHeader(
     name="Authorization", auto_error=False, description='Token in format: "Authorization": "{TOKEN}"'
