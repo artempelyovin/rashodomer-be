@@ -27,4 +27,3 @@ class BudgetSchema(CustomModel):
     user_id: Annotated[str, UUID] = Field(..., description=UserIDDesc)
     created_at: Annotated[datetime, AwareDatetime] = Field(default_factory=utc_now, description=CreatedAtDesc)
     updated_at: Annotated[datetime, AwareDatetime] = Field(default_factory=utc_now, description=UpdatedAtDesc)
-
