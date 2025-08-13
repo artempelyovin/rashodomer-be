@@ -84,8 +84,8 @@ class CategoryRepo(ABC):
     async def list_(
         self,
         user_id: str,
-        category_type: CategoryType,
         *,
+        category_type: CategoryType | None = None,
         show_archived: bool = False,
         limit: int | None = None,
         offset: int = 0,
