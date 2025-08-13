@@ -7,7 +7,7 @@ from starlette.requests import Request
 
 from enums import CategoryType
 from managers.category import CategoryManager
-from models.user import DetailedUserSchema
+from models import DetailedUserSchema
 from ui.components.buttons import DeleteButtonWithConfirmation
 from ui.components.labels import id_with_copy
 

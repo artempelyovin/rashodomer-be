@@ -8,8 +8,7 @@ from starlette.requests import Request
 
 from managers.category import CategoryManager
 from managers.transaction import TransactionManager
-from models.category import CategorySchema
-from models.user import DetailedUserSchema
+from models import CategorySchema, DetailedUserSchema
 from ui.components.buttons import DatePickerButton, DeleteButtonWithConfirmation, TimePickerButton
 from ui.components.labels import amount_with_gradient, id_with_copy
 
@@ -167,9 +166,7 @@ async def update_transaction(request: Request, transaction_id: str):
     categories = await load_categories()
     transaction = await TransactionManager().get(user_id=user.id, transaction_id=transaction_id)
 
-    async def validate_and_save(
-        amount: float, description: str, category_id: str, date: str, time: str
-    ) -> None:
+    async def validate_and_save(amount: float, description: str, category_id: str, date: str, time: str) -> None:
         if not category_id:
             return ui.notify("Выберите категорию", type="negative")
         timestamp = datetime.strptime(f"{date} {time}", "%Y-%m-%d %H:%M").astimezone(UTC)

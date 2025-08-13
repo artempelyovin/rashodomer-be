@@ -5,12 +5,8 @@ from typing import Any
 
 from pydantic_core import from_json, to_json
 
-from base import CustomModel
 from enums import CategoryType
-from models.budget import BudgetSchema
-from models.category import CategorySchema
-from models.transaction import TransactionSchema
-from models.user import DetailedUserSchema
+from models import BudgetSchema, CategorySchema, CustomModel, DetailedUserSchema, TransactionSchema
 from repos.abc import (
     BudgetRepo,
     CategoryRepo,

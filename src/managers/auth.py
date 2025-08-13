@@ -12,7 +12,7 @@ from exceptions import (
     UnauthorizedError,
     UserNotExistsError,
 )
-from models.user import CreateUserSchema, DetailedUserSchema
+from models import CreateUserSchema, DetailedUserSchema
 from repos.abc import TokenRepo, UserRepo
 from settings import settings
 

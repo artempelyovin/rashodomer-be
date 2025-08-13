@@ -3,12 +3,8 @@ from datetime import datetime
 from starlette import status
 from starlette.testclient import TestClient
 
-from base import ISO_TIMEZONE_FORMAT
 from enums import CategoryType
-from models.budget import BudgetSchema
-from models.category import CategorySchema
-from models.transaction import TransactionSchema
-from models.user import TokenSchema, UserSchema
+from models import ISO_TIMEZONE_FORMAT, BudgetSchema, CategorySchema, TokenSchema, TransactionSchema, UserSchema
 
 
 def register(client: TestClient, first_name: str, last_name: str, login: str, password: str) -> UserSchema:

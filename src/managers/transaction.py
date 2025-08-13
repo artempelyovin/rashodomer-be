@@ -9,7 +9,7 @@ from exceptions import (
     TransactionAccessDeniedError,
     TransactionNotExistsError,
 )
-from models.transaction import TransactionSchema
+from models import TransactionSchema
 from repos.abc import CategoryRepo, Total, TransactionRepo
 from settings import settings
 from utils import UnsetValue

@@ -9,7 +9,7 @@ from nicegui.elements.textarea import Textarea
 from starlette.requests import Request
 
 from managers.budget import BudgetManager
-from models.user import DetailedUserSchema
+from models import DetailedUserSchema
 from ui.components.buttons import DeleteButtonWithConfirmation
 from ui.components.labels import amount_with_gradient, id_with_copy
 

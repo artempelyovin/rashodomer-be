@@ -7,7 +7,7 @@ from exceptions import (
     BudgetNotExistsError,
     EmptySearchTextError,
 )
-from models.budget import BudgetSchema
+from models import BudgetSchema
 from repos.abc import BudgetRepo, Total
 from settings import settings
 from utils import UnsetValue
