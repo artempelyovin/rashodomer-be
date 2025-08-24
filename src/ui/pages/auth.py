@@ -5,7 +5,7 @@ from nicegui.elements.input import Input
 
 from exceptions import BaseCoreError, IncorrectPasswordError, LoginAlreadyExistsError, LoginNotExistsError
 from managers.auth import AuthManager
-from models import CreateUserSchema
+from models import CreateUser
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -49,7 +49,7 @@ async def register():
             return ui.notify("Заполните пароль", type="negative")
         try:
             await AuthManager().register(
-                data=CreateUserSchema(
+                data=CreateUser(
                     first_name=first_name.value, last_name=last_name.value, login=login.value, password=password.value
                 )
             )

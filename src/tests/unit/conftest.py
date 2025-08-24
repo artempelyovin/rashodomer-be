@@ -3,14 +3,14 @@ from faker import Faker
 
 from enums import CategoryType
 from managers.auth import AuthManager
-from models import BudgetSchema, CategorySchema, DetailedUserSchema
+from models import Budget, Category, DetailedUser
 
 fake = Faker(locale="ru_RU")
 
 
 @pytest.fixture
-def fake_budget() -> BudgetSchema:
-    return BudgetSchema(
+def fake_budget() -> Budget:
+    return Budget(
         name=fake.word(),
         description=fake.sentence(),
         amount=fake.pyfloat(positive=True),
@@ -19,10 +19,10 @@ def fake_budget() -> BudgetSchema:
 
 
 @pytest.fixture
-def fake_user() -> DetailedUserSchema:
+def fake_user() -> DetailedUser:
     password = fake.password()
     password_hash = AuthManager.hash_password(password)
-    return DetailedUserSchema(
+    return DetailedUser(
         first_name=fake.first_name(),
         last_name=fake.last_name(),
         login=fake.user_name(),
@@ -33,8 +33,8 @@ def fake_user() -> DetailedUserSchema:
 
 
 @pytest.fixture
-def fake_category() -> CategorySchema:
-    return CategorySchema(
+def fake_category() -> Category:
+    return Category(
         name=fake.word(),
         description=fake.sentence(),
         type=fake.random_element(list(CategoryType)),

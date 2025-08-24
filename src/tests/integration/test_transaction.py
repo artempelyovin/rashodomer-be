@@ -6,7 +6,7 @@ from starlette import status
 from starlette.testclient import TestClient
 
 from enums import CategoryType
-from models import ISO_TIMEZONE_FORMAT, CategorySchema, TransactionSchema, UserSchema
+from models import ISO_TIMEZONE_FORMAT, Category, Transaction, User
 from tests.integration.conftest import fake
 from tests.integration.utils import create_category, create_transaction, register_and_authenticate
 
@@ -23,7 +23,7 @@ def test_transaction_not_exists(
     method: str,
     payload: dict[str, Any] | None,
     client: TestClient,
-    created_user: UserSchema,  # noqa: ARG001
+    created_user: User,  # noqa: ARG001
 ) -> None:
     non_existent_id = "12345"
 
@@ -44,7 +44,7 @@ def test_transaction_not_exists(
     ],
 )
 def test_transaction_access_denied(
-    method: str, payload: dict[str, Any] | None, client: TestClient, created_transaction: TransactionSchema
+    method: str, payload: dict[str, Any] | None, client: TestClient, created_transaction: Transaction
 ) -> None:
     _, another_token = register_and_authenticate(
         client=client,
@@ -68,7 +68,7 @@ def test_transaction_access_denied(
 
 
 class TestTransactionCreate:
-    def test_ok(self, client: TestClient, created_category: CategorySchema) -> None:
+    def test_ok(self, client: TestClient, created_category: Category) -> None:
         payload = {
             "amount": 10,
             "description": "my first transaction",
@@ -88,7 +88,7 @@ class TestTransactionCreate:
         assert result["created_at"]
         assert result["updated_at"]
 
-    def test_amount_must_be_positive(self, client: TestClient, created_category: CategorySchema) -> None:
+    def test_amount_must_be_positive(self, client: TestClient, created_category: Category) -> None:
         response = client.post(
             "/v1/transactions",
             json={
@@ -102,7 +102,7 @@ class TestTransactionCreate:
         assert error["type"] == "AmountMustBePositiveError"
         assert error["detail"] == "Amount must be positive"
 
-    def test_category_not_exists(self, client: TestClient, created_user: UserSchema) -> None:  # noqa: ARG002
+    def test_category_not_exists(self, client: TestClient, created_user: User) -> None:  # noqa: ARG002
         non_existent_id = "12345"
 
         response = client.post("/v1/transactions", json={"amount": 10, "category_id": non_existent_id})
@@ -112,7 +112,7 @@ class TestTransactionCreate:
         assert error["type"] == "CategoryNotExistsError"
         assert error["detail"] == f"Category with ID '{non_existent_id}' does not exist"
 
-    def test_category_access_denied(self, client: TestClient, created_category: CategorySchema) -> None:
+    def test_category_access_denied(self, client: TestClient, created_category: Category) -> None:
         _, another_token = register_and_authenticate(
             client=client,
             first_name=fake.first_name(),
@@ -132,7 +132,7 @@ class TestTransactionCreate:
         assert error["type"] == "CategoryAccessDeniedError"
         assert error["detail"] == "Attempt to access another user's category"
 
-    def test_timestamp_in_future(self, client: TestClient, created_category: CategorySchema) -> None:
+    def test_timestamp_in_future(self, client: TestClient, created_category: Category) -> None:
         future_timestamp = datetime.now(tz=UTC) + timedelta(days=1)
 
         response = client.post(
@@ -151,16 +151,16 @@ class TestTransactionCreate:
 
 
 class TestTransactionGet:
-    def test_ok(self, client: TestClient, created_transaction: TransactionSchema) -> None:
+    def test_ok(self, client: TestClient, created_transaction: Transaction) -> None:
         response = client.get(url=f"/v1/transactions/{created_transaction.id}")
 
         assert response.status_code == status.HTTP_200_OK
-        transaction = TransactionSchema(**response.json()["result"])
+        transaction = Transaction(**response.json()["result"])
         assert created_transaction == transaction
 
 
 class TestTransactionList:
-    def test_ok(self, client: TestClient, created_user: UserSchema, created_category: CategorySchema) -> None:  # noqa: ARG002
+    def test_ok(self, client: TestClient, created_user: User, created_category: Category) -> None:  # noqa: ARG002
         expected_transactions = [
             create_transaction(
                 client=client,
@@ -182,11 +182,11 @@ class TestTransactionList:
         transactions_by_id = {transaction["id"]: transaction for transaction in transactions}
         for expected_transaction_id, expected_transaction in expected_transactons_by_id.items():
             assert expected_transaction_id in transactions_by_id
-            assert expected_transaction == TransactionSchema(**transactions_by_id[expected_transaction_id])
+            assert expected_transaction == Transaction(**transactions_by_id[expected_transaction_id])
 
 
 class TestTransactionUpdate:
-    def test_ok(self, client: TestClient, created_transaction: TransactionSchema, created_user: UserSchema) -> None:
+    def test_ok(self, client: TestClient, created_transaction: Transaction, created_user: User) -> None:
         new_category = create_category(
             client=client,
             name="new_category",
@@ -215,7 +215,7 @@ class TestTransactionUpdate:
         assert result["category_id"] == new_category.id
         assert result["timestamp"] == updated_payload["timestamp"]
 
-    def test_amount_must_be_positive(self, client: TestClient, created_transaction: TransactionSchema) -> None:
+    def test_amount_must_be_positive(self, client: TestClient, created_transaction: Transaction) -> None:
         response = client.patch(
             f"/v1/transactions/{created_transaction.id}",
             json={"amount": -1},  # <-- negative
@@ -226,7 +226,7 @@ class TestTransactionUpdate:
         assert error["type"] == "AmountMustBePositiveError"
         assert error["detail"] == "Amount must be positive"
 
-    def test_category_not_found(self, client: TestClient, created_transaction: TransactionSchema) -> None:
+    def test_category_not_found(self, client: TestClient, created_transaction: Transaction) -> None:
         non_existent_id = "12345"
 
         response = client.patch(
@@ -239,7 +239,7 @@ class TestTransactionUpdate:
         assert error["type"] == "CategoryNotExistsError"
         assert error["detail"] == f"Category with ID '{non_existent_id}' does not exist"
 
-    def test_category_access_denied(self, client: TestClient, created_transaction: TransactionSchema) -> None:
+    def test_category_access_denied(self, client: TestClient, created_transaction: Transaction) -> None:
         _, another_token = register_and_authenticate(
             client=client,
             first_name=fake.first_name(),
@@ -268,16 +268,16 @@ class TestTransactionUpdate:
 
 
 class TestTransactionDelete:
-    def test_ok(self, client: TestClient, created_transaction: TransactionSchema) -> None:
+    def test_ok(self, client: TestClient, created_transaction: Transaction) -> None:
         response = client.delete(f"/v1/transactions/{created_transaction.id}")
 
         assert response.status_code == status.HTTP_200_OK
-        transaction = TransactionSchema(**response.json()["result"])
+        transaction = Transaction(**response.json()["result"])
         assert transaction == created_transaction
 
 
 class TestTransactionFind:
-    def test_ok(self, client: TestClient, created_category: CategorySchema) -> None:
+    def test_ok(self, client: TestClient, created_category: Category) -> None:
         search_text = "car"
         created_transaction = create_transaction(
             client=client,
@@ -292,11 +292,11 @@ class TestTransactionFind:
         assert response.status_code == status.HTTP_200_OK
         result = response.json()["result"]
         assert result["total"] == 1
-        transaction = TransactionSchema(**result["items"][0])
+        transaction = Transaction(**result["items"][0])
         assert transaction == created_transaction
         assert search_text in transaction.description
 
-    def test_empty_category_text(self, client: TestClient, created_user: UserSchema) -> None:  # noqa: ARG002
+    def test_empty_category_text(self, client: TestClient, created_user: User) -> None:  # noqa: ARG002
         response = client.get("/v1/transactions/find", params={"text": ""})  # empty text
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST

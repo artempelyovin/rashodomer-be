@@ -7,7 +7,7 @@ from starlette.requests import Request
 
 from enums import CategoryType
 from managers.category import CategoryManager
-from models import DetailedUserSchema
+from models import DetailedUser
 from ui.components.buttons import DeleteButtonWithConfirmation
 from ui.components.labels import id_with_copy
 
@@ -30,7 +30,7 @@ async def list_categories(
             f"/categories?page=1&limit={limit}&category_type={category_type.value}&show_archived={show_archived}"
         )
 
-    user: DetailedUserSchema = request.state.user
+    user: DetailedUser = request.state.user
     logger.info(f"Show /categories page for user {user.id} with {page=}, {limit=}, {category_type=}, {show_archived=}")
 
     offset = (page - 1) * limit
@@ -128,7 +128,7 @@ async def list_categories(
 
 @router.page("/categories/new")
 async def create_category(request: Request):
-    user: DetailedUserSchema = request.state.user
+    user: DetailedUser = request.state.user
 
     async def validate_and_create(
         name: str, description: str, category_type: CategoryType, emoji_icon: str | None
@@ -166,7 +166,7 @@ async def create_category(request: Request):
 
 @router.page("/categories/{category_id}")
 async def update_category(request: Request, category_id: str):
-    user: DetailedUserSchema = request.state.user
+    user: DetailedUser = request.state.user
     logger.info(f"Show /categories/{category_id} page for user {user.id}")
 
     category = await CategoryManager().get(user_id=user.id, category_id=category_id)

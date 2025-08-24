@@ -1,7 +1,7 @@
 from nicegui import APIRouter, ui
 from starlette.requests import Request
 
-from models import DetailedUserSchema
+from models import DetailedUser
 from ui.components.labels import id_with_copy
 from utils import datetime_to_text
 
@@ -10,7 +10,7 @@ router = APIRouter()
 
 @router.page("/me")
 async def about_me(request: Request):
-    user: DetailedUserSchema = request.state.user
+    user: DetailedUser = request.state.user
 
     with ui.row():
         ui.button(icon="arrow_back", on_click=ui.navigate.back)

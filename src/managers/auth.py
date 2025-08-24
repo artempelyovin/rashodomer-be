@@ -12,7 +12,7 @@ from exceptions import (
     UnauthorizedError,
     UserNotExistsError,
 )
-from models import CreateUserSchema, DetailedUserSchema
+from models import CreateUser, DetailedUser
 from repos.abc import TokenRepo, UserRepo
 from settings import settings
 
@@ -33,7 +33,7 @@ class AuthManager:
     def check_password(password: str, password_hash: str) -> bool:
         return bcrypt.checkpw(password.encode(), password_hash.encode())
 
-    async def authenticate(self, token: str | None) -> DetailedUserSchema:
+    async def authenticate(self, token: str | None) -> DetailedUser:
         if not token:
             raise UnauthorizedError
         user_id = await self.token_repo.get_user_id_by_token(token=token)
@@ -53,13 +53,13 @@ class AuthManager:
         await self.user_repo.update_last_login(user_id=user.id, last_login=datetime.now(tz=UTC))
         return await self.token_repo.create_new_token(user_id=user.id)
 
-    async def register(self, data: CreateUserSchema) -> DetailedUserSchema:
+    async def register(self, data: CreateUser) -> DetailedUser:
         user = await self.user_repo.find_by_login(login=data.login)
         if user:
             raise LoginAlreadyExistsError(login=data.login)
         self._validate_password(data.password)
         password_hash = self.hash_password(data.password)
-        user = DetailedUserSchema(
+        user = DetailedUser(
             first_name=data.first_name, last_name=data.last_name, login=data.login, password_hash=password_hash
         )
         return await self.user_repo.add(user)

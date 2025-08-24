@@ -8,7 +8,7 @@ from starlette.testclient import TestClient
 
 from app import fast_api
 from enums import CategoryType
-from models import BudgetSchema, CategorySchema, TransactionSchema, UserSchema
+from models import Budget, Category, Transaction, User
 from repos.files import JsonFileMixin
 from tests.integration.utils import authenticate, create_budget, create_category, create_transaction, register
 
@@ -21,7 +21,7 @@ def client() -> TestClient:
 
 
 @pytest.fixture
-def created_user(client: TestClient) -> UserSchema:
+def created_user(client: TestClient) -> User:
     login = fake.user_name()
     password = fake.password()
     user = register(
@@ -33,14 +33,14 @@ def created_user(client: TestClient) -> UserSchema:
 
 
 @pytest.fixture
-def created_budget(client: TestClient, created_user: UserSchema) -> BudgetSchema:
+def created_budget(client: TestClient, created_user: User) -> Budget:
     return create_budget(
         client=client, name=fake.word(), description=fake.sentence(), amount=fake.pyfloat(positive=True)
     )
 
 
 @pytest.fixture
-def created_category(client: TestClient, created_user: UserSchema) -> CategorySchema:
+def created_category(client: TestClient, created_user: User) -> Category:
     return create_category(
         client=client,
         name=fake.word(),
@@ -51,7 +51,7 @@ def created_category(client: TestClient, created_user: UserSchema) -> CategorySc
 
 
 @pytest.fixture
-def created_transaction(client: TestClient, created_category: CategorySchema) -> TransactionSchema:
+def created_transaction(client: TestClient, created_category: Category) -> Transaction:
     return create_transaction(
         client=client,
         amount=fake.pyfloat(positive=True),

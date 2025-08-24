@@ -1,7 +1,7 @@
 from starlette import status
 from starlette.testclient import TestClient
 
-from models import UserSchema
+from models import User
 from tests.integration.utils import register
 
 
@@ -26,7 +26,7 @@ class TestRegister:
         assert result["result"]["created_at"]
         assert result["result"]["last_login"]
 
-    def test_login_already_exists(self, client: TestClient, created_user: UserSchema) -> None:
+    def test_login_already_exists(self, client: TestClient, created_user: User) -> None:
         response = client.post(
             "/v1/register",
             json={
@@ -96,7 +96,7 @@ class TestLogin:
         assert error["type"] == "LoginNotExistsError"
         assert error["detail"] == f"Login '{unknown_login}' does not exist"
 
-    def test_incorrect_password(self, client: TestClient, created_user: UserSchema) -> None:
+    def test_incorrect_password(self, client: TestClient, created_user: User) -> None:
         incorrect_password = "incorrect_password"  # noqa: S105
 
         response = client.post("/v1/login", json={"login": created_user.login, "password": incorrect_password})

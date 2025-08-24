@@ -19,7 +19,7 @@ class CustomModel(BaseModel):
     )
 
 
-class BudgetSchema(CustomModel):
+class Budget(CustomModel):
     id: Annotated[str, UUID] = Field(default_factory=uuid4_str)
     name: str
     description: str
@@ -29,7 +29,7 @@ class BudgetSchema(CustomModel):
     updated_at: Annotated[datetime, AwareDatetime] = Field(default_factory=utc_now)
 
 
-class CategorySchema(CustomModel):
+class Category(CustomModel):
     id: Annotated[str, UUID] = Field(default_factory=uuid4_str)
     name: str
     description: str
@@ -41,7 +41,7 @@ class CategorySchema(CustomModel):
     updated_at: Annotated[datetime, AwareDatetime] = Field(default_factory=utc_now)
 
 
-class TransactionSchema(CustomModel):
+class Transaction(CustomModel):
     id: Annotated[str, UUID] = Field(default_factory=uuid4_str)
     amount: float
     description: str
@@ -52,7 +52,7 @@ class TransactionSchema(CustomModel):
     updated_at: Annotated[datetime, AwareDatetime] = Field(default_factory=utc_now)
 
 
-class UserSchema(CustomModel):
+class User(CustomModel):
     id: Annotated[str, UUID] = Field(default_factory=uuid4_str)
     first_name: str
     last_name: str
@@ -61,16 +61,16 @@ class UserSchema(CustomModel):
     last_login: datetime = Field(default_factory=utc_now)
 
 
-class DetailedUserSchema(UserSchema):
+class DetailedUser(User):
     password_hash: str
 
 
-class CreateUserSchema(CustomModel):
+class CreateUser(CustomModel):
     first_name: str
     last_name: str
     login: str
     password: str
 
 
-class TokenSchema(CustomModel):
+class Token(CustomModel):
     token: str

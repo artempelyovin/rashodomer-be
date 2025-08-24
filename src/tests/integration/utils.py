@@ -4,10 +4,10 @@ from starlette import status
 from starlette.testclient import TestClient
 
 from enums import CategoryType
-from models import ISO_TIMEZONE_FORMAT, BudgetSchema, CategorySchema, TokenSchema, TransactionSchema, UserSchema
+from models import ISO_TIMEZONE_FORMAT, Budget, Category, Token, Transaction, User
 
 
-def register(client: TestClient, first_name: str, last_name: str, login: str, password: str) -> UserSchema:
+def register(client: TestClient, first_name: str, last_name: str, login: str, password: str) -> User:
     response = client.post(
         "/v1/register",
         json={"first_name": first_name, "last_name": last_name, "login": login, "password": password},
@@ -15,7 +15,7 @@ def register(client: TestClient, first_name: str, last_name: str, login: str, pa
     assert response.status_code == status.HTTP_201_CREATED, (
         f"Register error ({response.status_code} status code): {response.text}"
     )
-    return UserSchema(**response.json()["result"])
+    return User(**response.json()["result"])
 
 
 def authenticate(client: TestClient, login: str, password: str) -> str:
@@ -23,12 +23,12 @@ def authenticate(client: TestClient, login: str, password: str) -> str:
     assert response.status_code == status.HTTP_200_OK, (
         f"Authenticate error ({response.status_code} status code): {response.text}"
     )
-    return TokenSchema(**response.json()["result"]).token
+    return Token(**response.json()["result"]).token
 
 
 def register_and_authenticate(
     client: TestClient, first_name: str, last_name: str, login: str, password: str
-) -> tuple[UserSchema, str]:
+) -> tuple[User, str]:
     user = register(client, first_name, last_name, login, password)
     token = authenticate(client, login, password)
     return user, token
@@ -36,14 +36,14 @@ def register_and_authenticate(
 
 def create_budget(
     client: TestClient, name: str, description: str, amount: float, headers: dict[str, str] | None = None
-) -> BudgetSchema:
+) -> Budget:
     response = client.post(
         "/v1/budgets", json={"name": name, "description": description, "amount": amount}, headers=headers
     )
     assert response.status_code == status.HTTP_201_CREATED, (
         f"Create budget error ({response.status_code} status code): {response.text}"
     )
-    return BudgetSchema(**response.json()["result"])
+    return Budget(**response.json()["result"])
 
 
 def create_category(
@@ -53,7 +53,7 @@ def create_category(
     category_type: CategoryType,
     emoji_icon: str | None,
     headers: dict[str, str] | None = None,
-) -> CategorySchema:
+) -> Category:
     response = client.post(
         "/v1/categories",
         json={"name": name, "description": description, "type": category_type.name, "emoji_icon": emoji_icon},
@@ -62,7 +62,7 @@ def create_category(
     assert response.status_code == status.HTTP_201_CREATED, (
         f"Create category error ({response.status_code} status code): {response.text}"
     )
-    return CategorySchema(**response.json()["result"])
+    return Category(**response.json()["result"])
 
 
 def create_transaction(
@@ -72,7 +72,7 @@ def create_transaction(
     category_id: str,
     timestamp: datetime,
     headers: dict[str, str] | None = None,
-) -> TransactionSchema:
+) -> Transaction:
     response = client.post(
         "/v1/transactions",
         json={
@@ -86,4 +86,4 @@ def create_transaction(
     assert response.status_code == status.HTTP_201_CREATED, (
         f"Create transaction error ({response.status_code} status code): {response.text}"
     )
-    return TransactionSchema(**response.json()["result"])
+    return Transaction(**response.json()["result"])
