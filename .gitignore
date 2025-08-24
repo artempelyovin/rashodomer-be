@@ -1,4 +1,6 @@
 .venv
 .nicegui
 .idea
+__pycache__
+.DS_Store
 data.json
