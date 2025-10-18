@@ -62,8 +62,9 @@ class CategoryManager:
         name: str | UnsetValue,
         description: str | UnsetValue,
         category_type: CategoryType | UnsetValue,
-        is_archived: bool | UnsetValue,
         emoji_icon: str | None | UnsetValue,
+        *,
+        is_archived: bool | UnsetValue,
     ) -> CategorySchema:
         category = await self.repo.get(category_id)
         if not category:

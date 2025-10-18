@@ -1,6 +1,6 @@
 from collections.abc import Iterable
 from datetime import datetime
-from typing import Any, Generic, TypeVar
+from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -16,9 +16,6 @@ class CustomModel(BaseModel):
     )
 
 
-PydanticSchema = TypeVar("PydanticSchema", bound=CustomModel)
-
-
 class ErrorSchema(BaseModel):
     type: str = Field(..., description="Error type")
     detail: str = Field(
@@ -26,21 +23,21 @@ class ErrorSchema(BaseModel):
     )
 
 
-class ListSchema(BaseModel, Generic[PydanticSchema]):
+class ListSchema[T: CustomModel](BaseModel):
     total: int = Field(..., ge=0, examples=[1])
     limit: int | None = Field(None, ge=0)
     offset: int = Field(0, ge=0)
-    items: list[PydanticSchema]
+    items: list[T]
 
 
-def write_response_list(
+def write_response_list[T: CustomModel](
     total: int,
     items: Iterable[Any],
-    schema: type[PydanticSchema],
+    schema: type[T],
     *,
     limit: int | None = None,
     offset: int = 0,
-) -> ListSchema[PydanticSchema]:
+) -> ListSchema[T]:
     return ListSchema[schema].model_validate(  # type: ignore[valid-type]
         {
             "total": total,

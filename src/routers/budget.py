@@ -1,4 +1,3 @@
-# ruff: noqa: B008
 from typing import Annotated
 from uuid import UUID
 
@@ -28,8 +27,8 @@ BUDGET_TAG = "budgets"
 async def create_budget(
     body: CreateBudgetSchema,
     *,
-    user: DetailedUserSchema = Depends(authentication_user),
-    budget_repo: BudgetRepo = Depends(budget_repo_factory),
+    user: Annotated[DetailedUserSchema, Depends(authentication_user)],
+    budget_repo: Annotated[BudgetRepo, Depends(budget_repo_factory)],
 ) -> BudgetSchema:
     manager = BudgetManager(budget_repo=budget_repo)
     return await manager.create(user_id=user.id, data=body)
@@ -43,11 +42,11 @@ async def create_budget(
     tags=[BUDGET_TAG],
 )
 async def list_budgets(
-    limit: int | None = Query(None, description="Number of budgets to return"),
-    offset: int = Query(0, description="Offset of the budgets to return"),
+    limit: Annotated[int | None, Query(description="Number of budgets to return")] = None,
+    offset: Annotated[int, Query(description="Offset of the budgets to return")] = 0,
     *,
-    user: DetailedUserSchema = Depends(authentication_user),
-    budget_repo: BudgetRepo = Depends(budget_repo_factory),
+    user: Annotated[DetailedUserSchema, Depends(authentication_user)],
+    budget_repo: Annotated[BudgetRepo, Depends(budget_repo_factory)],
 ) -> ListSchema[BudgetSchema]:
     manager = BudgetManager(budget_repo=budget_repo)
     total, budgets = await manager.list_(user_id=user.id, limit=limit, offset=offset)
@@ -62,13 +61,13 @@ async def list_budgets(
     tags=[BUDGET_TAG],
 )
 async def find_budgets(
-    text: str = Query(..., description="Search text", example="Cash"),
-    case_sensitive: bool = Query(False, description="Case sensitive when searching"),  # noqa: FBT001, FBT003
-    limit: int | None = Query(None, description="Number of budgets to return"),
-    offset: int = Query(0, description="Offset of the budgets to return"),
+    text: Annotated[str, Query(description="Search text", example="Cash")],
+    case_sensitive: Annotated[bool, Query(description="Case sensitive when searching")] = False,  # noqa: FBT002
+    limit: Annotated[int | None, Query(description="Number of budgets to return")] = None,
+    offset: Annotated[int, Query(description="Offset of the budgets to return")] = 0,
     *,
-    user: DetailedUserSchema = Depends(authentication_user),
-    budget_repo: BudgetRepo = Depends(budget_repo_factory),
+    user: Annotated[DetailedUserSchema, Depends(authentication_user)],
+    budget_repo: Annotated[BudgetRepo, Depends(budget_repo_factory)],
 ) -> ListSchema[BudgetSchema]:
     manager = BudgetManager(budget_repo=budget_repo)
     total, budgets = await manager.find(
@@ -85,10 +84,10 @@ async def find_budgets(
     tags=[BUDGET_TAG],
 )
 async def get_budget(
-    budget_id: Annotated[str, UUID] = Path(..., description="The ID of the budget"),
+    budget_id: Annotated[Annotated[str, UUID], Path(description="The ID of the budget")],
     *,
-    user: DetailedUserSchema = Depends(authentication_user),
-    budget_repo: BudgetRepo = Depends(budget_repo_factory),
+    user: Annotated[DetailedUserSchema, Depends(authentication_user)],
+    budget_repo: Annotated[BudgetRepo, Depends(budget_repo_factory)],
 ) -> BudgetSchema:
     manager = BudgetManager(budget_repo=budget_repo)
     return await manager.get(user_id=user.id, budget_id=budget_id)
@@ -103,10 +102,10 @@ async def get_budget(
 )
 async def update_budget(
     body: UpdateBudgetSchema,
-    budget_id: Annotated[str, UUID] = Path(..., description="The ID of the budget"),
+    budget_id: Annotated[Annotated[str, UUID], Path(description="The ID of the budget")],
     *,
-    user: DetailedUserSchema = Depends(authentication_user),
-    budget_repo: BudgetRepo = Depends(budget_repo_factory),
+    user: Annotated[DetailedUserSchema, Depends(authentication_user)],
+    budget_repo: Annotated[BudgetRepo, Depends(budget_repo_factory)],
 ) -> BudgetSchema:
     params = body.model_dump(exclude_unset=True)
     manager = BudgetManager(budget_repo=budget_repo)
@@ -127,10 +126,10 @@ async def update_budget(
     tags=[BUDGET_TAG],
 )
 async def delete_budget(
-    budget_id: Annotated[str, UUID] = Path(..., description="The ID of the budget"),
+    budget_id: Annotated[Annotated[str, UUID], Path(description="The ID of the budget")],
     *,
-    user: DetailedUserSchema = Depends(authentication_user),
-    budget_repo: BudgetRepo = Depends(budget_repo_factory),
+    user: Annotated[DetailedUserSchema, Depends(authentication_user)],
+    budget_repo: Annotated[BudgetRepo, Depends(budget_repo_factory)],
 ) -> BudgetSchema:
     manager = BudgetManager(budget_repo=budget_repo)
     return await manager.delete(user_id=user.id, budget_id=budget_id)

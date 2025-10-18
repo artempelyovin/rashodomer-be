@@ -1,4 +1,5 @@
-# ruff: noqa: B008
+from typing import Annotated
+
 from fastapi import APIRouter, Depends
 from starlette import status
 
@@ -22,8 +23,8 @@ AUTH_TAG = "auth"
 async def register(
     body: CreateUserSchema,
     *,
-    user_repo: UserRepo = Depends(user_repo_factory),
-    token_repo: TokenRepo = Depends(token_repo_factory),
+    user_repo: Annotated[UserRepo, Depends(user_repo_factory)],
+    token_repo: Annotated[TokenRepo, Depends(token_repo_factory)],
 ) -> UserSchema:
     manager = AuthManager(user_repo=user_repo, token_repo=token_repo)
     return await manager.register(data=body)
@@ -39,8 +40,8 @@ async def register(
 async def login(
     body: UserLoginSchema,
     *,
-    user_repo: UserRepo = Depends(user_repo_factory),
-    token_repo: TokenRepo = Depends(token_repo_factory),
+    user_repo: Annotated[UserRepo, Depends(user_repo_factory)],
+    token_repo: Annotated[TokenRepo, Depends(token_repo_factory)],
 ) -> TokenSchema:
     manager = AuthManager(user_repo=user_repo, token_repo=token_repo)
     token = await manager.login(login=body.login, password=body.password)

@@ -23,7 +23,7 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-    "ruff==0.7.1", # TODO: update ruff!
+    "ruff>=0.14.1",
     "mypy>=1.18.2",
     "pre-commit>=4.3.0",
     "types-ujson>=5.10.0.20250822",

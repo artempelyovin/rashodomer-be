@@ -1,4 +1,3 @@
-# ruff: noqa: S105
 from unittest.mock import Mock
 
 import pytest

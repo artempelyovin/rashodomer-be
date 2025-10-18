@@ -1,4 +1,3 @@
-# ruff: noqa: B008
 from typing import Annotated
 from uuid import UUID
 
@@ -29,8 +28,8 @@ CATEGORY_TAG = "categories"
 async def create_category(
     body: CreateCategorySchema,
     *,
-    user: DetailedUserSchema = Depends(authentication_user),
-    category_repo: CategoryRepo = Depends(category_repo_factory),
+    user: Annotated[DetailedUserSchema, Depends(authentication_user)],
+    category_repo: Annotated[CategoryRepo, Depends(category_repo_factory)],
 ) -> CategorySchema:
     manager = CategoryManager(category_repo=category_repo)
     return await manager.create(user_id=user.id, data=body)
@@ -44,13 +43,13 @@ async def create_category(
     tags=[CATEGORY_TAG],
 )
 async def list_categories(
-    category_type: CategoryType = Query(..., description="The type of category"),
-    show_archived: bool = Query(False, description="Include archived categories if `true`"),  # noqa: FBT001, FBT003
-    limit: int | None = Query(None, description="Number of categories to return"),
-    offset: int = Query(0, description="Offset of the categories to return"),
+    category_type: Annotated[CategoryType, Query(description="The type of category")],
+    show_archived: Annotated[bool, Query(description="Include archived categories if `true`")] = False,  # noqa: FBT002
+    limit: Annotated[int | None, Query(description="Number of categories to return")] = None,
+    offset: Annotated[int, Query(description="Offset of the categories to return")] = 0,
     *,
-    user: DetailedUserSchema = Depends(authentication_user),
-    category_repo: CategoryRepo = Depends(category_repo_factory),
+    user: Annotated[DetailedUserSchema, Depends(authentication_user)],
+    category_repo: Annotated[CategoryRepo, Depends(category_repo_factory)],
 ) -> ListSchema[CategorySchema]:
     manager = CategoryManager(category_repo=category_repo)
     total, categories = await manager.list_(
@@ -67,13 +66,13 @@ async def list_categories(
     tags=[CATEGORY_TAG],
 )
 async def find_categories(
-    text: str = Query(..., description="Search text", example="Cash"),
-    case_sensitive: bool = Query(False, description="Case sensitive when searching"),  # noqa: FBT001, FBT003
-    limit: int | None = Query(None, description="Number of categories to return"),
-    offset: int = Query(0, description="Offset of the categories to return"),
+    text: Annotated[str, Query(description="Search text", example="Cash")],
+    case_sensitive: Annotated[bool, Query(description="Case sensitive when searching")] = False,  # noqa: FBT002
+    limit: Annotated[int | None, Query(description="Number of categories to return")] = None,
+    offset: Annotated[int, Query(description="Offset of the categories to return")] = 0,
     *,
-    user: DetailedUserSchema = Depends(authentication_user),
-    category_repo: CategoryRepo = Depends(category_repo_factory),
+    user: Annotated[DetailedUserSchema, Depends(authentication_user)],
+    category_repo: Annotated[CategoryRepo, Depends(category_repo_factory)],
 ) -> ListSchema[CategorySchema]:
     manager = CategoryManager(category_repo=category_repo)
     total, categories = await manager.find(
@@ -90,10 +89,10 @@ async def find_categories(
     tags=[CATEGORY_TAG],
 )
 async def get_category(
-    category_id: Annotated[str, UUID] = Path(..., description="The ID of the category"),
+    category_id: Annotated[Annotated[str, UUID], Path(description="The ID of the category")],
     *,
-    user: DetailedUserSchema = Depends(authentication_user),
-    category_repo: CategoryRepo = Depends(category_repo_factory),
+    user: Annotated[DetailedUserSchema, Depends(authentication_user)],
+    category_repo: Annotated[CategoryRepo, Depends(category_repo_factory)],
 ) -> CategorySchema:
     manager = CategoryManager(category_repo=category_repo)
     return await manager.get(user_id=user.id, category_id=category_id)
@@ -108,10 +107,10 @@ async def get_category(
 )
 async def update_category(
     body: UpdateCategorySchema,
-    category_id: Annotated[str, UUID] = Path(..., description="The ID of the category"),
+    category_id: Annotated[Annotated[str, UUID], Path(description="The ID of the category")],
     *,
-    user: DetailedUserSchema = Depends(authentication_user),
-    category_repo: CategoryRepo = Depends(category_repo_factory),
+    user: Annotated[DetailedUserSchema, Depends(authentication_user)],
+    category_repo: Annotated[CategoryRepo, Depends(category_repo_factory)],
 ) -> CategorySchema:
     params = body.model_dump(exclude_unset=True)
 
@@ -135,10 +134,10 @@ async def update_category(
     tags=[CATEGORY_TAG],
 )
 async def delete_categories(
-    category_id: Annotated[str, UUID] = Path(..., description="The ID of the category"),
+    category_id: Annotated[Annotated[str, UUID], Path(description="The ID of the category")],
     *,
-    user: DetailedUserSchema = Depends(authentication_user),
-    category_repo: CategoryRepo = Depends(category_repo_factory),
+    user: Annotated[DetailedUserSchema, Depends(authentication_user)],
+    category_repo: Annotated[CategoryRepo, Depends(category_repo_factory)],
 ) -> CategorySchema:
     manager = CategoryManager(category_repo=category_repo)
     return await manager.delete(user_id=user.id, category_id=category_id)

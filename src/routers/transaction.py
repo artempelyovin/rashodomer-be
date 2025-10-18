@@ -1,4 +1,3 @@
-# ruff: noqa: B008
 from typing import Annotated
 from uuid import UUID
 
@@ -28,9 +27,9 @@ TRANSACTION_TAG = "transactions"
 async def create_transaction(
     body: CreateTransactionSchema,
     *,
-    user: DetailedUserSchema = Depends(authentication_user),
-    transaction_repo: TransactionRepo = Depends(transaction_repo_factory),
-    category_repo: CategoryRepo = Depends(category_repo_factory),
+    user: Annotated[DetailedUserSchema, Depends(authentication_user)],
+    transaction_repo: Annotated[TransactionRepo, Depends(transaction_repo_factory)],
+    category_repo: Annotated[CategoryRepo, Depends(category_repo_factory)],
 ) -> TransactionSchema:
     manager = TransactionManager(transaction_repo=transaction_repo, category_repo=category_repo)
     return await manager.create(user_id=user.id, data=body)
@@ -44,12 +43,12 @@ async def create_transaction(
     tags=[TRANSACTION_TAG],
 )
 async def list_transactions(
-    limit: int | None = Query(None, description="Number of transactions to return"),
-    offset: int = Query(0, description="Offset of the transactions to return"),
+    limit: Annotated[int | None, Query(description="Number of transactions to return")] = None,
+    offset: Annotated[int, Query(description="Offset of the transactions to return")] = 0,
     *,
-    user: DetailedUserSchema = Depends(authentication_user),
-    transaction_repo: TransactionRepo = Depends(transaction_repo_factory),
-    category_repo: CategoryRepo = Depends(category_repo_factory),
+    user: Annotated[DetailedUserSchema, Depends(authentication_user)],
+    transaction_repo: Annotated[TransactionRepo, Depends(transaction_repo_factory)],
+    category_repo: Annotated[CategoryRepo, Depends(category_repo_factory)],
 ) -> ListSchema[TransactionSchema]:
     manager = TransactionManager(transaction_repo=transaction_repo, category_repo=category_repo)
     total, transactions = await manager.list_(user_id=user.id, limit=limit, offset=offset)
@@ -64,14 +63,14 @@ async def list_transactions(
     tags=[TRANSACTION_TAG],
 )
 async def find_transactions(
-    text: str = Query(..., description="Search text", example="Cash"),
-    case_sensitive: bool = Query(False, description="Case sensitive when searching"),  # noqa: FBT001, FBT003
-    limit: int | None = Query(None, description="Number of transactions to return"),
-    offset: int = Query(0, description="Offset of the transactions to return"),
+    text: Annotated[str, Query(description="Search text", example="Cash")],
+    case_sensitive: Annotated[bool, Query(description="Case sensitive when searching")] = False,  # noqa: FBT002
+    limit: Annotated[int | None, Query(description="Number of transactions to return")] = None,
+    offset: Annotated[int, Query(description="Offset of the transactions to return")] = 0,
     *,
-    user: DetailedUserSchema = Depends(authentication_user),
-    transaction_repo: TransactionRepo = Depends(transaction_repo_factory),
-    category_repo: CategoryRepo = Depends(category_repo_factory),
+    user: Annotated[DetailedUserSchema, Depends(authentication_user)],
+    transaction_repo: Annotated[TransactionRepo, Depends(transaction_repo_factory)],
+    category_repo: Annotated[CategoryRepo, Depends(category_repo_factory)],
 ) -> ListSchema[TransactionSchema]:
     manager = TransactionManager(transaction_repo=transaction_repo, category_repo=category_repo)
     total, transactions = await manager.find(
@@ -88,11 +87,11 @@ async def find_transactions(
     tags=[TRANSACTION_TAG],
 )
 async def get_transaction(
-    transaction_id: Annotated[str, UUID] = Path(..., description="The ID of the transaction"),
+    transaction_id: Annotated[Annotated[str, UUID], Path(description="The ID of the transaction")],
     *,
-    user: DetailedUserSchema = Depends(authentication_user),
-    transaction_repo: TransactionRepo = Depends(transaction_repo_factory),
-    category_repo: CategoryRepo = Depends(category_repo_factory),
+    user: Annotated[DetailedUserSchema, Depends(authentication_user)],
+    transaction_repo: Annotated[TransactionRepo, Depends(transaction_repo_factory)],
+    category_repo: Annotated[CategoryRepo, Depends(category_repo_factory)],
 ) -> TransactionSchema:
     manager = TransactionManager(transaction_repo=transaction_repo, category_repo=category_repo)
     return await manager.get(user_id=user.id, transaction_id=transaction_id)
@@ -107,11 +106,11 @@ async def get_transaction(
 )
 async def update_transaction(
     body: UpdateTransactionSchema,
-    transaction_id: Annotated[str, UUID] = Path(..., description="The ID of the transaction"),
+    transaction_id: Annotated[Annotated[str, UUID], Path(description="The ID of the transaction")],
     *,
-    user: DetailedUserSchema = Depends(authentication_user),
-    transaction_repo: TransactionRepo = Depends(transaction_repo_factory),
-    category_repo: CategoryRepo = Depends(category_repo_factory),
+    user: Annotated[DetailedUserSchema, Depends(authentication_user)],
+    transaction_repo: Annotated[TransactionRepo, Depends(transaction_repo_factory)],
+    category_repo: Annotated[CategoryRepo, Depends(category_repo_factory)],
 ) -> TransactionSchema:
     params = body.model_dump(exclude_unset=True)
 
@@ -134,11 +133,11 @@ async def update_transaction(
     tags=[TRANSACTION_TAG],
 )
 async def delete_transaction(
-    transaction_id: Annotated[str, UUID] = Path(..., description="The ID of the transaction"),
+    transaction_id: Annotated[Annotated[str, UUID], Path(description="The ID of the transaction")],
     *,
-    user: DetailedUserSchema = Depends(authentication_user),
-    transaction_repo: TransactionRepo = Depends(transaction_repo_factory),
-    category_repo: CategoryRepo = Depends(category_repo_factory),
+    user: Annotated[DetailedUserSchema, Depends(authentication_user)],
+    transaction_repo: Annotated[TransactionRepo, Depends(transaction_repo_factory)],
+    category_repo: Annotated[CategoryRepo, Depends(category_repo_factory)],
 ) -> TransactionSchema:
     manager = TransactionManager(transaction_repo=transaction_repo, category_repo=category_repo)
     return await manager.delete(user_id=user.id, transaction_id=transaction_id)
