@@ -7,7 +7,6 @@ from ui.middlewares import AuthMiddleware, on_exception_handler
 from ui.pages.auth import router as auth_router
 from ui.pages.budgets import router as budgets_router
 from ui.pages.categories import router as categories_router
-from ui.pages.transactions import router as transactions_router
 from ui.pages.user import router as users_router
 
 if __name__ in {"__main__", "__mp_main__"}:
@@ -16,7 +15,6 @@ if __name__ in {"__main__", "__mp_main__"}:
     app.include_router(auth_router)
     app.include_router(budgets_router)
     app.include_router(categories_router)
-    app.include_router(transactions_router)
     app.include_router(users_router)
     app.on_exception(on_exception_handler)
     ui.run(storage_secret=settings.storage_secret.get_secret_value(), reload=True)

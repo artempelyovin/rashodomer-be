@@ -28,3 +28,17 @@ class TransactionSchema(CustomModel):
     timestamp: Annotated[datetime, AwareDatetime] = Field(..., description=TimestampDesc)
     created_at: Annotated[datetime, AwareDatetime] = Field(default_factory=utc_now, description=CreatedAtDesc)
     updated_at: Annotated[datetime, AwareDatetime] = Field(default_factory=utc_now, description=CreatedAtDesc)
+
+
+class CreateTransactionSchema(CustomModel):
+    amount: float = Field(..., description=AmountDesc, examples=AmountExamples)
+    description: str = Field("", description=DescriptionDesc, examples=DescriptionExamples)
+    category_id: Annotated[str, UUID] = Field(..., description=CategoryIdDesc)
+    timestamp: Annotated[datetime, AwareDatetime] = Field(default_factory=utc_now, description=TimestampDesc)
+
+
+class UpdateTransactionSchema(CustomModel):
+    amount: float | None = Field(None, description=AmountDesc, examples=AmountExamples)
+    description: str | None = Field(None, description=DescriptionDesc, examples=DescriptionExamples)
+    category_id: Annotated[str, UUID] | None = Field(None, description=CategoryIdDesc)
+    timestamp: Annotated[datetime, AwareDatetime] | None = Field(None, description=TimestampDesc)

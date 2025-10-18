@@ -9,7 +9,7 @@ from exceptions import (
     TransactionAccessDeniedError,
     TransactionNotExistsError,
 )
-from models.transaction import TransactionSchema
+from models.transaction import CreateTransactionSchema, TransactionSchema
 from repos.abc import CategoryRepo, Total, TransactionRepo
 from settings import settings
 from utils import UnsetValue
@@ -24,29 +24,22 @@ class TransactionManager:
         self.transaction_repo = transaction_repo
         self.category_repo = category_repo
 
-    async def create(
-        self,
-        user_id: str,
-        amount: float,
-        category_id: str,
-        timestamp: datetime,
-        description: str = "",
-    ) -> TransactionSchema:
-        if amount <= 0:
+    async def create(self, user_id: str, data: CreateTransactionSchema) -> TransactionSchema:
+        if data.amount <= 0:
             raise AmountMustBePositiveError
-        category = await self.category_repo.get(category_id)
+        category = await self.category_repo.get(data.category_id)
         if category is None:
-            raise CategoryNotExistsError(category_id=category_id)
+            raise CategoryNotExistsError(category_id=data.category_id)
         if category.user_id != user_id:
             raise CategoryAccessDeniedError
         now = datetime.now(tz=UTC)
-        if timestamp > now:
-            raise TimestampInFutureError(timestamp=timestamp, current_timestamp=now)
+        if data.timestamp > now:
+            raise TimestampInFutureError(timestamp=data.timestamp, current_timestamp=now)
         transaction = TransactionSchema(
-            amount=amount,
-            description=description,
-            category_id=category_id,
-            timestamp=timestamp,
+            amount=data.amount,
+            description=data.description,
+            category_id=data.category_id,
+            timestamp=data.timestamp,
             user_id=user_id,
         )
         return await self.transaction_repo.add(transaction)

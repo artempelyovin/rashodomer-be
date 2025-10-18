@@ -57,13 +57,7 @@ class CategoryManager:
         return category
 
     async def list_(
-        self,
-        user_id: str,
-        *,
-        category_type: CategoryType | None = None,
-        show_archived: bool | None = False,
-        limit: int | None,
-        offset: int,
+        self, user_id: str, category_type: CategoryType, *, show_archived: bool, limit: int | None, offset: int
     ) -> tuple[Total, list[CategorySchema]]:
         return await self.repo.list_(
             user_id=user_id, category_type=category_type, show_archived=show_archived, limit=limit, offset=offset
