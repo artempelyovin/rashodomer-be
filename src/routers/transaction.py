@@ -8,9 +8,9 @@ from starlette import status
 from base import APIResponse, APIResponseList, write_response, write_response_list
 from depends import authentication_user, category_repo_factory, transaction_repo_factory
 from managers.transaction import TransactionManager
-from models.transaction import CreateTransactionSchema, TransactionSchema, UpdateTransactionSchema
-from models.user import DetailedUserSchema
 from repos.abc import CategoryRepo, TransactionRepo
+from schemas.transaction import CreateTransactionSchema, TransactionSchema, UpdateTransactionSchema
+from schemas.user import DetailedUserSchema
 from utils import UNSET
 
 router = APIRouter()

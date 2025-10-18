@@ -9,9 +9,9 @@ from base import APIResponse, APIResponseList, write_response, write_response_li
 from depends import authentication_user, category_repo_factory
 from enums import CategoryType
 from managers.category import CategoryManager
-from models.category import CategorySchema, CreateCategorySchema, UpdateCategorySchema
-from models.user import DetailedUserSchema
 from repos.abc import CategoryRepo
+from schemas.category import CategorySchema, CreateCategorySchema, UpdateCategorySchema
+from schemas.user import DetailedUserSchema
 from utils import UNSET
 
 router = APIRouter()

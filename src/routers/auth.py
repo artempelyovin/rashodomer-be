@@ -5,8 +5,8 @@ from starlette import status
 from base import APIResponse, write_response
 from depends import token_repo_factory, user_repo_factory
 from managers.auth import AuthManager
-from models.user import CreateUserSchema, TokenSchema, UserLoginSchema, UserSchema
 from repos.abc import TokenRepo, UserRepo
+from schemas.user import CreateUserSchema, TokenSchema, UserLoginSchema, UserSchema
 
 router = APIRouter()
 

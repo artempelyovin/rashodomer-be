@@ -7,8 +7,8 @@ from exceptions import (
     BudgetNotExistsError,
     EmptySearchTextError,
 )
-from models.budget import BudgetSchema
 from repos.abc import BudgetRepo, Total
+from schemas.budget import BudgetSchema, CreateBudgetSchema
 from settings import settings
 from utils import UnsetValue
 
@@ -17,15 +17,13 @@ class BudgetManager:
     def __init__(self, budget_repo: BudgetRepo = settings.budget_repo) -> None:
         self.repo = budget_repo
 
-    async def create(
-        self, user_id: str, name: str, description: str | None = "", amount: float | None = 0.0
-    ) -> BudgetSchema:
-        if amount < 0:
+    async def create(self, user_id: str, data: CreateBudgetSchema) -> BudgetSchema:
+        if data.amount < 0:
             raise AmountMustBePositiveError
-        _, exist_budgets = await self.repo.find_by_name(user_id=user_id, name=name)
+        _, exist_budgets = await self.repo.find_by_name(user_id=user_id, name=data.name)
         if exist_budgets:
-            raise BudgetAlreadyExistsError(name=name)
-        budget = BudgetSchema(name=name, description=description, amount=amount, user_id=user_id)
+            raise BudgetAlreadyExistsError(name=data.name)
+        budget = BudgetSchema(name=data.name, description=data.description, amount=data.amount, user_id=user_id)
         return await self.repo.add(budget)
 
     async def get(self, user_id: str, budget_id: str) -> BudgetSchema:

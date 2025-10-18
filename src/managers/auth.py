@@ -12,8 +12,8 @@ from exceptions import (
     UnauthorizedError,
     UserNotExistsError,
 )
-from models.user import CreateUserSchema, DetailedUserSchema
 from repos.abc import TokenRepo, UserRepo
+from schemas.user import CreateUserSchema, DetailedUserSchema
 from settings import settings
 
 

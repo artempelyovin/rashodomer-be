@@ -5,10 +5,10 @@ from starlette.testclient import TestClient
 
 from base import ISO_TIMEZONE_FORMAT
 from enums import CategoryType
-from models.budget import BudgetSchema
-from models.category import CategorySchema
-from models.transaction import TransactionSchema
-from models.user import TokenSchema, UserSchema
+from schemas.budget import BudgetSchema
+from schemas.category import CategorySchema
+from schemas.transaction import TransactionSchema
+from schemas.user import TokenSchema, UserSchema
 
 
 def register(client: TestClient, first_name: str, last_name: str, login: str, password: str) -> UserSchema:

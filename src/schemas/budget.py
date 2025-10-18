@@ -28,3 +28,14 @@ class BudgetSchema(CustomModel):
     created_at: Annotated[datetime, AwareDatetime] = Field(default_factory=utc_now, description=CreatedAtDesc)
     updated_at: Annotated[datetime, AwareDatetime] = Field(default_factory=utc_now, description=UpdatedAtDesc)
 
+
+class CreateBudgetSchema(CustomModel):
+    name: str = Field(..., description=NameDesc, examples=NameExamples)
+    description: str = Field("", description=DescriptionDesc, examples=DescriptionExamples)
+    amount: float = Field(0.0, description=AmountDesc, examples=AmountExamples)
+
+
+class UpdateBudgetSchema(CustomModel):
+    name: str | None = Field(None, description=NameDesc, examples=NameExamples)
+    description: str | None = Field(None, description=DescriptionDesc, examples=DescriptionExamples)
+    amount: float | None = Field(None, description=AmountDesc, examples=AmountExamples)
