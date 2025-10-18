@@ -4,7 +4,7 @@ import pytest
 from starlette import status
 from starlette.testclient import TestClient
 
-from models import ISO_TIMEZONE_FORMAT, Budget, User
+from models import ISO_TIMEZONE_FORMAT, BudgetSchema, UserSchema
 from tests.integration.conftest import fake
 from tests.integration.utils import create_budget, register_and_authenticate
 
@@ -21,7 +21,7 @@ def test_budget_not_exists(
     method: str,
     payload: dict[str, Any] | None,
     client: TestClient,
-    created_user: User,  # noqa: ARG001
+    created_user: UserSchema,  # noqa: ARG001
 ) -> None:
     non_existent_id = "12345"
 
@@ -42,7 +42,7 @@ def test_budget_not_exists(
     ],
 )
 def test_budget_access_denied(
-    method: str, payload: dict[str, Any] | None, client: TestClient, created_budget: Budget
+    method: str, payload: dict[str, Any] | None, client: TestClient, created_budget: BudgetSchema
 ) -> None:
     _, another_token = register_and_authenticate(
         client=client,
@@ -66,7 +66,7 @@ def test_budget_access_denied(
 
 
 class TestBudgetCreate:
-    def test_ok(self, client: TestClient, created_user: User) -> None:
+    def test_ok(self, client: TestClient, created_user: UserSchema) -> None:
         name = "Cash"
         description = "A budget for tracking all cash transactions and managing daily expenses"
         amount = 100
@@ -89,7 +89,7 @@ class TestBudgetCreate:
         assert result["created_at"]
         assert result["updated_at"]
 
-    def test_amount_must_be_positive(self, client: TestClient, created_user: User) -> None:  # noqa: ARG002
+    def test_amount_must_be_positive(self, client: TestClient, created_user: UserSchema) -> None:  # noqa: ARG002
         response = client.post(
             "/v1/budgets",
             json={
@@ -104,7 +104,7 @@ class TestBudgetCreate:
         assert error["type"] == "AmountMustBePositiveError"
         assert error["detail"] == "Amount must be positive"
 
-    def test_budget_already_exists(self, client: TestClient, created_budget: Budget) -> None:
+    def test_budget_already_exists(self, client: TestClient, created_budget: BudgetSchema) -> None:
         response = client.post(
             "/v1/budgets",
             json={
@@ -121,7 +121,7 @@ class TestBudgetCreate:
 
 
 class TestBudgetGet:
-    def test_ok(self, client: TestClient, created_budget: Budget, created_user: User) -> None:
+    def test_ok(self, client: TestClient, created_budget: BudgetSchema, created_user: UserSchema) -> None:
         response = client.get(f"/v1/budgets/{created_budget.id}")
 
         assert response.status_code == status.HTTP_200_OK
@@ -136,7 +136,7 @@ class TestBudgetGet:
 
 
 class TestBudgetList:
-    def test_success(self, client: TestClient, created_user: User) -> None:  # noqa: ARG002
+    def test_success(self, client: TestClient, created_user: UserSchema) -> None:  # noqa: ARG002
         expected_budgets = [
             create_budget(
                 client=client, name=fake.word(), description=fake.sentence(), amount=fake.pyfloat(positive=True)
@@ -154,11 +154,11 @@ class TestBudgetList:
         budgets_by_id = {budget["id"]: budget for budget in budgets}
         for expected_budget_id, expected_budget in expected_budgets_by_id.items():
             assert expected_budget_id in budgets_by_id
-            assert expected_budget == Budget(**budgets_by_id[expected_budget_id])
+            assert expected_budget == BudgetSchema(**budgets_by_id[expected_budget_id])
 
 
 class TestBudgetUpdate:
-    def test_ok(self, client: TestClient, created_budget: Budget, created_user: User) -> None:
+    def test_ok(self, client: TestClient, created_budget: BudgetSchema, created_user: UserSchema) -> None:
         updated_payload = {"name": "New Name", "description": "New description", "amount": 400}
 
         response = client.patch(f"/v1/budgets/{created_budget.id}", json=updated_payload)
@@ -175,7 +175,7 @@ class TestBudgetUpdate:
         assert result["amount"] == updated_payload["amount"]
         assert result["updated_at"] != created_budget.updated_at.strftime(ISO_TIMEZONE_FORMAT)
 
-    def test_amount_must_be_positive(self, client: TestClient, created_budget: Budget) -> None:
+    def test_amount_must_be_positive(self, client: TestClient, created_budget: BudgetSchema) -> None:
         response = client.patch(
             f"/v1/budgets/{created_budget.id}",
             json={
@@ -192,17 +192,17 @@ class TestBudgetUpdate:
 
 
 class TestBudgetDelete:
-    def test_ok(self, client: TestClient, created_budget: Budget) -> None:
+    def test_ok(self, client: TestClient, created_budget: BudgetSchema) -> None:
         response = client.delete(f"/v1/budgets/{created_budget.id}")
 
         assert response.status_code == status.HTTP_200_OK
-        budget = Budget(**response.json()["result"])
+        budget = BudgetSchema(**response.json()["result"])
         assert budget == created_budget
 
 
 class TestBudgetFind:
     @pytest.mark.parametrize("search_in_name", [True, False])
-    def test_ok(self, search_in_name: bool, client: TestClient, created_user: User) -> None:  # noqa: ARG002, FBT001
+    def test_ok(self, search_in_name: bool, client: TestClient, created_user: UserSchema) -> None:  # noqa: ARG002, FBT001
         search_text = "cash"
         created_budget = create_budget(
             client=client,
@@ -216,14 +216,14 @@ class TestBudgetFind:
         assert response.status_code == status.HTTP_200_OK
         result = response.json()["result"]
         assert result["total"] == 1
-        budget = Budget(**result["items"][0])
+        budget = BudgetSchema(**result["items"][0])
         assert budget == created_budget
         if search_in_name:
             assert search_text in budget.name
         else:
             assert search_text in budget.description
 
-    def test_empty_budget_text(self, client: TestClient, created_user: User) -> None:  # noqa: ARG002
+    def test_empty_budget_text(self, client: TestClient, created_user: UserSchema) -> None:  # noqa: ARG002
         response = client.get("/v1/budgets/find", params={"text": ""})  # empty text
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST

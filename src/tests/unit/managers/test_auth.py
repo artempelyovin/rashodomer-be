@@ -8,7 +8,7 @@ from exceptions import (
     UserNotExistsError,
 )
 from managers.auth import AuthManager
-from models import DetailedUser
+from models import DetailedUserSchema
 from repos.abc import TokenRepo, UserRepo
 from tests.unit.conftest import fake
 
@@ -24,7 +24,7 @@ def token_repo() -> Mock:
 
 
 class TestAuthManagerAuthenticate:
-    async def test_success(self, user_repo: Mock, token_repo: Mock, fake_user: DetailedUser) -> None:
+    async def test_success(self, user_repo: Mock, token_repo: Mock, fake_user: DetailedUserSchema) -> None:
         user_repo.get.return_value = fake_user
         token_repo.get_user_id_by_token.return_value = fake_user.id
         manager = AuthManager(user_repo=user_repo, token_repo=token_repo)

@@ -8,7 +8,7 @@ from starlette.requests import Request
 
 from managers.category import CategoryManager
 from managers.transaction import TransactionManager
-from models import Category, DetailedUser
+from models import CategorySchema, DetailedUserSchema
 from ui.components.buttons import DatePickerButton, DeleteButtonWithConfirmation, TimePickerButton
 from ui.components.labels import amount_with_gradient, id_with_copy
 
@@ -23,7 +23,7 @@ async def list_transactions(request: Request, page: int = 1, limit: int = 10, se
         logger.info(f"Successful delete transaction {transaction_id} for user {user_id}")
         ui.navigate.to(f"/transactions?page={page}&limit={limit}&search_text={search_text}")
 
-    user: DetailedUser = request.state.user
+    user: DetailedUserSchema = request.state.user
     logger.info(f"Show /transactions page for user {user.id} with {page=}, {limit=}, {search_text=}")
 
     offset = (page - 1) * limit
@@ -108,9 +108,9 @@ async def list_transactions(request: Request, page: int = 1, limit: int = 10, se
 
 @router.page("/transactions/new")
 async def create_transaction(request: Request):
-    user: DetailedUser = request.state.user
+    user: DetailedUserSchema = request.state.user
 
-    async def load_categories() -> list[Category]:
+    async def load_categories() -> list[CategorySchema]:
         _, categories = await CategoryManager().list_(user_id=user.id, limit=None, offset=0)
         return categories
 
@@ -156,10 +156,10 @@ async def create_transaction(request: Request):
 
 @router.page("/transactions/{transaction_id}")
 async def update_transaction(request: Request, transaction_id: str):
-    user: DetailedUser = request.state.user
+    user: DetailedUserSchema = request.state.user
     logger.info(f"Show /transactions/{transaction_id} page for user {user.id}")
 
-    async def load_categories() -> list[Category]:
+    async def load_categories() -> list[CategorySchema]:
         _, categories = await CategoryManager().list_(user_id=user.id, limit=None, offset=0)
         return categories
 

@@ -6,7 +6,7 @@ from typing import Any
 from pydantic_core import from_json, to_json
 
 from enums import CategoryType
-from models import Budget, Category, CustomModel, DetailedUser, Transaction
+from models import BudgetSchema, CategorySchema, CustomModel, DetailedUserSchema, TransactionSchema
 from repos.abc import (
     BudgetRepo,
     CategoryRepo,
@@ -69,41 +69,41 @@ class FileUserRepo(UserRepo, JsonFileMixin):
     collection = "users"
 
     def __init__(self) -> None:
-        self._users: dict[str, DetailedUser] = self.load(model=DetailedUser)
+        self._users: dict[str, DetailedUserSchema] = self.load(model=DetailedUserSchema)
 
-    async def add(self, user: DetailedUser) -> DetailedUser:
+    async def add(self, user: DetailedUserSchema) -> DetailedUserSchema:
         self._users[user.id] = user
         self.save(self._users)
         return user
 
-    async def find_by_login(self, login: str) -> DetailedUser | None:
+    async def find_by_login(self, login: str) -> DetailedUserSchema | None:
         for user in self._users.values():
             if user.login == login:
                 return user
         return None
 
-    async def get(self, user_id: str) -> DetailedUser | None:
+    async def get(self, user_id: str) -> DetailedUserSchema | None:
         return self._users.get(user_id, None)
 
-    async def update_first_name(self, user_id: str, first_name: str) -> DetailedUser:
+    async def update_first_name(self, user_id: str, first_name: str) -> DetailedUserSchema:
         user = self._users[user_id]
         user.first_name = first_name
         self.save(self._users)
         return user
 
-    async def update_last_name(self, user_id: str, last_name: str) -> DetailedUser:
+    async def update_last_name(self, user_id: str, last_name: str) -> DetailedUserSchema:
         user = self._users[user_id]
         user.last_name = last_name
         self.save(self._users)
         return user
 
-    async def update_last_login(self, user_id: str, last_login: datetime.datetime) -> DetailedUser:
+    async def update_last_login(self, user_id: str, last_login: datetime.datetime) -> DetailedUserSchema:
         user = self._users[user_id]
         user.last_login = last_login
         self.save(self._users)
         return user
 
-    async def change_password_hash(self, user_id: str, password_hash: str) -> DetailedUser:
+    async def change_password_hash(self, user_id: str, password_hash: str) -> DetailedUserSchema:
         user = self._users[user_id]
         user.password_hash = password_hash
         self.save(self._users)
@@ -118,17 +118,17 @@ class FileBudgetRepo(BudgetRepo, JsonFileMixin):
     collection = "budgets"
 
     def __init__(self) -> None:
-        self._budgets: dict[str, Budget] = self.load(model=Budget)
+        self._budgets: dict[str, BudgetSchema] = self.load(model=BudgetSchema)
 
-    async def add(self, budget: Budget) -> Budget:
+    async def add(self, budget: BudgetSchema) -> BudgetSchema:
         self._budgets[budget.id] = budget
         self.save(self._budgets)
         return budget
 
-    async def get(self, budget_id: str) -> Budget | None:
+    async def get(self, budget_id: str) -> BudgetSchema | None:
         return self._budgets.get(budget_id, None)
 
-    async def list_(self, user_id: str, limit: int | None = None, offset: int = 0) -> tuple[Total, list[Budget]]:
+    async def list_(self, user_id: str, limit: int | None = None, offset: int = 0) -> tuple[Total, list[BudgetSchema]]:
         budgets = [budget for budget in self._budgets.values() if budget.user_id == user_id]
         if limit is None:
             return len(budgets), budgets[offset:]
@@ -136,14 +136,14 @@ class FileBudgetRepo(BudgetRepo, JsonFileMixin):
 
     async def find_by_name(
         self, user_id: str, name: str, limit: int | None = None, offset: int = 0
-    ) -> tuple[Total, list[Budget]]:
+    ) -> tuple[Total, list[BudgetSchema]]:
         budgets = [budget for budget in self._budgets.values() if budget.user_id == user_id and budget.name == name]
         return paginate(budgets, limit, offset)
 
     async def find_by_text(
         self, user_id: str, text: str, *, case_sensitive: bool = False, limit: int | None = None, offset: int = 0
-    ) -> tuple[Total, list[Budget]]:
-        def matches_text(budget: Budget) -> bool:
+    ) -> tuple[Total, list[BudgetSchema]]:
+        def matches_text(budget: BudgetSchema) -> bool:
             if case_sensitive:
                 return text in budget.name or text in budget.description
             return text.lower() in budget.name.lower() or text.lower() in budget.description.lower()
@@ -151,12 +151,12 @@ class FileBudgetRepo(BudgetRepo, JsonFileMixin):
         budgets = [budget for budget in self._budgets.values() if budget.user_id == user_id and matches_text(budget)]
         return paginate(budgets, limit, offset)
 
-    async def update(self, budget: Budget) -> Budget:
+    async def update(self, budget: BudgetSchema) -> BudgetSchema:
         self._budgets[budget.id] = budget
         self.save(self._budgets)
         return budget
 
-    async def delete(self, budget_id: str) -> Budget:
+    async def delete(self, budget_id: str) -> BudgetSchema:
         budget = self._budgets.pop(budget_id)
         self.save(self._budgets)
         return budget
@@ -166,14 +166,14 @@ class FileCategoryRepo(CategoryRepo, JsonFileMixin):
     collection = "categories"
 
     def __init__(self) -> None:
-        self._categories: dict[str, Category] = self.load(model=Category)
+        self._categories: dict[str, CategorySchema] = self.load(model=CategorySchema)
 
-    async def add(self, category: Category) -> Category:
+    async def add(self, category: CategorySchema) -> CategorySchema:
         self._categories[category.id] = category
         self.save(self._categories)
         return category
 
-    async def get(self, category_id: str) -> Category | None:
+    async def get(self, category_id: str) -> CategorySchema | None:
         return self._categories.get(category_id, None)
 
     async def list_(
@@ -184,7 +184,7 @@ class FileCategoryRepo(CategoryRepo, JsonFileMixin):
         show_archived: bool = False,
         limit: int | None = None,
         offset: int = 0,
-    ) -> tuple[Total, list[Category]]:
+    ) -> tuple[Total, list[CategorySchema]]:
         user_categories = [category for category in self._categories.values() if category.user_id == user_id]
         if category_type:
             user_categories = [category for category in user_categories if category.type == category_type]
@@ -199,7 +199,7 @@ class FileCategoryRepo(CategoryRepo, JsonFileMixin):
         category_type: CategoryType | None = None,
         limit: int | None = None,
         offset: int = 0,
-    ) -> tuple[Total, list[Category]]:
+    ) -> tuple[Total, list[CategorySchema]]:
         user_categories = [
             category for category in self._categories.values() if category.user_id == user_id and category.name == name
         ]
@@ -209,8 +209,8 @@ class FileCategoryRepo(CategoryRepo, JsonFileMixin):
 
     async def find_by_text(
         self, user_id: str, text: str, *, case_sensitive: bool = False, limit: int | None = None, offset: int = 0
-    ) -> tuple[Total, list[Category]]:
-        def matches_text(category: Category) -> bool:
+    ) -> tuple[Total, list[CategorySchema]]:
+        def matches_text(category: CategorySchema) -> bool:
             if case_sensitive:
                 return text in category.name or text in category.description
             return text.lower() in category.name.lower() or text.lower() in category.description.lower()
@@ -220,12 +220,12 @@ class FileCategoryRepo(CategoryRepo, JsonFileMixin):
         ]
         return paginate(categories, limit, offset)
 
-    async def update(self, category: Category) -> Category:
+    async def update(self, category: CategorySchema) -> CategorySchema:
         self._categories[category.id] = category
         self.save(self._categories)
         return category
 
-    async def delete(self, category_id: str) -> Category:
+    async def delete(self, category_id: str) -> CategorySchema:
         category = self._categories.pop(category_id)
         self.save(self._categories)
         return category
@@ -235,26 +235,26 @@ class FileTransactionRepo(TransactionRepo, JsonFileMixin):
     collection = "incomes"
 
     def __init__(self) -> None:
-        self._transactions: dict[str, Transaction] = self.load(model=Transaction)
+        self._transactions: dict[str, TransactionSchema] = self.load(model=TransactionSchema)
 
-    async def add(self, transaction: Transaction) -> Transaction:
+    async def add(self, transaction: TransactionSchema) -> TransactionSchema:
         self._transactions[transaction.id] = transaction
         self.save(self._transactions)
         return transaction
 
-    async def get(self, transaction_id: str) -> Transaction | None:
+    async def get(self, transaction_id: str) -> TransactionSchema | None:
         return self._transactions.get(transaction_id, None)
 
     async def list_(
         self, user_id: str, limit: int | None = None, offset: int = 0
-    ) -> tuple[Total, list[Transaction]]:
+    ) -> tuple[Total, list[TransactionSchema]]:
         incomes = [transaction for transaction in self._transactions.values() if transaction.user_id == user_id]
         return paginate(incomes, limit, offset)
 
     async def find_by_text(
         self, user_id: str, text: str, *, case_sensitive: bool = False, limit: int | None = None, offset: int = 0
-    ) -> tuple[Total, list[Transaction]]:
-        def matches_text(transaction: Transaction) -> bool:
+    ) -> tuple[Total, list[TransactionSchema]]:
+        def matches_text(transaction: TransactionSchema) -> bool:
             if case_sensitive:
                 return text in transaction.description
             return text.lower() in transaction.description.lower()
@@ -266,12 +266,12 @@ class FileTransactionRepo(TransactionRepo, JsonFileMixin):
         ]
         return paginate(transactions, limit, offset)
 
-    async def update(self, transaction: Transaction) -> Transaction:
+    async def update(self, transaction: TransactionSchema) -> TransactionSchema:
         self._transactions[transaction.id] = transaction
         self.save(self._transactions)
         return transaction
 
-    async def delete(self, transaction_id: str) -> Transaction:
+    async def delete(self, transaction_id: str) -> TransactionSchema:
         transaction = self._transactions.pop(transaction_id)
         self.save(self._transactions)
         return transaction

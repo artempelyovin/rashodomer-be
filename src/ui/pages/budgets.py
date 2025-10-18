@@ -9,7 +9,7 @@ from nicegui.elements.textarea import Textarea
 from starlette.requests import Request
 
 from managers.budget import BudgetManager
-from models import DetailedUser
+from models import DetailedUserSchema
 from ui.components.buttons import DeleteButtonWithConfirmation
 from ui.components.labels import amount_with_gradient, id_with_copy
 
@@ -24,7 +24,7 @@ async def list_budgets(request: Request, page: int = 1, limit: int = 10):
         logger.info(f"Successful delete budget {budget_id} for user {user_id}")
         ui.navigate.to("/budgets")
 
-    user: DetailedUser = request.state.user
+    user: DetailedUserSchema = request.state.user
     logger.info(f"Show /budgets page for user {user.id} with {page=}, {limit=}")
 
     offset = (page - 1) * limit
@@ -80,7 +80,7 @@ async def list_budgets(request: Request, page: int = 1, limit: int = 10):
 
 @router.page("/budgets/new")
 async def create_budget(request: Request):
-    user: DetailedUser = request.state.user
+    user: DetailedUserSchema = request.state.user
 
     async def validate_and_create(name: str, description: str, amount: float) -> None:
         if not name:
@@ -102,7 +102,7 @@ async def create_budget(request: Request):
 
 @router.page("/budgets/{budget_id}")
 async def update_budget(request: Request, budget_id: str):
-    user: DetailedUser = request.state.user
+    user: DetailedUserSchema = request.state.user
     logger.info(f"Show /budgets/{budget_id} page for user {user.id}")
 
     budget = await BudgetManager().get(user_id=user.id, budget_id=budget_id)

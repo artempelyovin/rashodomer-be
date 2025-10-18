@@ -9,7 +9,7 @@ from exceptions import (
     TransactionAccessDeniedError,
     TransactionNotExistsError,
 )
-from models import Transaction
+from models import TransactionSchema
 from repos.abc import CategoryRepo, Total, TransactionRepo
 from settings import settings
 from utils import utc_now
@@ -31,7 +31,7 @@ class TransactionManager:
         category_id: str,
         timestamp: datetime,
         description: str = "",
-    ) -> Transaction:
+    ) -> TransactionSchema:
         if amount <= 0:
             raise AmountMustBePositiveError
         category = await self.category_repo.get(category_id)
@@ -42,7 +42,7 @@ class TransactionManager:
         now = datetime.now(tz=UTC)
         if timestamp > now:
             raise TimestampInFutureError(timestamp=timestamp, current_timestamp=now)
-        transaction = Transaction(
+        transaction = TransactionSchema(
             amount=amount,
             description=description,
             category_id=category_id,
@@ -51,7 +51,7 @@ class TransactionManager:
         )
         return await self.transaction_repo.add(transaction)
 
-    async def get(self, user_id: str, transaction_id: str) -> Transaction:
+    async def get(self, user_id: str, transaction_id: str) -> TransactionSchema:
         transaction = await self.transaction_repo.get(transaction_id)
         if not transaction:
             raise TransactionNotExistsError(transaction_id=transaction_id)
@@ -59,7 +59,7 @@ class TransactionManager:
             raise TransactionAccessDeniedError
         return transaction
 
-    async def list_(self, user_id: str, *, limit: int | None, offset: int) -> tuple[Total, list[Transaction]]:
+    async def list_(self, user_id: str, *, limit: int | None, offset: int) -> tuple[Total, list[TransactionSchema]]:
         return await self.transaction_repo.list_(user_id=user_id, limit=limit, offset=offset)
 
     async def update(
@@ -70,7 +70,7 @@ class TransactionManager:
         description: str,
         category_id: str,
         timestamp: datetime,
-    ) -> Transaction:
+    ) -> TransactionSchema:
         transaction = await self.transaction_repo.get(transaction_id)
         if not transaction:
             raise TransactionNotExistsError(transaction_id=transaction_id)
@@ -93,7 +93,7 @@ class TransactionManager:
         transaction.updated_at = datetime.now(tz=UTC)
         return await self.transaction_repo.update(transaction)
 
-    async def delete(self, user_id: str, transaction_id: str) -> Transaction:
+    async def delete(self, user_id: str, transaction_id: str) -> TransactionSchema:
         transaction = await self.transaction_repo.get(transaction_id)
         if not transaction:
             raise TransactionNotExistsError(transaction_id=transaction_id)
@@ -103,7 +103,7 @@ class TransactionManager:
 
     async def find(
         self, user_id: str, text: str, *, case_sensitive: bool, limit: int | None, offset: int
-    ) -> tuple[Total, list[Transaction]]:
+    ) -> tuple[Total, list[TransactionSchema]]:
         if len(text) == 0:
             raise EmptySearchTextError
         return await self.transaction_repo.find_by_text(

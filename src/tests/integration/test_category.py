@@ -5,7 +5,7 @@ from starlette import status
 from starlette.testclient import TestClient
 
 from enums import CategoryType
-from models import ISO_TIMEZONE_FORMAT, Category, User
+from models import ISO_TIMEZONE_FORMAT, CategorySchema, UserSchema
 from tests.integration.conftest import fake
 from tests.integration.utils import create_category, register_and_authenticate
 
@@ -22,7 +22,7 @@ def test_category_not_exists(
     method: str,
     payload: dict[str, Any] | None,
     client: TestClient,
-    created_user: User,  # noqa: ARG001
+    created_user: UserSchema,  # noqa: ARG001
 ) -> None:
     non_existent_id = "12345"
 
@@ -43,7 +43,7 @@ def test_category_not_exists(
     ],
 )
 def test_category_access_denied(
-    method: str, payload: dict[str, Any] | None, client: TestClient, created_category: Category
+    method: str, payload: dict[str, Any] | None, client: TestClient, created_category: CategorySchema
 ) -> None:
     _, another_token = register_and_authenticate(
         client=client,
@@ -70,7 +70,7 @@ class TestCategoryCreate:
     @pytest.mark.parametrize("category_type", list(CategoryType))
     @pytest.mark.parametrize("emoji_icon", ["🤪", None])
     def test_ok(
-        self, category_type: CategoryType, emoji_icon: str | None, client: TestClient, created_user: User
+        self, category_type: CategoryType, emoji_icon: str | None, client: TestClient, created_user: UserSchema
     ) -> None:
         payload = {
             "name": "new category",
@@ -93,7 +93,7 @@ class TestCategoryCreate:
         assert result["updated_at"]
 
     def test_ok_with_same_name_but_different_category_type(
-        self, client: TestClient, created_category: Category
+        self, client: TestClient, created_category: CategorySchema
     ) -> None:
         another_type = fake.random_element(set(CategoryType) - {created_category.type})
 
@@ -108,7 +108,7 @@ class TestCategoryCreate:
 
         assert response.status_code == status.HTTP_201_CREATED
 
-    def test_empty_category_name(self, client: TestClient, created_user: User) -> None:  # noqa: ARG002
+    def test_empty_category_name(self, client: TestClient, created_user: UserSchema) -> None:  # noqa: ARG002
         response = client.post(
             "/v1/categories",
             json={
@@ -124,7 +124,7 @@ class TestCategoryCreate:
         assert error["detail"] == "Category name cannot be empty"
 
     @pytest.mark.parametrize("bad_emoji_icon", ["🍿s", "not emodj", "s", ""])
-    def test_not_emoji_icon(self, bad_emoji_icon: str, client: TestClient, created_user: User) -> None:  # noqa: ARG002
+    def test_not_emoji_icon(self, bad_emoji_icon: str, client: TestClient, created_user: UserSchema) -> None:  # noqa: ARG002
         response = client.post(
             "/v1/categories",
             json={
@@ -140,7 +140,7 @@ class TestCategoryCreate:
         assert error["type"] == "NotEmojiIconError"
         assert error["detail"] == f"The provided icon in text format '{bad_emoji_icon}' is not a valid emoji"
 
-    def test_category_already_exists(self, client: TestClient, created_category: Category) -> None:
+    def test_category_already_exists(self, client: TestClient, created_category: CategorySchema) -> None:
         response = client.post(
             "/v1/categories",
             json={
@@ -160,7 +160,7 @@ class TestCategoryCreate:
 
 
 class TestCategoryGet:
-    def test_ok(self, client: TestClient, created_category: Category) -> None:
+    def test_ok(self, client: TestClient, created_category: CategorySchema) -> None:
         response = client.get(f"/v1/categories/{created_category.id}")
 
         assert response.status_code == status.HTTP_200_OK
@@ -178,7 +178,7 @@ class TestCategoryGet:
 
 class TestCategoryList:
     @pytest.mark.parametrize("category_type", list(CategoryType))
-    def test_ok(self, category_type: CategoryType, client: TestClient, created_user: User) -> None:  # noqa: ARG002
+    def test_ok(self, category_type: CategoryType, client: TestClient, created_user: UserSchema) -> None:  # noqa: ARG002
         expected_categories = [
             create_category(
                 client=client,
@@ -200,11 +200,11 @@ class TestCategoryList:
         categories_by_id = {category["id"]: category for category in categories}
         for expected_category_id, expected_category in expected_categories_by_id.items():
             assert expected_category_id in categories_by_id
-            assert expected_category == Category(**categories_by_id[expected_category_id])
+            assert expected_category == CategorySchema(**categories_by_id[expected_category_id])
 
 
 class TestCategoryUpdate:
-    def test_ok(self, client: TestClient, created_category: Category, created_user: User) -> None:
+    def test_ok(self, client: TestClient, created_category: CategorySchema, created_user: UserSchema) -> None:
         updated_payload = {
             "name": "New Name",
             "description": "New description",
@@ -231,17 +231,17 @@ class TestCategoryUpdate:
 
 
 class TestCategoryDelete:
-    def test_ok(self, client: TestClient, created_category: Category) -> None:
+    def test_ok(self, client: TestClient, created_category: CategorySchema) -> None:
         response = client.delete(f"/v1/categories/{created_category.id}")
 
         assert response.status_code == status.HTTP_200_OK
-        category = Category(**response.json()["result"])
+        category = CategorySchema(**response.json()["result"])
         assert category == created_category
 
 
 class TestCategoryFind:
     @pytest.mark.parametrize("search_in_name", [True, False])
-    def test_ok(self, search_in_name: bool, client: TestClient, created_user: User) -> None:  # noqa: ARG002, FBT001
+    def test_ok(self, search_in_name: bool, client: TestClient, created_user: UserSchema) -> None:  # noqa: ARG002, FBT001
         search_text = "car"
         created_category = create_category(
             client=client,
@@ -256,14 +256,14 @@ class TestCategoryFind:
         assert response.status_code == status.HTTP_200_OK
         result = response.json()["result"]
         assert result["total"] == 1
-        category = Category(**result["items"][0])
+        category = CategorySchema(**result["items"][0])
         assert category == created_category
         if search_in_name:
             assert search_text in category.name
         else:
             assert search_text in category.description
 
-    def test_empty_category_text(self, client: TestClient, created_user: User) -> None:  # noqa: ARG002
+    def test_empty_category_text(self, client: TestClient, created_user: UserSchema) -> None:  # noqa: ARG002
         response = client.get("/v1/categories/find", params={"text": ""})  # empty text
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST

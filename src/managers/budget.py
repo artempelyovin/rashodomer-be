@@ -7,7 +7,7 @@ from exceptions import (
     BudgetNotExistsError,
     EmptySearchTextError,
 )
-from models import Budget
+from models import BudgetSchema
 from repos.abc import BudgetRepo, Total
 from settings import settings
 
@@ -18,16 +18,16 @@ class BudgetManager:
 
     async def create(
         self, user_id: str, name: str, description: str | None = "", amount: float | None = 0.0
-    ) -> Budget:
+    ) -> BudgetSchema:
         if amount < 0:
             raise AmountMustBePositiveError
         _, exist_budgets = await self.repo.find_by_name(user_id=user_id, name=name)
         if exist_budgets:
             raise BudgetAlreadyExistsError(name=name)
-        budget = Budget(name=name, description=description, amount=amount, user_id=user_id)
+        budget = BudgetSchema(name=name, description=description, amount=amount, user_id=user_id)
         return await self.repo.add(budget)
 
-    async def get(self, user_id: str, budget_id: str) -> Budget:
+    async def get(self, user_id: str, budget_id: str) -> BudgetSchema:
         budget = await self.repo.get(budget_id)
         if not budget:
             raise BudgetNotExistsError(budget_id=budget_id)
@@ -35,7 +35,7 @@ class BudgetManager:
             raise BudgetAccessDeniedError
         return budget
 
-    async def list_(self, user_id: str, limit: int | None, offset: int) -> tuple[Total, list[Budget]]:
+    async def list_(self, user_id: str, limit: int | None, offset: int) -> tuple[Total, list[BudgetSchema]]:
         return await self.repo.list_(user_id=user_id, limit=limit, offset=offset)
 
     async def update(
@@ -46,7 +46,7 @@ class BudgetManager:
         name: str,
         description: str,
         amount: float,
-    ) -> Budget:
+    ) -> BudgetSchema:
         budget = await self.repo.get(budget_id)
         if not budget:
             raise BudgetNotExistsError(budget_id=budget_id)
@@ -61,7 +61,7 @@ class BudgetManager:
         budget.updated_at = datetime.now(tz=UTC)
         return await self.repo.update(budget)
 
-    async def delete(self, user_id: str, budget_id: str) -> Budget:
+    async def delete(self, user_id: str, budget_id: str) -> BudgetSchema:
         budget = await self.repo.get(budget_id)
         if not budget:
             raise BudgetNotExistsError(budget_id=budget_id)
@@ -71,7 +71,7 @@ class BudgetManager:
 
     async def find(
         self, user_id: str, text: str, *, case_sensitive: bool, limit: int | None, offset: int
-    ) -> tuple[Total, list[Budget]]:
+    ) -> tuple[Total, list[BudgetSchema]]:
         if len(text) == 0:
             raise EmptySearchTextError
         return await self.repo.find_by_text(

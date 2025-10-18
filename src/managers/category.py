@@ -11,7 +11,7 @@ from exceptions import (
     EmptySearchTextError,
     NotEmojiIconError,
 )
-from models import Category
+from models import CategorySchema
 from repos.abc import CategoryRepo, Total
 from settings import settings
 
@@ -27,7 +27,7 @@ class CategoryManager:
         category_type: CategoryType,
         description: str | None = "",
         emoji_icon: str | None = None,
-    ) -> Category:
+    ) -> CategorySchema:
         if len(name) == 0:
             raise EmptyCategoryNameError
         if emoji_icon is not None and not emoji.is_emoji(emoji_icon):
@@ -37,7 +37,7 @@ class CategoryManager:
         )
         if total_exist_categories != 0:
             raise CategoryAlreadyExistsError(name=name, category_type=category_type)
-        category = Category(
+        category = CategorySchema(
             name=name,
             description=description,
             type=category_type,
@@ -47,7 +47,7 @@ class CategoryManager:
         )
         return await self.repo.add(category)
 
-    async def get(self, user_id: str, category_id: str) -> Category:
+    async def get(self, user_id: str, category_id: str) -> CategorySchema:
         category = await self.repo.get(category_id)
         if not category:
             raise CategoryNotExistsError(category_id=category_id)
@@ -63,7 +63,7 @@ class CategoryManager:
         show_archived: bool | None = False,
         limit: int | None,
         offset: int,
-    ) -> tuple[Total, list[Category]]:
+    ) -> tuple[Total, list[CategorySchema]]:
         return await self.repo.list_(
             user_id=user_id, category_type=category_type, show_archived=show_archived, limit=limit, offset=offset
         )
@@ -77,7 +77,7 @@ class CategoryManager:
         category_type: CategoryType,
         is_archived: bool,
         emoji_icon: str | None,
-    ) -> Category:
+    ) -> CategorySchema:
         category = await self.repo.get(category_id)
         if not category:
             raise CategoryNotExistsError(category_id=category_id)
@@ -93,7 +93,7 @@ class CategoryManager:
         return await self.repo.update(category)
         # тут логика по изменению бюджетов, при условии смены `category_type`
 
-    async def delete(self, user_id: str, category_id: str) -> Category:
+    async def delete(self, user_id: str, category_id: str) -> CategorySchema:
         category = await self.repo.get(category_id)
         if not category:
             raise CategoryNotExistsError(category_id=category_id)
@@ -103,7 +103,7 @@ class CategoryManager:
 
     async def find(
         self, user_id: str, text: str, *, case_sensitive: bool, limit: int | None, offset: int
-    ) -> tuple[Total, list[Category]]:
+    ) -> tuple[Total, list[CategorySchema]]:
         if len(text) == 0:
             raise EmptySearchTextError
         return await self.repo.find_by_text(
