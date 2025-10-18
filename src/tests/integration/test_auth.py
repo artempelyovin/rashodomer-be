@@ -1,7 +1,7 @@
 from starlette import status
 from starlette.testclient import TestClient
 
-from models import UserSchema
+from models.user import UserSchema
 from tests.integration.utils import register
 
 

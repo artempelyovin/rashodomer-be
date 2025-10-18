@@ -2,6 +2,8 @@ import gettext
 import uuid
 from datetime import UTC, datetime
 
+from base import ISO_TIMEZONE_FORMAT
+
 _ = gettext.gettext
 
 

@@ -1,7 +1,7 @@
 from nicegui import APIRouter, ui
 from starlette.requests import Request
 
-from models import DetailedUserSchema
+from models.user import DetailedUserSchema
 from ui.components.labels import id_with_copy
 from utils import datetime_to_text
 

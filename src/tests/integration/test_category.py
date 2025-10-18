@@ -4,8 +4,10 @@ import pytest
 from starlette import status
 from starlette.testclient import TestClient
 
+from base import ISO_TIMEZONE_FORMAT
 from enums import CategoryType
-from models import ISO_TIMEZONE_FORMAT, CategorySchema, UserSchema
+from models.category import CategorySchema
+from models.user import UserSchema
 from tests.integration.conftest import fake
 from tests.integration.utils import create_category, register_and_authenticate
 

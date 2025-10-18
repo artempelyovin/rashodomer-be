@@ -8,7 +8,10 @@ from starlette.testclient import TestClient
 
 from app import fast_api
 from enums import CategoryType
-from models import BudgetSchema, CategorySchema, TransactionSchema, UserSchema
+from models.budget import BudgetSchema
+from models.category import CategorySchema
+from models.transaction import TransactionSchema
+from models.user import UserSchema
 from repos.files import JsonFileMixin
 from tests.integration.utils import authenticate, create_budget, create_category, create_transaction, register
 
