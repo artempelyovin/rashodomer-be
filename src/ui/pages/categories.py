@@ -43,9 +43,9 @@ async def list_categories(
     )
     logger.debug(f"Get {len(categories)} categories, {total=}")
 
-    pages = ceil(total / limit) or 1
+    pages = ceil(total / limit) if total else 1
 
-    with ui.row():
+    with ui.row().classes("w-full"):
         ui.select(
             [CategoryType.EXPENSE, CategoryType.INCOME, CategoryType.TRANSFER],
             value=category_type,
@@ -66,11 +66,11 @@ async def list_categories(
         ui.label("У вас ещё нет категорий...")
         ui.label("Самое время создать первую категорию!")
     else:
-        with ui.column():
+        with ui.column().classes("w-full"):
             for category in categories:
-                with ui.card():
-                    with ui.row():
-                        with ui.row():
+                with ui.card().classes("w-full"):
+                    with ui.row().classes("w-full justify-between items-center"):
+                        with ui.row().classes("items-center gap-2"):
                             id_with_copy(category.id)
                         with ui.row():
                             ui.button(
@@ -88,7 +88,7 @@ async def list_categories(
                                     category_id=category.id,
                                 ),
                             )
-                    with ui.row():
+                    with ui.row().classes("items-center gap-2"):
                         if category.emoji_icon:
                             ui.label(category.emoji_icon).classes("text-2xl")
                         ui.label(category.name).classes("text-xl font-bold")
@@ -96,7 +96,7 @@ async def list_categories(
                         if category.is_archived:
                             ui.badge("ARCHIVED", color="negative")
                     ui.label(category.description).classes("text-sm")
-                    with ui.row():
+                    with ui.row().classes("w-full justify-between"):
                         with ui.column():
                             ui.label("Дата создания")
                             ui.label(category.created_at).classes("text-sm")
@@ -104,7 +104,7 @@ async def list_categories(
                             ui.label("Дата обновления")
                             ui.label(category.updated_at).classes("text-sm")
 
-        with ui.row():
+        with ui.row().classes("w-full justify-center"):
             ui.pagination(
                 min=1,
                 max=pages,
@@ -174,8 +174,6 @@ async def update_category(request: Request, category_id: str):
     async def validate_and_save(
         name: str, description: str, category_type: CategoryType, is_archived: bool, emoji_icon: str | None
     ) -> None:
-        if not name:
-            return ui.notify("Заполните название", type="negative")
         await CategoryManager().update(
             user_id=user.id,
             category_id=category.id,

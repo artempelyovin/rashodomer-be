@@ -18,7 +18,7 @@ router = APIRouter()
 
 
 @router.page("/budgets")
-async def list_budgets(request: Request, page: int = 1, limit: int = 10):
+async def list_budgets(request: Request, page: int = 1, limit: int = 1):
     async def confirm_deletion(user_id: str, budget_id: str) -> None:
         await BudgetManager().delete(user_id=user_id, budget_id=budget_id)
         logger.info(f"Successful delete budget {budget_id} for user {user_id}")
@@ -31,7 +31,7 @@ async def list_budgets(request: Request, page: int = 1, limit: int = 10):
     total, budgets = await BudgetManager().list_(user_id=user.id, limit=limit, offset=offset)
     logger.debug(f"Get {len(budgets)} budgets, {total=}")
 
-    pages = ceil(total / limit) or 1
+    pages = ceil(total / limit)
 
     if len(budgets) == 0:
         ui.label("У вас ещё нет бюджетов...")
@@ -70,7 +70,7 @@ async def list_budgets(request: Request, page: int = 1, limit: int = 10):
                 on_change=lambda event: ui.navigate.to(f"/budgets?page={event.value}&limit={limit}"),
             )
             ui.select(
-                [5, 10, 20, 50],
+                [1, 2, 5, 10],
                 value=limit,
                 on_change=lambda event: ui.navigate.to(f"/budgets?page=1&limit={event.value}"),
             )
@@ -79,13 +79,15 @@ async def list_budgets(request: Request, page: int = 1, limit: int = 10):
 
 
 @router.page("/budgets/new")
-async def create_budget(request: Request):
+async def create_budgets(request: Request):
     user: DetailedUserSchema = request.state.user
 
-    async def validate_and_create(name: str, description: str, amount: float) -> None:
-        if not name:
+    async def validate_and_create(name: Input, description: Textarea, amount: Number) -> None:
+        if not name.value:
             return ui.notify("Заполните название", type="negative")
-        await BudgetManager().create(user_id=user.id, name=name, description=description, amount=amount)
+        await BudgetManager().create(
+            user_id=user.id, name=name.value, description=description.value, amount=amount.value
+        )
         ui.navigate.to("/budgets")
 
     with ui.row():
@@ -94,10 +96,7 @@ async def create_budget(request: Request):
     name = ui.input("Название*")
     description = ui.textarea("Описание")
     amount = ui.number("Сумма", value=0.0, precision=5)
-    ui.button(
-        "Создать",
-        on_click=lambda _: validate_and_create(name=name.value, description=description.value, amount=amount.value),
-    )
+    ui.button("Создать", on_click=lambda _: validate_and_create(name=name, description=description, amount=amount))
 
 
 @router.page("/budgets/{budget_id}")
