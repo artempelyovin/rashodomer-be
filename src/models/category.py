@@ -33,3 +33,18 @@ class CategorySchema(CustomModel):
     user_id: Annotated[str, UUID] = Field(..., description=UserIDDesc)
     created_at: Annotated[datetime, AwareDatetime] = Field(default_factory=utc_now, description=CreatedAtDesc)
     updated_at: Annotated[datetime, AwareDatetime] = Field(default_factory=utc_now, description=UpdatedAtDesc)
+
+
+class CreateCategorySchema(CustomModel):
+    name: str = Field(..., description=NameDesc, examples=NameExamples)
+    description: str = Field("", description=DescriptionDesc, examples=DescriptionExamples)
+    type: CategoryType = Field(..., description=CategoryTypeDesc, examples=CategoryTypeExamples)
+    emoji_icon: str | None = Field(None, description=EmojiIconDesc, examples=EmojiExamples)
+
+
+class UpdateCategorySchema(CustomModel):
+    name: str | None = Field(None, description=NameDesc, examples=NameExamples)
+    description: str | None = Field(None, description=DescriptionDesc, examples=DescriptionExamples)
+    type: CategoryType | None = Field(None, description=CategoryTypeDesc, examples=CategoryTypeExamples)
+    is_archived: bool | None = Field(False, description=IsArchivedDesc)  # noqa: FBT003
+    emoji_icon: str | None = Field(None, description=EmojiIconDesc, examples=EmojiExamples)
