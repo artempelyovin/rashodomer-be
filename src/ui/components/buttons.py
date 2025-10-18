@@ -1,5 +1,6 @@
 import asyncio
-from typing import Callable, Coroutine
+import inspect
+from typing import Callable
 
 from nicegui import ui
 from nicegui.elements.button import Button
@@ -7,7 +8,7 @@ from nicegui.elements.dialog import Dialog
 
 
 class DeleteButtonWithConfirmation(Button):
-    def __init__(self, *args, dialog_text: str, on_delete_callback: Callable | Coroutine, **kwargs) -> None:
+    def __init__(self, *args, dialog_text: str, on_delete_callback: Callable, **kwargs) -> None:
         self._dialog_text = dialog_text
         self._dialog = Dialog()
         self._on_delete_callback = on_delete_callback
@@ -25,7 +26,6 @@ class DeleteButtonWithConfirmation(Button):
 
     async def handle_confirmation(self):
         self._dialog.close()
-        result = self._on_delete_callback()
-        if asyncio.iscoroutine(result):
-            await result
-
+        if asyncio.iscoroutine(self._on_delete_callback):
+            await self._on_delete_callback
+        self._on_delete_callback()

@@ -1,5 +1,4 @@
 import logging
-from functools import partial
 from math import ceil
 
 from nicegui import APIRouter, ui
@@ -8,7 +7,6 @@ from nicegui.elements.number import Number
 from nicegui.elements.textarea import Textarea
 from starlette.requests import Request
 
-from exceptions import BaseCoreError
 from managers.budget import BudgetManager
 from schemas.budget import CreateBudgetSchema
 from schemas.user import DetailedUserSchema
@@ -21,15 +19,6 @@ router = APIRouter()
 
 @router.page("/budgets")
 async def list_budgets(request: Request, page: int = 1, limit: int = 1):
-    async def confirm_deletion(user_id: str, budget_id: str) -> None:
-        try:
-            await BudgetManager().delete(user_id=user_id, budget_id=budget_id)
-        except BaseCoreError as e:
-            ui.notify(e.message(), type="negative")
-            return
-        logger.info(f"Succeseful delete budget {budget_id} for user {user_id}")
-        ui.navigate.to("/budgets")
-
     user: DetailedUserSchema = request.state.user
     logging.info(f"Show /budgets page for user {user.id} with {page=}, {limit=}")
 
@@ -50,7 +39,7 @@ async def list_budgets(request: Request, page: int = 1, limit: int = 1):
                     DeleteButtonWithConfirmation(
                         icon="delete",
                         dialog_text=f"Вы действительно хотите удалить бюджет {budget.name} ({budget.id})?",
-                        on_delete_callback=partial(confirm_deletion, user_id=user.id, budget_id=budget.id)
+                        on_delete_callback=BudgetManager().delete(user_id=user.id, budget_id=budget.id),
                     )
                 with ui.row():
                     ui.label(budget.name).classes("text-xl font-bold")
