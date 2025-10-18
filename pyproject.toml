@@ -1,31 +1,36 @@
-[tool.poetry]
+[project]
 name = "rashodomer"
-version = "0.0.1"
-description = ""
-authors = ["artempelevin <artempelevin@list.ru>"]
+version = "0.1.0"
+description = ""  # TODO: add
 readme = "README.md"
-packages = [{ include = "src" }]
+authors = [
+    { name = "artempelevin", email = "artempelevin@list.ru" }
+]
+requires-python = ">=3.13"
 
 
-[tool.poetry.dependencies]
-python = "^3.12"
-pydantic = "^2.9.2"
-bcrypt = "^4.2.0"
-fastapi = "^0.115.5"
-uvicorn = "^0.32.0"
-ujson = "^5.10.0"
-emoji = "^2.14.0"
-httpx = "^0.28.1"
+dependencies = [
+    "fastapi>=0.119.0",
+    "uvicorn>=0.37.0",
+    "pydantic>=2.12.3",
+    "pydantic-settings>=2.11.0",
+    "ujson>=5.11.0",
+    "httpx>=0.28.1",
+    "bcrypt>=5.0.0",
+    "emoji>=2.15.0",
+]
 
 
-[tool.poetry.group.dev.dependencies]
-ruff = "0.7.1"  # we update it with our hands because all rules are enabled
-mypy = "^1.13.0"
-pre-commit = "^4.0.1"
-types-ujson = "^5.10.0.20240515"
-pytest = "^8.3.3"
-pytest-asyncio = "^0.24.0"
-faker = "^33.0.0"
+[dependency-groups]
+dev = [
+    "ruff==0.7.1", # TODO: update ruff!
+    "mypy>=1.18.2",
+    "pre-commit>=4.3.0",
+    "types-ujson>=5.10.0.20250822",
+    "pytest>=8.4.2",
+    "pytest-asyncio>=1.2.0",
+    "faker>=37.11.0",
+]
 
 
 [tool.ruff]
@@ -55,10 +60,10 @@ ignore = [
     "ISC001", # single-line-implicit-string-concatenation (skip it because it conflicts with `ruff format`)
     "TD002", # Missing T O D O author
     "TD003", # Missing T O D O link
-    "ANN",  # flake8-annotations (skip it because using `mypy`)
-    "RUF001",  # ambiguous-unicode-character-string (skip it because many false positives)
-    "RUF002",  # ambiguous-unicode-character-docstring (skip it because many false positives)
-    "RUF003",  # ambiguous-unicode-character-comment (skip it because many false positives)
+    "ANN", # flake8-annotations (skip it because using `mypy`)
+    "RUF001", # ambiguous-unicode-character-string (skip it because many false positives)
+    "RUF002", # ambiguous-unicode-character-docstring (skip it because many false positives)
+    "RUF003", # ambiguous-unicode-character-comment (skip it because many false positives)
     "S101", # Use of `assert` detected (interferes with tests)
 ]
 
@@ -74,8 +79,3 @@ strict = true
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
-
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
