@@ -16,8 +16,6 @@ uvicorn = "^0.32.0"
 ujson = "^5.10.0"
 emoji = "^2.14.0"
 httpx = "^0.28.1"
-nicegui = "^2.20.0"
-pydantic-settings = "^2.10.0"
 
 
 [tool.poetry.group.dev.dependencies]

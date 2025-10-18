@@ -13,12 +13,11 @@ from exceptions import (
 )
 from repos.abc import CategoryRepo, Total
 from schemas.category import CategorySchema, CreateCategorySchema
-from settings import settings
 from utils import UnsetValue
 
 
 class CategoryManager:
-    def __init__(self, category_repo: CategoryRepo = settings.category_repo) -> None:
+    def __init__(self, category_repo: CategoryRepo) -> None:
         self.repo = category_repo
 
     async def create(self, user_id: str, data: CreateCategorySchema) -> CategorySchema:

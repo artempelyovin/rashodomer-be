@@ -14,13 +14,12 @@ from exceptions import (
 )
 from repos.abc import TokenRepo, UserRepo
 from schemas.user import CreateUserSchema, DetailedUserSchema
-from settings import settings
 
 
 class AuthManager:
     MIN_PASSWORD_LENGTH = 8
 
-    def __init__(self, user_repo: UserRepo = settings.user_repo, token_repo: TokenRepo = settings.token_repo) -> None:
+    def __init__(self, user_repo: UserRepo, token_repo: TokenRepo) -> None:
         self.user_repo = user_repo
         self.token_repo = token_repo
 
