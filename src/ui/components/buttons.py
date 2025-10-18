@@ -28,3 +28,4 @@ class DeleteButtonWithConfirmation(Button):
         result = self._on_delete_callback()
         if asyncio.iscoroutine(result):
             await result
+

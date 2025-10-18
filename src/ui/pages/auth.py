@@ -32,7 +32,9 @@ async def login(unauthorized: bool = False):
     if unauthorized:
         ui.notify("Не авторизован", type="negative")
     login_ = ui.input("Логин").classes("w-1/6")  # TODO: убери default value
-    password_ = ui.input("Пароль", password=True, password_toggle_button=True).classes("w-1/6")
+    password_ = ui.input("Пароль", password=True, password_toggle_button=True).classes(
+        "w-1/6"
+    )
     ui.button("Войти", on_click=lambda _: validate_and_login(login_, password_))
 
 
