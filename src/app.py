@@ -3,7 +3,7 @@ from starlette.middleware.cors import CORSMiddleware
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
-from base import APIResponse
+from base import ErrorSchema
 from exceptions import BaseCoreError
 from routers.auth import router as auth_router
 from routers.budget import router as budget_router
@@ -12,16 +12,12 @@ from routers.transaction import router as transaction_router
 
 
 def exception_handler(_: Request, core_error: BaseCoreError) -> JSONResponse:
-    content = APIResponse.model_validate(
+    content = ErrorSchema.model_validate(
         {
-            "result": None,
-            "status_code": core_error.status_code,
-            "error": {
-                "type": core_error.__class__.__name__,
-                "detail": core_error.message(),
-            },
+            "type": core_error.__class__.__name__,
+            "detail": core_error.message(),
         }
-    ).dict()
+    ).model_dump(mode="json")
     return JSONResponse(content=content, status_code=core_error.status_code)
 
 

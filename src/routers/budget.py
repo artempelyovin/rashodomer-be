@@ -5,7 +5,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, Path, Query
 from starlette import status
 
-from base import APIResponse, APIResponseList, write_response, write_response_list
+from base import ListSchema, write_response_list
 from depends import authentication_user, budget_repo_factory
 from managers.budget import BudgetManager
 from repos.abc import BudgetRepo
@@ -30,10 +30,9 @@ async def create_budget(
     *,
     user: DetailedUserSchema = Depends(authentication_user),
     budget_repo: BudgetRepo = Depends(budget_repo_factory),
-) -> APIResponse[BudgetSchema]:
+) -> BudgetSchema:
     manager = BudgetManager(budget_repo=budget_repo)
-    budget = await manager.create(user_id=user.id, data=body)
-    return write_response(result=budget, schema=BudgetSchema, status_code=status.HTTP_201_CREATED)
+    return await manager.create(user_id=user.id, data=body)
 
 
 @router.get(
@@ -49,7 +48,7 @@ async def list_budgets(
     *,
     user: DetailedUserSchema = Depends(authentication_user),
     budget_repo: BudgetRepo = Depends(budget_repo_factory),
-) -> APIResponseList[BudgetSchema]:
+) -> ListSchema[BudgetSchema]:
     manager = BudgetManager(budget_repo=budget_repo)
     total, budgets = await manager.list_(user_id=user.id, limit=limit, offset=offset)
     return write_response_list(items=budgets, total=total, limit=limit, offset=offset, schema=BudgetSchema)
@@ -70,7 +69,7 @@ async def find_budgets(
     *,
     user: DetailedUserSchema = Depends(authentication_user),
     budget_repo: BudgetRepo = Depends(budget_repo_factory),
-) -> APIResponseList[BudgetSchema]:
+) -> ListSchema[BudgetSchema]:
     manager = BudgetManager(budget_repo=budget_repo)
     total, budgets = await manager.find(
         user_id=user.id, text=text, case_sensitive=case_sensitive, limit=limit, offset=offset
@@ -90,10 +89,9 @@ async def get_budget(
     *,
     user: DetailedUserSchema = Depends(authentication_user),
     budget_repo: BudgetRepo = Depends(budget_repo_factory),
-) -> APIResponse[BudgetSchema]:
+) -> BudgetSchema:
     manager = BudgetManager(budget_repo=budget_repo)
-    budget = await manager.get(user_id=user.id, budget_id=budget_id)
-    return write_response(result=budget, schema=BudgetSchema)
+    return await manager.get(user_id=user.id, budget_id=budget_id)
 
 
 @router.patch(
@@ -109,17 +107,16 @@ async def update_budget(
     *,
     user: DetailedUserSchema = Depends(authentication_user),
     budget_repo: BudgetRepo = Depends(budget_repo_factory),
-) -> APIResponse[BudgetSchema]:
+) -> BudgetSchema:
     params = body.model_dump(exclude_unset=True)
     manager = BudgetManager(budget_repo=budget_repo)
-    budget = await manager.update(
+    return await manager.update(
         user_id=user.id,
         budget_id=budget_id,
         name=params.get("name", UNSET),
         description=params.get("description", UNSET),
         amount=params.get("amount", UNSET),
     )
-    return write_response(result=budget, schema=BudgetSchema)
 
 
 @router.delete(
@@ -134,7 +131,6 @@ async def delete_budget(
     *,
     user: DetailedUserSchema = Depends(authentication_user),
     budget_repo: BudgetRepo = Depends(budget_repo_factory),
-) -> APIResponse[BudgetSchema]:
+) -> BudgetSchema:
     manager = BudgetManager(budget_repo=budget_repo)
-    budget = await manager.delete(user_id=user.id, budget_id=budget_id)
-    return write_response(result=budget, schema=BudgetSchema)
+    return await manager.delete(user_id=user.id, budget_id=budget_id)

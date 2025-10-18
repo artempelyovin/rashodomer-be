@@ -2,7 +2,6 @@
 from fastapi import APIRouter, Depends
 from starlette import status
 
-from base import APIResponse, write_response
 from depends import token_repo_factory, user_repo_factory
 from managers.auth import AuthManager
 from repos.abc import TokenRepo, UserRepo
@@ -25,10 +24,9 @@ async def register(
     *,
     user_repo: UserRepo = Depends(user_repo_factory),
     token_repo: TokenRepo = Depends(token_repo_factory),
-) -> APIResponse[UserSchema]:
+) -> UserSchema:
     manager = AuthManager(user_repo=user_repo, token_repo=token_repo)
-    user = await manager.register(data=body)
-    return write_response(result=user, schema=UserSchema, status_code=status.HTTP_201_CREATED)
+    return await manager.register(data=body)
 
 
 @router.post(
@@ -43,7 +41,7 @@ async def login(
     *,
     user_repo: UserRepo = Depends(user_repo_factory),
     token_repo: TokenRepo = Depends(token_repo_factory),
-) -> APIResponse[TokenSchema]:
+) -> TokenSchema:
     manager = AuthManager(user_repo=user_repo, token_repo=token_repo)
     token = await manager.login(login=body.login, password=body.password)
-    return write_response(result={"token": token}, schema=TokenSchema, status_code=status.HTTP_200_OK)
+    return TokenSchema(token=token)

@@ -1,3 +1,4 @@
+# ruff: noqa: ARG001, ARG002
 from datetime import UTC, datetime, timedelta
 from typing import Any
 
@@ -26,14 +27,14 @@ def test_transaction_not_exists(
     method: str,
     payload: dict[str, Any] | None,
     client: TestClient,
-    created_user: UserSchema,  # noqa: ARG001
+    created_user: UserSchema,
 ) -> None:
     non_existent_id = "12345"
 
     response = client.request(method=method, url=f"/v1/transactions/{non_existent_id}", json=payload)
 
     assert response.status_code == status.HTTP_404_NOT_FOUND
-    error = response.json()["error"]
+    error = response.json()
     assert error["type"] == "TransactionNotExistsError"
     assert error["detail"] == f"Transaction with ID '{non_existent_id}' does not exist"
 
@@ -61,11 +62,11 @@ def test_transaction_access_denied(
         method=method,
         url=f"/v1/transactions/{created_transaction.id}",
         json=payload,
-        headers={"Authorization": another_token},  # <-- trying to get access by another user
+        headers={"Authorization": another_token},
     )
 
     assert response.status_code == status.HTTP_403_FORBIDDEN
-    error = response.json()["error"]
+    error = response.json()
     assert error["type"] == "TransactionAccessDeniedError"
     assert error["detail"] == "Attempt to access another user's transaction"
 
@@ -81,7 +82,7 @@ class TestTransactionCreate:
         response = client.post("/v1/transactions", json=payload)
 
         assert response.status_code == status.HTTP_201_CREATED
-        result = response.json()["result"]
+        result = response.json()
         assert result["id"]
         assert result["amount"] == payload["amount"]
         assert result["description"] == payload["description"]
@@ -95,23 +96,23 @@ class TestTransactionCreate:
         response = client.post(
             "/v1/transactions",
             json={
-                "amount": -1,  # <-- negative
+                "amount": -1,
                 "category_id": created_category.id,
             },
         )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-        error = response.json()["error"]
+        error = response.json()
         assert error["type"] == "AmountMustBePositiveError"
         assert error["detail"] == "Amount must be positive"
 
-    def test_category_not_exists(self, client: TestClient, created_user: UserSchema) -> None:  # noqa: ARG002
+    def test_category_not_exists(self, client: TestClient, created_user: UserSchema) -> None:
         non_existent_id = "12345"
 
         response = client.post("/v1/transactions", json={"amount": 10, "category_id": non_existent_id})
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
-        error = response.json()["error"]
+        error = response.json()
         assert error["type"] == "CategoryNotExistsError"
         assert error["detail"] == f"Category with ID '{non_existent_id}' does not exist"
 
@@ -127,11 +128,11 @@ class TestTransactionCreate:
         response = client.post(
             url="/v1/transactions",
             json={"amount": 10, "category_id": created_category.id},
-            headers={"Authorization": another_token},  # <-- trying to get access by another user
+            headers={"Authorization": another_token},
         )
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
-        error = response.json()["error"]
+        error = response.json()
         assert error["type"] == "CategoryAccessDeniedError"
         assert error["detail"] == "Attempt to access another user's category"
 
@@ -148,22 +149,22 @@ class TestTransactionCreate:
         )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-        error = response.json()["error"]
+        error = response.json()
         assert error["type"] == "TimestampInFutureError"
         assert f"Timestamp '{future_timestamp}' cannot be in the future time. Current time:" in error["detail"]
 
 
 class TestTransactionGet:
     def test_ok(self, client: TestClient, created_transaction: TransactionSchema) -> None:
-        response = client.get(url=f"/v1/transactions/{created_transaction.id}")
+        response = client.get(f"/v1/transactions/{created_transaction.id}")
 
         assert response.status_code == status.HTTP_200_OK
-        transaction = TransactionSchema(**response.json()["result"])
+        transaction = TransactionSchema(**response.json())
         assert created_transaction == transaction
 
 
 class TestTransactionList:
-    def test_ok(self, client: TestClient, created_user: UserSchema, created_category: CategorySchema) -> None:  # noqa: ARG002
+    def test_ok(self, client: TestClient, created_user: UserSchema, created_category: CategorySchema) -> None:
         expected_transactions = [
             create_transaction(
                 client=client,
@@ -174,16 +175,16 @@ class TestTransactionList:
             )
             for _ in range(3)
         ]
-        expected_transactons_by_id = {transaction.id: transaction for transaction in expected_transactions}
+        expected_transactions_by_id = {transaction.id: transaction for transaction in expected_transactions}
 
         response = client.get("/v1/transactions")
 
         assert response.status_code == status.HTTP_200_OK
-        result = response.json()["result"]
+        result = response.json()
         assert result["total"] == len(expected_transactions)
         transactions = result["items"]
         transactions_by_id = {transaction["id"]: transaction for transaction in transactions}
-        for expected_transaction_id, expected_transaction in expected_transactons_by_id.items():
+        for expected_transaction_id, expected_transaction in expected_transactions_by_id.items():
             assert expected_transaction_id in transactions_by_id
             assert expected_transaction == TransactionSchema(**transactions_by_id[expected_transaction_id])
 
@@ -207,12 +208,10 @@ class TestTransactionUpdate:
         response = client.patch(f"/v1/transactions/{created_transaction.id}", json=updated_payload)
 
         assert response.status_code == status.HTTP_200_OK
-        result = response.json()["result"]
-        # without changes
+        result = response.json()
         assert result["id"] == created_transaction.id
         assert result["user_id"] == created_user.id
         assert result["created_at"] == created_transaction.created_at.strftime(ISO_TIMEZONE_FORMAT)
-        # changed
         assert result["amount"] == updated_payload["amount"]
         assert result["description"] == updated_payload["description"]
         assert result["category_id"] == new_category.id
@@ -221,11 +220,11 @@ class TestTransactionUpdate:
     def test_amount_must_be_positive(self, client: TestClient, created_transaction: TransactionSchema) -> None:
         response = client.patch(
             f"/v1/transactions/{created_transaction.id}",
-            json={"amount": -1},  # <-- negative
+            json={"amount": -1},
         )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-        error = response.json()["error"]
+        error = response.json()
         assert error["type"] == "AmountMustBePositiveError"
         assert error["detail"] == "Amount must be positive"
 
@@ -238,7 +237,7 @@ class TestTransactionUpdate:
         )
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
-        error = response.json()["error"]
+        error = response.json()
         assert error["type"] == "CategoryNotExistsError"
         assert error["detail"] == f"Category with ID '{non_existent_id}' does not exist"
 
@@ -256,7 +255,7 @@ class TestTransactionUpdate:
             description="some desc",
             category_type=CategoryType.EXPENSE,
             emoji_icon=None,
-            headers={"Authorization": another_token},  # <-- a category created by another user
+            headers={"Authorization": another_token},
         )
 
         response = client.patch(
@@ -265,7 +264,7 @@ class TestTransactionUpdate:
         )
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
-        error = response.json()["error"]
+        error = response.json()
         assert error["type"] == "CategoryAccessDeniedError"
         assert error["detail"] == "Attempt to access another user's category"
 
@@ -275,7 +274,7 @@ class TestTransactionDelete:
         response = client.delete(f"/v1/transactions/{created_transaction.id}")
 
         assert response.status_code == status.HTTP_200_OK
-        transaction = TransactionSchema(**response.json()["result"])
+        transaction = TransactionSchema(**response.json())
         assert transaction == created_transaction
 
 
@@ -293,16 +292,16 @@ class TestTransactionFind:
         response = client.get("/v1/transactions/find", params={"text": search_text, "case_sensitive": False})
 
         assert response.status_code == status.HTTP_200_OK
-        result = response.json()["result"]
+        result = response.json()
         assert result["total"] == 1
         transaction = TransactionSchema(**result["items"][0])
         assert transaction == created_transaction
         assert search_text in transaction.description
 
-    def test_empty_category_text(self, client: TestClient, created_user: UserSchema) -> None:  # noqa: ARG002
-        response = client.get("/v1/transactions/find", params={"text": ""})  # empty text
+    def test_empty_category_text(self, client: TestClient, created_user: UserSchema) -> None:
+        response = client.get("/v1/transactions/find", params={"text": ""})
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-        error = response.json()["error"]
+        error = response.json()
         assert error["type"] == "EmptySearchTextError"
         assert error["detail"] == "Search text cannot be empty"

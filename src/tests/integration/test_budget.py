@@ -1,3 +1,4 @@
+# ruff: noqa: ARG001, ARG002
 from typing import Any
 
 import pytest
@@ -23,14 +24,14 @@ def test_budget_not_exists(
     method: str,
     payload: dict[str, Any] | None,
     client: TestClient,
-    created_user: UserSchema,  # noqa: ARG001
+    created_user: UserSchema,
 ) -> None:
     non_existent_id = "12345"
 
     response = client.request(method=method, url=f"/v1/budgets/{non_existent_id}", json=payload)
 
     assert response.status_code == status.HTTP_404_NOT_FOUND
-    error = response.json()["error"]
+    error = response.json()
     assert error["type"] == "BudgetNotExistsError"
     assert error["detail"] == f"Budget with ID '{non_existent_id}' does not exist"
 
@@ -58,11 +59,11 @@ def test_budget_access_denied(
         method=method,
         url=f"/v1/budgets/{created_budget.id}",
         json=payload,
-        headers={"Authorization": another_token},  # <-- trying to get access by another user
+        headers={"Authorization": another_token},
     )
 
     assert response.status_code == status.HTTP_403_FORBIDDEN
-    error = response.json()["error"]
+    error = response.json()
     assert error["type"] == "BudgetAccessDeniedError"
     assert error["detail"] == "Attempt to access another user's budget"
 
@@ -75,14 +76,14 @@ class TestBudgetCreate:
         response = client.post(
             "/v1/budgets",
             json={
-                "name": "Cash",
-                "description": "A budget for tracking all cash transactions and managing daily expenses",
+                "name": name,
+                "description": description,
                 "amount": amount,
             },
         )
 
         assert response.status_code == status.HTTP_201_CREATED
-        result = response.json()["result"]
+        result = response.json()
         assert result["id"]
         assert result["name"] == name
         assert result["description"] == description
@@ -91,18 +92,18 @@ class TestBudgetCreate:
         assert result["created_at"]
         assert result["updated_at"]
 
-    def test_amount_must_be_positive(self, client: TestClient, created_user: UserSchema) -> None:  # noqa: ARG002
+    def test_amount_must_be_positive(self, client: TestClient, created_user: UserSchema) -> None:
         response = client.post(
             "/v1/budgets",
             json={
                 "name": fake.word(),
                 "description": fake.sentence(),
-                "amount": fake.pyfloat(positive=False),  # <-- negative
+                "amount": fake.pyfloat(positive=False),
             },
         )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-        error = response.json()["error"]
+        error = response.json()
         assert error["type"] == "AmountMustBePositiveError"
         assert error["detail"] == "Amount must be positive"
 
@@ -110,14 +111,14 @@ class TestBudgetCreate:
         response = client.post(
             "/v1/budgets",
             json={
-                "name": created_budget.name,  # <-- a second attempt to create budget with the same name
+                "name": created_budget.name,
                 "description": fake.sentence(),
                 "amount": fake.pyfloat(positive=True),
             },
         )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-        error = response.json()["error"]
+        error = response.json()
         assert error["type"] == "BudgetAlreadyExistsError"
         assert error["detail"] == f"A budget with the name '{created_budget.name}' already exists"
 
@@ -127,7 +128,7 @@ class TestBudgetGet:
         response = client.get(f"/v1/budgets/{created_budget.id}")
 
         assert response.status_code == status.HTTP_200_OK
-        result = response.json()["result"]
+        result = response.json()
         assert result["id"] == created_budget.id
         assert result["name"] == created_budget.name
         assert result["description"] == created_budget.description
@@ -138,7 +139,7 @@ class TestBudgetGet:
 
 
 class TestBudgetList:
-    def test_success(self, client: TestClient, created_user: UserSchema) -> None:  # noqa: ARG002
+    def test_success(self, client: TestClient, created_user: UserSchema) -> None:
         expected_budgets = [
             create_budget(
                 client=client, name=fake.word(), description=fake.sentence(), amount=fake.pyfloat(positive=True)
@@ -150,7 +151,7 @@ class TestBudgetList:
         response = client.get("/v1/budgets")
 
         assert response.status_code == status.HTTP_200_OK
-        result = response.json()["result"]
+        result = response.json()
         assert result["total"] == len(expected_budgets)
         budgets = result["items"]
         budgets_by_id = {budget["id"]: budget for budget in budgets}
@@ -166,12 +167,10 @@ class TestBudgetUpdate:
         response = client.patch(f"/v1/budgets/{created_budget.id}", json=updated_payload)
 
         assert response.status_code == status.HTTP_200_OK
-        result = response.json()["result"]
-        # without changes
+        result = response.json()
         assert result["id"] == created_budget.id
         assert result["user_id"] == created_user.id
         assert result["created_at"] == created_budget.created_at.strftime(ISO_TIMEZONE_FORMAT)
-        # changed
         assert result["name"] == updated_payload["name"]
         assert result["description"] == updated_payload["description"]
         assert result["amount"] == updated_payload["amount"]
@@ -183,12 +182,12 @@ class TestBudgetUpdate:
             json={
                 "name": "New Name",
                 "description": "New description",
-                "amount": -200,  # <-- negative
+                "amount": -200,
             },
         )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-        error = response.json()["error"]
+        error = response.json()
         assert error["type"] == "AmountMustBePositiveError"
         assert error["detail"] == "Amount must be positive"
 
@@ -198,13 +197,13 @@ class TestBudgetDelete:
         response = client.delete(f"/v1/budgets/{created_budget.id}")
 
         assert response.status_code == status.HTTP_200_OK
-        budget = BudgetSchema(**response.json()["result"])
+        budget = BudgetSchema(**response.json())
         assert budget == created_budget
 
 
 class TestBudgetFind:
     @pytest.mark.parametrize("search_in_name", [True, False])
-    def test_ok(self, search_in_name: bool, client: TestClient, created_user: UserSchema) -> None:  # noqa: ARG002, FBT001
+    def test_ok(self, client: TestClient, created_user: UserSchema, *, search_in_name: bool) -> None:
         search_text = "cash"
         created_budget = create_budget(
             client=client,
@@ -216,7 +215,7 @@ class TestBudgetFind:
         response = client.get("/v1/budgets/find", params={"text": search_text, "case_sensitive": False})
 
         assert response.status_code == status.HTTP_200_OK
-        result = response.json()["result"]
+        result = response.json()
         assert result["total"] == 1
         budget = BudgetSchema(**result["items"][0])
         assert budget == created_budget
@@ -225,10 +224,10 @@ class TestBudgetFind:
         else:
             assert search_text in budget.description
 
-    def test_empty_budget_text(self, client: TestClient, created_user: UserSchema) -> None:  # noqa: ARG002
-        response = client.get("/v1/budgets/find", params={"text": ""})  # empty text
+    def test_empty_budget_text(self, client: TestClient, created_user: UserSchema) -> None:
+        response = client.get("/v1/budgets/find", params={"text": ""})
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-        error = response.json()["error"]
+        error = response.json()
         assert error["type"] == "EmptySearchTextError"
         assert error["detail"] == "Search text cannot be empty"
