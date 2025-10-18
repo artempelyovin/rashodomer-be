@@ -12,7 +12,7 @@ from exceptions import (
 from models import TransactionSchema
 from repos.abc import CategoryRepo, Total, TransactionRepo
 from settings import settings
-from utils import utc_now
+from utils import UnsetValue
 
 
 class TransactionManager:
@@ -66,10 +66,10 @@ class TransactionManager:
         self,
         user_id: str,
         transaction_id: str,
-        amount: float,
-        description: str,
-        category_id: str,
-        timestamp: datetime,
+        amount: float | UnsetValue,
+        description: str | UnsetValue,
+        category_id: str | UnsetValue,
+        timestamp: datetime | UnsetValue,
     ) -> TransactionSchema:
         transaction = await self.transaction_repo.get(transaction_id)
         if not transaction:
@@ -77,19 +77,21 @@ class TransactionManager:
         if transaction.user_id != user_id:
             raise TransactionAccessDeniedError
 
-        if amount <= 0:
-            raise AmountMustBePositiveError
-        transaction.amount = amount
-        transaction.description = description
-        
-        category = await self.category_repo.get(category_id)
-        if not category:
-            raise CategoryNotExistsError(category_id=category_id)
-        if category.user_id != user_id:
-            raise CategoryAccessDeniedError
-        transaction.category_id = category_id
-        
-        transaction.timestamp = timestamp
+        if not isinstance(amount, UnsetValue):
+            if amount <= 0:
+                raise AmountMustBePositiveError
+            transaction.amount = amount
+        if not isinstance(description, UnsetValue):
+            transaction.description = description
+        if not isinstance(category_id, UnsetValue):
+            category = await self.category_repo.get(category_id)
+            if not category:
+                raise CategoryNotExistsError(category_id=category_id)
+            if category.user_id != user_id:
+                raise CategoryAccessDeniedError
+            transaction.category_id = category_id
+        if not isinstance(timestamp, UnsetValue):
+            transaction.timestamp = timestamp
         transaction.updated_at = datetime.now(tz=UTC)
         return await self.transaction_repo.update(transaction)
 

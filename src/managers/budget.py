@@ -10,6 +10,7 @@ from exceptions import (
 from models import BudgetSchema
 from repos.abc import BudgetRepo, Total
 from settings import settings
+from utils import UnsetValue
 
 
 class BudgetManager:
@@ -43,21 +44,24 @@ class BudgetManager:
         user_id: str,
         budget_id: str,
         *,
-        name: str,
-        description: str,
-        amount: float,
+        name: str | UnsetValue,
+        description: str | UnsetValue,
+        amount: float | UnsetValue,
     ) -> BudgetSchema:
         budget = await self.repo.get(budget_id)
         if not budget:
             raise BudgetNotExistsError(budget_id=budget_id)
         if budget.user_id != user_id:
             raise BudgetAccessDeniedError
-        if amount < 0:
+        if not isinstance(amount, UnsetValue) and amount < 0:
             raise AmountMustBePositiveError
 
-        budget.name = name
-        budget.description = description
-        budget.amount = amount
+        if not isinstance(name, UnsetValue):
+            budget.name = name
+        if not isinstance(description, UnsetValue):
+            budget.description = description
+        if not isinstance(amount, UnsetValue):
+            budget.amount = amount
         budget.updated_at = datetime.now(tz=UTC)
         return await self.repo.update(budget)
 

@@ -14,6 +14,7 @@ from exceptions import (
 from models import CategorySchema
 from repos.abc import CategoryRepo, Total
 from settings import settings
+from utils import UnsetValue
 
 
 class CategoryManager:
@@ -72,11 +73,11 @@ class CategoryManager:
         self,
         user_id: str,
         category_id: str,
-        name: str,
-        description: str,
-        category_type: CategoryType,
-        is_archived: bool,
-        emoji_icon: str | None,
+        name: str | UnsetValue,
+        description: str | UnsetValue,
+        category_type: CategoryType | UnsetValue,
+        is_archived: bool | UnsetValue,
+        emoji_icon: str | None | UnsetValue,
     ) -> CategorySchema:
         category = await self.repo.get(category_id)
         if not category:
@@ -84,11 +85,16 @@ class CategoryManager:
         if category.user_id != user_id:
             raise CategoryAccessDeniedError
 
-        category.name = name
-        category.description = description
-        category.type = category_type
-        category.is_archived = is_archived
-        category.emoji_icon = emoji_icon
+        if not isinstance(name, UnsetValue):
+            category.name = name
+        if not isinstance(description, UnsetValue):
+            category.description = description
+        if not isinstance(category_type, UnsetValue):
+            category.type = category_type
+        if not isinstance(is_archived, UnsetValue):
+            category.is_archived = is_archived
+        if not isinstance(emoji_icon, UnsetValue):
+            category.emoji_icon = emoji_icon
         category.updated_at = datetime.now(tz=UTC)
         return await self.repo.update(category)
         # тут логика по изменению бюджетов, при условии смены `category_type`
