@@ -39,47 +39,41 @@ async def list_budgets(request: Request, page: int = 1, limit: int = 1):
 
     pages = ceil(total / limit)
 
-    if len(budgets) == 0:
-        ui.label("У вас ещё нет бюджетов...")
-        ui.label("Самое время создать первый бюджет!")
-    else:
-        with ui.column():
-            for budget in budgets:
-                with ui.card():
-                    with ui.row():
-                        id_with_copy(budget.id)
-                        ui.button(
-                            icon="edit", on_click=lambda _, budget_id=budget.id: ui.navigate.to(f"/budgets/{budget_id}")
-                        )
-                        DeleteButtonWithConfirmation(
-                            icon="delete",
-                            dialog_text=f"Вы действительно хотите удалить бюджет {budget.name} ({budget.id})?",
-                            on_delete_callback=partial(confirm_deletion, user_id=user.id, budget_id=budget.id),
-                        )
-                    with ui.row():
-                        ui.label(budget.name).classes("text-xl font-bold")
-                        amount_with_gradient(budget.amount)
-                    ui.label(budget.description).classes("text-sm")
-                    with ui.row():
-                        with ui.column():
-                            ui.label("Дата создания")
-                            ui.label(budget.created_at).classes("text-sm")
-                        with ui.column():
-                            ui.label("Дата обновления")
-                            ui.label(budget.updated_at).classes("text-sm")
-        with ui.row():
-            ui.pagination(
-                min=1,
-                max=pages,
-                value=page,
-                direction_links=True,
-                on_change=lambda event: ui.navigate.to(f"/budgets?page={event.value}&limit={limit}"),
-            )
-            ui.select(
-                [1, 2, 5, 10],
-                value=limit,
-                on_change=lambda event: ui.navigate.to(f"/budgets?page=1&limit={event.value}"),
-            )
+    with ui.column():
+        for budget in budgets:
+            with ui.card():
+                with ui.row():
+                    id_with_copy(budget.id)
+                    ui.button(
+                        icon="edit", on_click=lambda _, budget_id=budget.id: ui.navigate.to(f"/budgets/{budget_id}")
+                    )
+                    DeleteButtonWithConfirmation(
+                        icon="delete",
+                        dialog_text=f"Вы действительно хотите удалить бюджет {budget.name} ({budget.id})?",
+                        on_delete_callback=partial(confirm_deletion, user_id=user.id, budget_id=budget.id),
+                    )
+                with ui.row():
+                    ui.label(budget.name).classes("text-xl font-bold")
+                    amount_with_gradient(budget.amount)
+                ui.label(budget.description).classes("text-sm")
+                with ui.row():
+                    with ui.column():
+                        ui.label("Дата создания")
+                        ui.label(budget.created_at).classes("text-sm")
+                    with ui.column():
+                        ui.label("Дата обновления")
+                        ui.label(budget.updated_at).classes("text-sm")
+    with ui.row():
+        ui.pagination(
+            min=1,
+            max=pages,
+            value=page,
+            direction_links=True,
+            on_change=lambda event: ui.navigate.to(f"/budgets?page={event.value}&limit={limit}"),
+        )
+        ui.select(
+            [1, 2, 5, 10], value=limit, on_change=lambda event: ui.navigate.to(f"/budgets?page=1&limit={event.value}")
+        )
     with ui.page_sticky(x_offset=18, y_offset=18):
         ui.button("+", on_click=lambda: ui.navigate.to("/budgets/new")).props("fab")
 
