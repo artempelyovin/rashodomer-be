@@ -8,7 +8,7 @@ from nicegui.elements.textarea import Textarea
 from starlette.requests import Request
 
 from managers.budget import BudgetManager
-from schemas.budget import CreateBudgetSchema
+from schemas.budget import CreateBudgetSchema, BudgetSchema
 from schemas.user import DetailedUserSchema
 from ui.components.buttons import DeleteButtonWithConfirmation
 from ui.components.labels import amount_with_gradient, id_with_copy
@@ -33,14 +33,8 @@ async def list_budgets(request: Request, page: int = 1, limit: int = 1):
             with ui.card():
                 with ui.row():
                     id_with_copy(budget.id)
-                    ui.button(
-                        icon="edit", on_click=lambda _, budget_id=budget.id: ui.navigate.to(f"/budgets/{budget_id}")
-                    )
-                    DeleteButtonWithConfirmation(
-                        icon="delete",
-                        dialog_text=f"Вы действительно хотите удалить бюджет {budget.name} ({budget.id})?",
-                        on_delete_callback=BudgetManager().delete(user_id=user.id, budget_id=budget.id),
-                    )
+                    ui.button(icon="edit", on_click=lambda _, budget_id=budget.id: ui.navigate.to(f"/budgets/{budget_id}"))
+                    DeleteButtonWithConfirmation(icon="delete", dialog_text=f"Вы действительно хотите удалить бюджет {budget.name} ({budget.id})?", on_delete_callback=BudgetManager().delete(user_id=user.id, budget_id=budget.id))
                 with ui.row():
                     ui.label(budget.name).classes("text-xl font-bold")
                     amount_with_gradient(budget.amount)
@@ -72,10 +66,7 @@ async def create_budgets(request: Request):
     async def validate_and_create(name: Input, description: Textarea, amount: Number) -> None:
         if not name.value:
             return ui.notify("Заполните название", type="negative")
-        await BudgetManager().create(
-            user_id=user.id,
-            data=CreateBudgetSchema(name=name.value, description=description.value, amount=amount.value),
-        )
+        await BudgetManager().create(user_id=user.id, data=CreateBudgetSchema(name=name.value, description=description.value, amount=amount.value))
         ui.navigate.to("/budgets")
 
     ui.label("Создание нового бюджета")
@@ -95,9 +86,7 @@ async def update_budget(request: Request, budget_id: str):
     async def validate_and_save(name: Input, description: Textarea, amount: Number) -> None:
         if not name.value:
             return ui.notify("Заполните название", type="negative")
-        await BudgetManager().update(
-            user_id=user.id, budget_id=budget.id, name=name.value, description=description.value, amount=amount.value
-        )
+        await BudgetManager().update(user_id=user.id, budget_id=budget.id, name=name.value, description=description.value, amount=amount.value)
         ui.navigate.to("/budgets")
 
     with ui.row():
@@ -108,3 +97,5 @@ async def update_budget(request: Request, budget_id: str):
     description = ui.textarea("Описание", value=budget.description)
     amount = ui.number("Сумма", value=budget.amount, precision=5)
     ui.button("Сохранить", on_click=lambda _: validate_and_save(name=name, description=description, amount=amount))
+
+
