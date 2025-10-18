@@ -50,7 +50,7 @@ async def list_budgets(request: Request, page: int = 1, limit: int = 1):
                     DeleteButtonWithConfirmation(
                         icon="delete",
                         dialog_text=f"Вы действительно хотите удалить бюджет {budget.name} ({budget.id})?",
-                        on_delete_callback=partial(confirm_deletion, user_id=user.id, budget_id=budget.id),
+                        on_delete_callback=partial(confirm_deletion, user_id=user.id, budget_id=budget.id)
                     )
                 with ui.row():
                     ui.label(budget.name).classes("text-xl font-bold")
@@ -74,8 +74,6 @@ async def list_budgets(request: Request, page: int = 1, limit: int = 1):
         ui.select(
             [1, 2, 5, 10], value=limit, on_change=lambda event: ui.navigate.to(f"/budgets?page=1&limit={event.value}")
         )
-    with ui.page_sticky(x_offset=18, y_offset=18):
-        ui.button("+", on_click=lambda: ui.navigate.to("/budgets/new")).props("fab")
 
 
 @router.page("/budgets/new")
@@ -91,9 +89,7 @@ async def create_budgets(request: Request):
         )
         ui.navigate.to("/budgets")
 
-    with ui.row():
-        ui.button(icon="arrow_back", on_click=ui.navigate.back)
-        ui.label("Создание нового бюджета")
+    ui.label("Создание нового бюджета")
     name = ui.input("Название*")
     description = ui.textarea("Описание")
     amount = ui.number("Сумма", value=0.0, precision=5)
