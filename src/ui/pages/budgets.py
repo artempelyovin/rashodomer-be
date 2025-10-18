@@ -22,7 +22,11 @@ router = APIRouter()
 @router.page("/budgets")
 async def list_budgets(request: Request, page: int = 1, limit: int = 1):
     async def confirm_deletion(user_id: str, budget_id: str) -> None:
-        await BudgetManager().delete(user_id=user_id, budget_id=budget_id)
+        try:
+            await BudgetManager().delete(user_id=user_id, budget_id=budget_id)
+        except BaseCoreError as e:
+            ui.notify(e.message(), type="negative")
+            return
         logger.info(f"Succeseful delete budget {budget_id} for user {user_id}")
         ui.navigate.to("/budgets")
 
