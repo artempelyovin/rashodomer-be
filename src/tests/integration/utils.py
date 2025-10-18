@@ -19,7 +19,7 @@ def register(client: TestClient, first_name: str, last_name: str, login: str, pa
     assert (
         response.status_code == status.HTTP_201_CREATED
     ), f"Register error ({response.status_code} status code): {response.text}"
-    return UserSchema(**response.json()["result"])
+    return UserSchema(**response.json())
 
 
 def authenticate(client: TestClient, login: str, password: str) -> str:
@@ -27,7 +27,7 @@ def authenticate(client: TestClient, login: str, password: str) -> str:
     assert (
         response.status_code == status.HTTP_200_OK
     ), f"Authenticate error ({response.status_code} status code): {response.text}"
-    return TokenSchema(**response.json()["result"]).token
+    return TokenSchema(**response.json()).token
 
 
 def register_and_authenticate(
@@ -47,7 +47,7 @@ def create_budget(
     assert (
         response.status_code == status.HTTP_201_CREATED
     ), f"Create budget error ({response.status_code} status code): {response.text}"
-    return BudgetSchema(**response.json()["result"])
+    return BudgetSchema(**response.json())
 
 
 def create_category(
@@ -66,7 +66,7 @@ def create_category(
     assert (
         response.status_code == status.HTTP_201_CREATED
     ), f"Create category error ({response.status_code} status code): {response.text}"
-    return CategorySchema(**response.json()["result"])
+    return CategorySchema(**response.json())
 
 
 def create_transaction(
@@ -90,4 +90,4 @@ def create_transaction(
     assert (
         response.status_code == status.HTTP_201_CREATED
     ), f"Create transaction error ({response.status_code} status code): {response.text}"
-    return TransactionSchema(**response.json()["result"])
+    return TransactionSchema(**response.json())

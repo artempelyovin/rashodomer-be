@@ -5,7 +5,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, Path, Query
 from starlette import status
 
-from base import APIResponse, APIResponseList, write_response, write_response_list
+from base import ListSchema, write_response_list
 from depends import authentication_user, category_repo_factory
 from enums import CategoryType
 from managers.category import CategoryManager
@@ -31,10 +31,9 @@ async def create_category(
     *,
     user: DetailedUserSchema = Depends(authentication_user),
     category_repo: CategoryRepo = Depends(category_repo_factory),
-) -> APIResponse[CategorySchema]:
+) -> CategorySchema:
     manager = CategoryManager(category_repo=category_repo)
-    category = await manager.create(user_id=user.id, data=body)
-    return write_response(result=category, schema=CategorySchema, status_code=status.HTTP_201_CREATED)
+    return await manager.create(user_id=user.id, data=body)
 
 
 @router.get(
@@ -52,7 +51,7 @@ async def list_categories(
     *,
     user: DetailedUserSchema = Depends(authentication_user),
     category_repo: CategoryRepo = Depends(category_repo_factory),
-) -> APIResponseList[CategorySchema]:
+) -> ListSchema[CategorySchema]:
     manager = CategoryManager(category_repo=category_repo)
     total, categories = await manager.list_(
         user_id=user.id, category_type=category_type, limit=limit, show_archived=show_archived, offset=offset
@@ -75,7 +74,7 @@ async def find_categories(
     *,
     user: DetailedUserSchema = Depends(authentication_user),
     category_repo: CategoryRepo = Depends(category_repo_factory),
-) -> APIResponseList[CategorySchema]:
+) -> ListSchema[CategorySchema]:
     manager = CategoryManager(category_repo=category_repo)
     total, categories = await manager.find(
         user_id=user.id, text=text, case_sensitive=case_sensitive, limit=limit, offset=offset
@@ -95,10 +94,9 @@ async def get_category(
     *,
     user: DetailedUserSchema = Depends(authentication_user),
     category_repo: CategoryRepo = Depends(category_repo_factory),
-) -> APIResponse[CategorySchema]:
+) -> CategorySchema:
     manager = CategoryManager(category_repo=category_repo)
-    category = await manager.get(user_id=user.id, category_id=category_id)
-    return write_response(result=category, schema=CategorySchema)
+    return await manager.get(user_id=user.id, category_id=category_id)
 
 
 @router.patch(
@@ -114,11 +112,11 @@ async def update_category(
     *,
     user: DetailedUserSchema = Depends(authentication_user),
     category_repo: CategoryRepo = Depends(category_repo_factory),
-) -> APIResponse[CategorySchema]:
+) -> CategorySchema:
     params = body.model_dump(exclude_unset=True)
 
     manager = CategoryManager(category_repo=category_repo)
-    category = await manager.update(
+    return await manager.update(
         user_id=user.id,
         category_id=category_id,
         name=params.get("name", UNSET),
@@ -127,7 +125,6 @@ async def update_category(
         is_archived=params.get("is_archived", UNSET),
         emoji_icon=params.get("emoji_icon", UNSET),
     )
-    return write_response(result=category, schema=CategorySchema)
 
 
 @router.delete(
@@ -142,7 +139,6 @@ async def delete_categories(
     *,
     user: DetailedUserSchema = Depends(authentication_user),
     category_repo: CategoryRepo = Depends(category_repo_factory),
-) -> APIResponse[CategorySchema]:
+) -> CategorySchema:
     manager = CategoryManager(category_repo=category_repo)
-    category = await manager.delete(user_id=user.id, category_id=category_id)
-    return write_response(result=category, schema=CategorySchema)
+    return await manager.delete(user_id=user.id, category_id=category_id)
