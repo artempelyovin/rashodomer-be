@@ -17,6 +17,7 @@ def fake_budget() -> BudgetSchema:
         description=fake.sentence(),
         amount=fake.pyfloat(positive=True),
         user_id=str(fake.uuid4()),
+        emoji_icon=fake.random_element([None, fake.emoji()]),
     )
 
 

@@ -38,7 +38,11 @@ def created_user(client: TestClient) -> UserSchema:
 @pytest.fixture
 def created_budget(client: TestClient, created_user: UserSchema) -> BudgetSchema:
     return create_budget(
-        client=client, name=fake.word(), description=fake.sentence(), amount=fake.pyfloat(positive=True)
+        client=client,
+        name=fake.word(),
+        description=fake.sentence(),
+        amount=fake.pyfloat(positive=True),
+        emoji_icon=fake.random_element([None, fake.emoji()]),
     )
 
 

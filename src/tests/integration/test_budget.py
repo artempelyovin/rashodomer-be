@@ -16,7 +16,7 @@ from tests.integration.utils import create_budget, register_and_authenticate
     ("method", "payload"),
     [
         ("GET", None),
-        ("PATCH", {"name": "New Name", "description": "New description", "amount": 400}),
+        ("PATCH", {"name": "New Name", "description": "New description", "amount": 400, "emoji_icon": "💵"}),
         ("DELETE", None),
     ],
 )
@@ -40,7 +40,7 @@ def test_budget_not_exists(
     ("method", "payload"),
     [
         ("GET", None),
-        ("PATCH", {"name": "New Name", "description": "New description", "amount": 400}),
+        ("PATCH", {"name": "New Name", "description": "New description", "amount": 400, "emoji_icon": "💵"}),
         ("DELETE", None),
     ],
 )
@@ -69,18 +69,18 @@ def test_budget_access_denied(
 
 
 class TestBudgetCreate:
-    def test_ok(self, client: TestClient, created_user: UserSchema) -> None:
+    @pytest.mark.parametrize("emoji_icon", ["💵", None])
+    def test_ok(self, client: TestClient, created_user: UserSchema, emoji_icon: str | None) -> None:
         name = "Cash"
         description = "A budget for tracking all cash transactions and managing daily expenses"
         amount = 100
-        response = client.post(
-            "/v1/budgets",
-            json={
-                "name": name,
-                "description": description,
-                "amount": amount,
-            },
-        )
+        payload = {
+            "name": name,
+            "description": description,
+            "amount": amount,
+            "emoji_icon": emoji_icon,
+        }
+        response = client.post("/v1/budgets", json=payload)
 
         assert response.status_code == status.HTTP_201_CREATED
         result = response.json()
@@ -88,6 +88,7 @@ class TestBudgetCreate:
         assert result["name"] == name
         assert result["description"] == description
         assert result["amount"] == amount
+        assert result["emoji_icon"] == emoji_icon
         assert result["user_id"] == created_user.id
         assert result["created_at"]
         assert result["updated_at"]
@@ -99,6 +100,7 @@ class TestBudgetCreate:
                 "name": fake.word(),
                 "description": fake.sentence(),
                 "amount": fake.pyfloat(positive=False),
+                "emoji_icon": fake.random_element([None, fake.emoji()]),
             },
         )
 
@@ -107,6 +109,23 @@ class TestBudgetCreate:
         assert error["type"] == "AmountMustBePositiveError"
         assert error["detail"] == "Amount must be positive"
 
+    @pytest.mark.parametrize("bad_emoji_icon", ["🍿s", "not emoji", "s", ""])
+    def test_not_emoji_icon(self, bad_emoji_icon: str, client: TestClient, created_user: UserSchema) -> None:
+        response = client.post(
+            "/v1/budgets",
+            json={
+                "name": fake.word(),
+                "description": fake.sentence(),
+                "amount": fake.pyfloat(positive=True),
+                "emoji_icon": bad_emoji_icon,
+            },
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        error = response.json()
+        assert error["type"] == "NotEmojiIconError"
+        assert error["detail"] == f"The provided icon in text format '{bad_emoji_icon}' is not a valid emoji"
+
     def test_budget_already_exists(self, client: TestClient, created_budget: BudgetSchema) -> None:
         response = client.post(
             "/v1/budgets",
@@ -114,6 +133,7 @@ class TestBudgetCreate:
                 "name": created_budget.name,
                 "description": fake.sentence(),
                 "amount": fake.pyfloat(positive=True),
+                "emoji_icon": fake.random_element([None, fake.emoji()]),
             },
         )
 
@@ -133,6 +153,7 @@ class TestBudgetGet:
         assert result["name"] == created_budget.name
         assert result["description"] == created_budget.description
         assert result["amount"] == created_budget.amount
+        assert result["emoji_icon"] == created_budget.emoji_icon
         assert result["user_id"] == created_user.id
         assert result["created_at"] == created_budget.created_at.strftime(ISO_TIMEZONE_FORMAT)
         assert result["updated_at"] == created_budget.updated_at.strftime(ISO_TIMEZONE_FORMAT)
@@ -142,7 +163,11 @@ class TestBudgetList:
     def test_success(self, client: TestClient, created_user: UserSchema) -> None:
         expected_budgets = [
             create_budget(
-                client=client, name=fake.word(), description=fake.sentence(), amount=fake.pyfloat(positive=True)
+                client=client,
+                name=fake.word(),
+                description=fake.sentence(),
+                amount=fake.pyfloat(positive=True),
+                emoji_icon=fake.random_element([None, fake.emoji()]),
             )
             for _ in range(3)
         ]
@@ -162,7 +187,12 @@ class TestBudgetList:
 
 class TestBudgetUpdate:
     def test_ok(self, client: TestClient, created_budget: BudgetSchema, created_user: UserSchema) -> None:
-        updated_payload = {"name": "New Name", "description": "New description", "amount": 400}
+        updated_payload = {
+            "name": "New Name",
+            "description": "New description",
+            "amount": 400,
+            "emoji_icon": fake.random_element([None, fake.emoji()]),
+        }
 
         response = client.patch(f"/v1/budgets/{created_budget.id}", json=updated_payload)
 
@@ -174,6 +204,7 @@ class TestBudgetUpdate:
         assert result["name"] == updated_payload["name"]
         assert result["description"] == updated_payload["description"]
         assert result["amount"] == updated_payload["amount"]
+        assert result["emoji_icon"] == updated_payload["emoji_icon"]
         assert result["updated_at"] != created_budget.updated_at.strftime(ISO_TIMEZONE_FORMAT)
 
     def test_amount_must_be_positive(self, client: TestClient, created_budget: BudgetSchema) -> None:
@@ -183,6 +214,7 @@ class TestBudgetUpdate:
                 "name": "New Name",
                 "description": "New description",
                 "amount": -200,
+                "emoji_icon": fake.random_element([None, fake.emoji()]),
             },
         )
 
@@ -190,6 +222,23 @@ class TestBudgetUpdate:
         error = response.json()
         assert error["type"] == "AmountMustBePositiveError"
         assert error["detail"] == "Amount must be positive"
+
+    @pytest.mark.parametrize("bad_emoji_icon", ["🍿s", "not emoji", "s", ""])
+    def test_not_emoji_icon(self, bad_emoji_icon: str, client: TestClient, created_budget: BudgetSchema) -> None:
+        response = client.patch(
+            f"/v1/budgets/{created_budget.id}",
+            json={
+                "name": "New Name",
+                "description": "New description",
+                "amount": 400,
+                "emoji_icon": bad_emoji_icon,
+            },
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        error = response.json()
+        assert error["type"] == "NotEmojiIconError"
+        assert error["detail"] == f"The provided icon in text format '{bad_emoji_icon}' is not a valid emoji"
 
 
 class TestBudgetDelete:
@@ -210,6 +259,7 @@ class TestBudgetFind:
             name=f"my {search_text}" if search_in_name else "some budget",
             description="some description" if search_in_name else f"description with {search_text}",
             amount=700,
+            emoji_icon=fake.random_element([None, fake.emoji()]),
         )
 
         response = client.get("/v1/budgets/find", params={"text": search_text, "case_sensitive": False})

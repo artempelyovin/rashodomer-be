@@ -39,10 +39,17 @@ def register_and_authenticate(
 
 
 def create_budget(
-    client: TestClient, name: str, description: str, amount: float, headers: dict[str, str] | None = None
+    client: TestClient,
+    name: str,
+    description: str,
+    amount: float,
+    emoji_icon: str | None,
+    headers: dict[str, str] | None = None,
 ) -> BudgetSchema:
     response = client.post(
-        "/v1/budgets", json={"name": name, "description": description, "amount": amount}, headers=headers
+        "/v1/budgets",
+        json={"name": name, "description": description, "amount": amount, "emoji_icon": emoji_icon},
+        headers=headers,
     )
     assert response.status_code == status.HTTP_201_CREATED, (
         f"Create budget error ({response.status_code} status code): {response.text}"

@@ -231,10 +231,7 @@ class TestTransactionUpdate:
     def test_category_not_found(self, client: TestClient, created_transaction: TransactionSchema) -> None:
         non_existent_id = "f5f1f06b-2675-4510-95ce-e21d48d14e3b"
 
-        response = client.patch(
-            f"/v1/transactions/{created_transaction.id}",
-            json={"category_id": non_existent_id}
-        )
+        response = client.patch(f"/v1/transactions/{created_transaction.id}", json={"category_id": non_existent_id})
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
         error = response.json()

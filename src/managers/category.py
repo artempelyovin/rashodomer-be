@@ -70,6 +70,8 @@ class CategoryManager:
         if "is_archived" in params.model_fields_set and params.is_archived is not None:
             category.is_archived = params.is_archived
         if "emoji_icon" in params.model_fields_set:
+            if params.emoji_icon is not None and not emoji.is_emoji(params.emoji_icon):
+                raise NotEmojiIconError(emoji_icon=params.emoji_icon)
             category.emoji_icon = params.emoji_icon
         category.updated_at = datetime.now(tz=UTC)
         return await self.repo.update(category)

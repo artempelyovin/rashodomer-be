@@ -1,11 +1,14 @@
 from datetime import UTC, datetime
 
+import emoji
+
 from exceptions import (
     AmountMustBePositiveError,
     BudgetAccessDeniedError,
     BudgetAlreadyExistsError,
     BudgetNotExistsError,
     EmptySearchTextError,
+    NotEmojiIconError,
 )
 from repos.abc import BudgetRepo, Total
 from schemas.budget import BudgetSchema, CreateBudgetSchema, UpdateBudgetSchema
@@ -21,7 +24,15 @@ class BudgetManager:
         _, exist_budgets = await self.repo.find_by_name(user_id=user_id, name=data.name)
         if exist_budgets:
             raise BudgetAlreadyExistsError(name=data.name)
-        budget = BudgetSchema(name=data.name, description=data.description, amount=data.amount, user_id=user_id)
+        if data.emoji_icon is not None and not emoji.is_emoji(data.emoji_icon):
+            raise NotEmojiIconError(emoji_icon=data.emoji_icon)
+        budget = BudgetSchema(
+            name=data.name,
+            description=data.description,
+            amount=data.amount,
+            emoji_icon=data.emoji_icon,
+            user_id=user_id,
+        )
         return await self.repo.add(budget)
 
     async def get(self, user_id: str, budget_id: str) -> BudgetSchema:
@@ -50,6 +61,10 @@ class BudgetManager:
             budget.description = params.description
         if "amount" in params.model_fields_set and params.amount is not None:
             budget.amount = params.amount
+        if "emoji_icon" in params.model_fields_set:
+            if params.emoji_icon is not None and not emoji.is_emoji(params.emoji_icon):
+                raise NotEmojiIconError(emoji_icon=params.emoji_icon)
+            budget.emoji_icon = params.emoji_icon
         budget.updated_at = datetime.now(tz=UTC)
         return await self.repo.update(budget)
 

@@ -230,6 +230,23 @@ class TestCategoryUpdate:
         assert result["is_archived"] == updated_payload["is_archived"]
         assert result["updated_at"] != created_category.updated_at.strftime(ISO_TIMEZONE_FORMAT)
 
+    @pytest.mark.parametrize("bad_emoji_icon", ["🍿s", "not emoji", "s", ""])
+    def test_not_emoji_icon(self, bad_emoji_icon: str, client: TestClient, created_category: CategorySchema) -> None:
+        updated_payload = {
+            "name": "New Name",
+            "description": "New description",
+            "type": fake.random_element(list(CategoryType)).name,
+            "emoji_icon": bad_emoji_icon,
+            "is_archived": fake.pybool(),
+        }
+
+        response = client.patch(f"/v1/categories/{created_category.id}", json=updated_payload)
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        error = response.json()
+        assert error["type"] == "NotEmojiIconError"
+        assert error["detail"] == f"The provided icon in text format '{bad_emoji_icon}' is not a valid emoji"
+
 
 class TestCategoryDelete:
     def test_ok(self, client: TestClient, created_category: CategorySchema) -> None:
