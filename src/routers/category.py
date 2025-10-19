@@ -11,7 +11,6 @@ from managers.category import CategoryManager
 from repos.abc import CategoryRepo
 from schemas.category import CategorySchema, CreateCategorySchema, UpdateCategorySchema
 from schemas.user import DetailedUserSchema
-from utils import UNSET
 
 router = APIRouter()
 
@@ -112,18 +111,8 @@ async def update_category(
     user: Annotated[DetailedUserSchema, Depends(authentication_user)],
     category_repo: Annotated[CategoryRepo, Depends(category_repo_factory)],
 ) -> CategorySchema:
-    params = body.model_dump(exclude_unset=True)
-
     manager = CategoryManager(category_repo=category_repo)
-    return await manager.update(
-        user_id=user.id,
-        category_id=category_id,
-        name=params.get("name", UNSET),
-        description=params.get("description", UNSET),
-        category_type=params.get("type", UNSET),
-        is_archived=params.get("is_archived", UNSET),
-        emoji_icon=params.get("emoji_icon", UNSET),
-    )
+    return await manager.update(user_id=user.id, category_id=category_id, params=body)
 
 
 @router.delete(

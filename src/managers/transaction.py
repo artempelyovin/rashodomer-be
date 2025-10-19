@@ -10,8 +10,7 @@ from exceptions import (
     TransactionNotExistsError,
 )
 from repos.abc import CategoryRepo, Total, TransactionRepo
-from schemas.transaction import CreateTransactionSchema, TransactionSchema
-from utils import UnsetValue
+from schemas.transaction import CreateTransactionSchema, TransactionSchema, UpdateTransactionSchema
 
 
 class TransactionManager:
@@ -50,36 +49,28 @@ class TransactionManager:
     async def list_(self, user_id: str, *, limit: int | None, offset: int) -> tuple[Total, list[TransactionSchema]]:
         return await self.transaction_repo.list_(user_id=user_id, limit=limit, offset=offset)
 
-    async def update(
-        self,
-        user_id: str,
-        transaction_id: str,
-        amount: float | UnsetValue,
-        description: str | UnsetValue,
-        category_id: str | UnsetValue,
-        timestamp: datetime | UnsetValue,
-    ) -> TransactionSchema:
+    async def update(self, user_id: str, transaction_id: str, params: UpdateTransactionSchema) -> TransactionSchema:
         transaction = await self.transaction_repo.get(transaction_id)
         if not transaction:
             raise TransactionNotExistsError(transaction_id=transaction_id)
         if transaction.user_id != user_id:
             raise TransactionAccessDeniedError
 
-        if not isinstance(amount, UnsetValue):
-            if amount <= 0:
+        if "amount" in params.model_fields_set and params.amount is not None:
+            if params.amount <= 0:
                 raise AmountMustBePositiveError
-            transaction.amount = amount
-        if not isinstance(description, UnsetValue):
-            transaction.description = description
-        if not isinstance(category_id, UnsetValue):
-            category = await self.category_repo.get(category_id)
+            transaction.amount = params.amount
+        if "description" in params.model_fields_set and params.description is not None:
+            transaction.description = params.description
+        if "category_id" in params.model_fields_set and params.category_id is not None:
+            category = await self.category_repo.get(params.category_id)
             if not category:
-                raise CategoryNotExistsError(category_id=category_id)
+                raise CategoryNotExistsError(category_id=params.category_id)
             if category.user_id != user_id:
                 raise CategoryAccessDeniedError
-            transaction.category_id = category_id
-        if not isinstance(timestamp, UnsetValue):
-            transaction.timestamp = timestamp
+            transaction.category_id = params.category_id
+        if "timestamp" in params.model_fields_set and params.timestamp is not None:
+            transaction.timestamp = params.timestamp
         transaction.updated_at = datetime.now(tz=UTC)
         return await self.transaction_repo.update(transaction)
 

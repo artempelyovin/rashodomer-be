@@ -10,7 +10,6 @@ from managers.budget import BudgetManager
 from repos.abc import BudgetRepo
 from schemas.budget import BudgetSchema, CreateBudgetSchema, UpdateBudgetSchema
 from schemas.user import DetailedUserSchema
-from utils import UNSET
 
 router = APIRouter()
 
@@ -107,15 +106,8 @@ async def update_budget(
     user: Annotated[DetailedUserSchema, Depends(authentication_user)],
     budget_repo: Annotated[BudgetRepo, Depends(budget_repo_factory)],
 ) -> BudgetSchema:
-    params = body.model_dump(exclude_unset=True)
     manager = BudgetManager(budget_repo=budget_repo)
-    return await manager.update(
-        user_id=user.id,
-        budget_id=budget_id,
-        name=params.get("name", UNSET),
-        description=params.get("description", UNSET),
-        amount=params.get("amount", UNSET),
-    )
+    return await manager.update(user_id=user.id, budget_id=budget_id, params=body)
 
 
 @router.delete(

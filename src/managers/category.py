@@ -12,8 +12,7 @@ from exceptions import (
     NotEmojiIconError,
 )
 from repos.abc import CategoryRepo, Total
-from schemas.category import CategorySchema, CreateCategorySchema
-from utils import UnsetValue
+from schemas.category import CategorySchema, CreateCategorySchema, UpdateCategorySchema
 
 
 class CategoryManager:
@@ -55,33 +54,23 @@ class CategoryManager:
             user_id=user_id, category_type=category_type, show_archived=show_archived, limit=limit, offset=offset
         )
 
-    async def update(
-        self,
-        user_id: str,
-        category_id: str,
-        name: str | UnsetValue,
-        description: str | UnsetValue,
-        category_type: CategoryType | UnsetValue,
-        emoji_icon: str | None | UnsetValue,
-        *,
-        is_archived: bool | UnsetValue,
-    ) -> CategorySchema:
+    async def update(self, user_id: str, category_id: str, params: UpdateCategorySchema) -> CategorySchema:
         category = await self.repo.get(category_id)
         if not category:
             raise CategoryNotExistsError(category_id=category_id)
         if category.user_id != user_id:
             raise CategoryAccessDeniedError
 
-        if not isinstance(name, UnsetValue):
-            category.name = name
-        if not isinstance(description, UnsetValue):
-            category.description = description
-        if not isinstance(category_type, UnsetValue):
-            category.type = category_type
-        if not isinstance(is_archived, UnsetValue):
-            category.is_archived = is_archived
-        if not isinstance(emoji_icon, UnsetValue):
-            category.emoji_icon = emoji_icon
+        if "name" in params.model_fields_set and params.name is not None:
+            category.name = params.name
+        if "description" in params.model_fields_set and params.description is not None:
+            category.description = params.description
+        if "type" in params.model_fields_set and params.type is not None:
+            category.type = params.type
+        if "is_archived" in params.model_fields_set and params.is_archived is not None:
+            category.is_archived = params.is_archived
+        if "emoji_icon" in params.model_fields_set:
+            category.emoji_icon = params.emoji_icon
         category.updated_at = datetime.now(tz=UTC)
         return await self.repo.update(category)
         # тут логика по изменению бюджетов, при условии смены `category_type`
