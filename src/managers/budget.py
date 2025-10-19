@@ -8,8 +8,7 @@ from exceptions import (
     EmptySearchTextError,
 )
 from repos.abc import BudgetRepo, Total
-from schemas.budget import BudgetSchema, CreateBudgetSchema
-from utils import UnsetValue
+from schemas.budget import BudgetSchema, CreateBudgetSchema, UpdateBudgetSchema
 
 
 class BudgetManager:
@@ -36,29 +35,21 @@ class BudgetManager:
     async def list_(self, user_id: str, limit: int | None, offset: int) -> tuple[Total, list[BudgetSchema]]:
         return await self.repo.list_(user_id=user_id, limit=limit, offset=offset)
 
-    async def update(
-        self,
-        user_id: str,
-        budget_id: str,
-        *,
-        name: str | UnsetValue,
-        description: str | UnsetValue,
-        amount: float | UnsetValue,
-    ) -> BudgetSchema:
+    async def update(self, user_id: str, budget_id: str, params: UpdateBudgetSchema) -> BudgetSchema:
         budget = await self.repo.get(budget_id)
         if not budget:
             raise BudgetNotExistsError(budget_id=budget_id)
         if budget.user_id != user_id:
             raise BudgetAccessDeniedError
-        if not isinstance(amount, UnsetValue) and amount < 0:
+        if "amount" in params.model_fields_set and params.amount is not None and params.amount < 0:
             raise AmountMustBePositiveError
 
-        if not isinstance(name, UnsetValue):
-            budget.name = name
-        if not isinstance(description, UnsetValue):
-            budget.description = description
-        if not isinstance(amount, UnsetValue):
-            budget.amount = amount
+        if "name" in params.model_fields_set and params.name is not None:
+            budget.name = params.name
+        if "description" in params.model_fields_set and params.description is not None:
+            budget.description = params.description
+        if "amount" in params.model_fields_set and params.amount is not None:
+            budget.amount = params.amount
         budget.updated_at = datetime.now(tz=UTC)
         return await self.repo.update(budget)
 

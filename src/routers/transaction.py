@@ -10,7 +10,6 @@ from managers.transaction import TransactionManager
 from repos.abc import CategoryRepo, TransactionRepo
 from schemas.transaction import CreateTransactionSchema, TransactionSchema, UpdateTransactionSchema
 from schemas.user import DetailedUserSchema
-from utils import UNSET
 
 router = APIRouter()
 
@@ -112,17 +111,8 @@ async def update_transaction(
     transaction_repo: Annotated[TransactionRepo, Depends(transaction_repo_factory)],
     category_repo: Annotated[CategoryRepo, Depends(category_repo_factory)],
 ) -> TransactionSchema:
-    params = body.model_dump(exclude_unset=True)
-
     manager = TransactionManager(transaction_repo=transaction_repo, category_repo=category_repo)
-    return await manager.update(
-        user_id=user.id,
-        transaction_id=transaction_id,
-        amount=params.get("amount", UNSET),
-        description=params.get("description", UNSET),
-        category_id=params.get("category_id", UNSET),
-        timestamp=params.get("timestamp", UNSET),
-    )
+    return await manager.update(user_id=user.id, transaction_id=transaction_id, params=body)
 
 
 @router.delete(
