@@ -62,7 +62,7 @@ async def list_transactions(
     tags=[TRANSACTION_TAG],
 )
 async def find_transactions(
-    text: Annotated[str, Query(description="Search text", example="Cash")],
+    text: Annotated[str, Query(description="Search text", examples=["Buy a car"])],
     case_sensitive: Annotated[bool, Query(description="Case sensitive when searching")] = False,  # noqa: FBT002
     limit: Annotated[int | None, Query(description="Number of transactions to return")] = None,
     offset: Annotated[int, Query(description="Offset of the transactions to return")] = 0,

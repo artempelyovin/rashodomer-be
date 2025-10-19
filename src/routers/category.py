@@ -65,7 +65,7 @@ async def list_categories(
     tags=[CATEGORY_TAG],
 )
 async def find_categories(
-    text: Annotated[str, Query(description="Search text", example="Cash")],
+    text: Annotated[str, Query(description="Search text", example=["Food"])],
     case_sensitive: Annotated[bool, Query(description="Case sensitive when searching")] = False,  # noqa: FBT002
     limit: Annotated[int | None, Query(description="Number of categories to return")] = None,
     offset: Annotated[int, Query(description="Offset of the categories to return")] = 0,
