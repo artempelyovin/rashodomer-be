@@ -1,11 +1,9 @@
 from datetime import datetime
-from typing import Annotated
-from uuid import UUID
 
 from pydantic import Field
 
 from base import CustomModel
-from utils import utc_now, uuid4_str
+from utils import UUID4Str, utc_now, uuid4_str
 
 IdDesc = "Unique ID of the user"
 FirstNameDesc = "User's first name for personalization"
@@ -23,7 +21,7 @@ LastLoginDesc = "Date when user was last login"
 
 
 class UserSchema(CustomModel):
-    id: Annotated[str, UUID] = Field(default_factory=uuid4_str, description=IdDesc)
+    id: UUID4Str = Field(default_factory=uuid4_str, description=IdDesc)
     first_name: str = Field(..., description=FirstNameDesc, examples=FirstNameExamples)
     last_name: str = Field(..., description=LastNameDesc, examples=LastNameExamples)
     login: str = Field(..., description=LoginDesc, examples=LoginExamples)
