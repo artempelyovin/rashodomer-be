@@ -40,3 +40,38 @@ jobs:
 
       - name: Run integration tests
         run: uv run pytest src/tests/integration -v
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            apt update -y
+            apt install -y git curl
+            
+            if [ ! -d "/var/rashodomer-be/.git" ]; then
+              git clone https://github.com/artempelyovin/rashodomer-be.git /var/rashodomer-be
+            fi
+            
+            if ! command -v uv &> /dev/null; then
+                curl -LsSf https://astral.sh/uv/install.sh | sh
+            fi
+            
+            # add uv to PATH
+            export PATH="$HOME/.local/bin:$PATH"
+            
+            cd /var/rashodomer-be
+            git pull origin master
+            
+            if ! uv python list | grep -q "3.13"; then
+              uv python install 3.13
+            fi
+            
+            if [ ! -d ".venv" ]; then
+              uv venv
+            fi
+            uv sync --no-dev
+            sudo systemctl restart rashodomer
+            exit 0
