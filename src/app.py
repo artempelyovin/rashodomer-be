@@ -9,6 +9,7 @@ from routers.auth import router as auth_router
 from routers.budget import router as budget_router
 from routers.category import router as category_router
 from routers.transaction import router as transaction_router
+from utils import get_version
 
 
 def exception_handler(_: Request, core_error: BaseCoreError) -> JSONResponse:
@@ -21,7 +22,7 @@ def exception_handler(_: Request, core_error: BaseCoreError) -> JSONResponse:
     return JSONResponse(content=content, status_code=core_error.status_code)
 
 
-fast_api = FastAPI()
+fast_api = FastAPI(version=get_version())
 fast_api.include_router(auth_router)
 fast_api.include_router(budget_router)
 fast_api.include_router(category_router)
