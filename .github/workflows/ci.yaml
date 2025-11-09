@@ -73,5 +73,15 @@ jobs:
               uv venv
             fi
             uv sync --no-dev
+            
+            SERVICE_FILE="/etc/systemd/system/rashodomer.service"
+            sudo install -m 644 /var/rashodomer-be/deploy/rashodomer.service "$SERVICE_FILE"
+            sudo systemctl daemon-reload
+            sudo systemctl enable rashodomer
+            echo "Installed or updated systemd service file"
+
+            # restart and check status
             sudo systemctl restart rashodomer
+            sleep 1
+            sudo systemctl status --no-pager -l rashodomer || sudo journalctl -u rashodomer --no-pager -n 50
             exit 0
