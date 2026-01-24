@@ -20,6 +20,8 @@ dependencies = [
     "emoji>=2.15.0",
     "sqlalchemy>=2.0.46",
     "asyncpg>=0.31.0",
+    "alembic>=1.18.1",
+    "greenlet>=3.3.1",
 ]
 
 
