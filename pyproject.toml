@@ -18,6 +18,8 @@ dependencies = [
     "httpx>=0.28.1",
     "bcrypt>=5.0.0",
     "emoji>=2.15.0",
+    "sqlalchemy>=2.0.46",
+    "asyncpg>=0.31.0",
 ]
 
 
