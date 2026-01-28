@@ -1,8 +1,12 @@
 import string
-from datetime import UTC, datetime
 
 import bcrypt
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from db.models import Token, User
+from db.query.token import get_user_id_by_token
+from db.query.user import get_user, find_user_by_login
+from db.utils import fetch_one_or_none, save_and_flush
 from exceptions import (
     IncorrectPasswordError,
     LoginAlreadyExistsError,
@@ -12,16 +16,15 @@ from exceptions import (
     UnauthorizedError,
     UserNotExistsError,
 )
-from repos.abc import TokenRepo, UserRepo
 from schemas.user import CreateUserSchema, DetailedUserSchema
+from utils import utc_now, uuid4_str
 
 
-class AuthManager:
+class AuthManager:  # TODO: переименовать в UserManager???
     MIN_PASSWORD_LENGTH = 8
 
-    def __init__(self, user_repo: UserRepo, token_repo: TokenRepo) -> None:
-        self.user_repo = user_repo
-        self.token_repo = token_repo
+    def __init__(self, session: AsyncSession) -> None:
+        self.session = session
 
     @staticmethod
     def hash_password(password: str) -> str:
@@ -35,38 +38,42 @@ class AuthManager:
     async def authenticate(self, token: str | None) -> DetailedUserSchema:
         if not token:
             raise UnauthorizedError
-        user_id = await self.token_repo.get_user_id_by_token(token=token)
+        user_id = await fetch_one_or_none(session=self.session, query=get_user_id_by_token(token))
         if not user_id:
             raise UnauthorizedError
-        user = await self.user_repo.get(user_id)
+        user = await fetch_one_or_none(session=self.session, query=get_user(user_id))
         if not user:
             raise UserNotExistsError(user_id=user_id)
-        return user
+        return DetailedUserSchema.model_validate(user, from_attributes=True)
 
     async def login(self, login: str, password: str) -> str:
-        user = await self.user_repo.find_by_login(login=login)
+        user = await fetch_one_or_none(session=self.session, query=find_user_by_login(login))
         if not user:
             raise LoginNotExistsError(login=login)
         if not self.check_password(password=password, password_hash=user.password_hash):
             raise IncorrectPasswordError
-        await self.user_repo.update_last_login(user_id=user.id, last_login=datetime.now(tz=UTC))
-        return await self.token_repo.create_new_token(user_id=user.id)
+        new_token = Token(user_id=user.id, token=uuid4_str())
+        self.session.add(new_token)
+        user.last_login = utc_now()
+        await self.session.commit()
+        return new_token.token
 
     async def register(self, data: CreateUserSchema) -> DetailedUserSchema:
-        user = await self.user_repo.find_by_login(login=data.login)
+        user = await fetch_one_or_none(session=self.session, query=find_user_by_login(data.login))
         if user:
             raise LoginAlreadyExistsError(login=data.login)
         self._validate_password(data.password)
         password_hash = self.hash_password(data.password)
-        user = DetailedUserSchema(
-            first_name=data.first_name, last_name=data.last_name, login=data.login, password_hash=password_hash
-        )
-        return await self.user_repo.add(user)
+        user = User(first_name=data.first_name, last_name=data.last_name, login=data.login, password_hash=password_hash)
+        saved_user = await save_and_flush(session=self.session, obj=user)
+        await self.session.commit()
+        return DetailedUserSchema.model_validate(saved_user, from_attributes=True)
 
-    def _validate_password(self, password: str) -> None:
-        if len(password) < self.MIN_PASSWORD_LENGTH:
-            raise PasswordTooShortError(password_length=self.MIN_PASSWORD_LENGTH)
-        if not self._has_special_characters(password):
+    @classmethod
+    def _validate_password(cls, password: str) -> None:
+        if len(password) < cls.MIN_PASSWORD_LENGTH:
+            raise PasswordTooShortError(password_length=cls.MIN_PASSWORD_LENGTH)
+        if not cls._has_special_characters(password):
             raise PasswordMissingSpecialCharacterError
 
     @staticmethod

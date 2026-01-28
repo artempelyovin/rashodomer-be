@@ -1,11 +1,9 @@
-from typing import Annotated
-
 from fastapi import APIRouter, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
-from depends import token_repo_factory, user_repo_factory
+from depends import get_db
 from managers.auth import AuthManager
-from repos.abc import TokenRepo, UserRepo
 from schemas.user import CreateUserSchema, TokenSchema, UserLoginSchema, UserSchema
 
 router = APIRouter()
@@ -23,10 +21,9 @@ AUTH_TAG = "auth"
 async def register(
     body: CreateUserSchema,
     *,
-    user_repo: Annotated[UserRepo, Depends(user_repo_factory)],
-    token_repo: Annotated[TokenRepo, Depends(token_repo_factory)],
+    session: AsyncSession = Depends(get_db),
 ) -> UserSchema:
-    manager = AuthManager(user_repo=user_repo, token_repo=token_repo)
+    manager = AuthManager(session=session)
     return await manager.register(data=body)
 
 
@@ -40,9 +37,8 @@ async def register(
 async def login(
     body: UserLoginSchema,
     *,
-    user_repo: Annotated[UserRepo, Depends(user_repo_factory)],
-    token_repo: Annotated[TokenRepo, Depends(token_repo_factory)],
+    session: AsyncSession = Depends(get_db),
 ) -> TokenSchema:
-    manager = AuthManager(user_repo=user_repo, token_repo=token_repo)
+    manager = AuthManager(session=session)
     token = await manager.login(login=body.login, password=body.password)
     return TokenSchema(token=token)

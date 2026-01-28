@@ -1,5 +1,4 @@
 from typing import Annotated
-from uuid import UUID
 
 from fastapi import APIRouter, Depends, Path, Query
 from starlette import status
@@ -10,6 +9,7 @@ from managers.transaction import TransactionManager
 from repos.abc import CategoryRepo, TransactionRepo
 from schemas.transaction import CreateTransactionSchema, TransactionSchema, UpdateTransactionSchema
 from schemas.user import DetailedUserSchema
+from utils import UUID4Str
 
 router = APIRouter()
 
@@ -86,7 +86,7 @@ async def find_transactions(
     tags=[TRANSACTION_TAG],
 )
 async def get_transaction(
-    transaction_id: Annotated[Annotated[str, UUID], Path(description="The ID of the transaction")],
+    transaction_id: Annotated[Annotated[str, UUID4Str], Path(description="The ID of the transaction")],
     *,
     user: Annotated[DetailedUserSchema, Depends(authentication_user)],
     transaction_repo: Annotated[TransactionRepo, Depends(transaction_repo_factory)],
@@ -105,7 +105,7 @@ async def get_transaction(
 )
 async def update_transaction(
     body: UpdateTransactionSchema,
-    transaction_id: Annotated[Annotated[str, UUID], Path(description="The ID of the transaction")],
+    transaction_id: Annotated[Annotated[str, UUID4Str], Path(description="The ID of the transaction")],
     *,
     user: Annotated[DetailedUserSchema, Depends(authentication_user)],
     transaction_repo: Annotated[TransactionRepo, Depends(transaction_repo_factory)],
@@ -123,7 +123,7 @@ async def update_transaction(
     tags=[TRANSACTION_TAG],
 )
 async def delete_transaction(
-    transaction_id: Annotated[Annotated[str, UUID], Path(description="The ID of the transaction")],
+    transaction_id: Annotated[Annotated[str, UUID4Str], Path(description="The ID of the transaction")],
     *,
     user: Annotated[DetailedUserSchema, Depends(authentication_user)],
     transaction_repo: Annotated[TransactionRepo, Depends(transaction_repo_factory)],

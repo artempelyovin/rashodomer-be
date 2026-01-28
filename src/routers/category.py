@@ -1,5 +1,4 @@
 from typing import Annotated
-from uuid import UUID
 
 from fastapi import APIRouter, Depends, Path, Query
 from starlette import status
@@ -11,6 +10,7 @@ from managers.category import CategoryManager
 from repos.abc import CategoryRepo
 from schemas.category import CategorySchema, CreateCategorySchema, UpdateCategorySchema
 from schemas.user import DetailedUserSchema
+from utils import UUID4Str
 
 router = APIRouter()
 
@@ -88,7 +88,7 @@ async def find_categories(
     tags=[CATEGORY_TAG],
 )
 async def get_category(
-    category_id: Annotated[Annotated[str, UUID], Path(description="The ID of the category")],
+    category_id: Annotated[Annotated[str, UUID4Str], Path(description="The ID of the category")],
     *,
     user: Annotated[DetailedUserSchema, Depends(authentication_user)],
     category_repo: Annotated[CategoryRepo, Depends(category_repo_factory)],
@@ -106,7 +106,7 @@ async def get_category(
 )
 async def update_category(
     body: UpdateCategorySchema,
-    category_id: Annotated[Annotated[str, UUID], Path(description="The ID of the category")],
+    category_id: Annotated[Annotated[str, UUID4Str], Path(description="The ID of the category")],
     *,
     user: Annotated[DetailedUserSchema, Depends(authentication_user)],
     category_repo: Annotated[CategoryRepo, Depends(category_repo_factory)],
@@ -123,7 +123,7 @@ async def update_category(
     tags=[CATEGORY_TAG],
 )
 async def delete_categories(
-    category_id: Annotated[Annotated[str, UUID], Path(description="The ID of the category")],
+    category_id: Annotated[Annotated[str, UUID4Str], Path(description="The ID of the category")],
     *,
     user: Annotated[DetailedUserSchema, Depends(authentication_user)],
     category_repo: Annotated[CategoryRepo, Depends(category_repo_factory)],

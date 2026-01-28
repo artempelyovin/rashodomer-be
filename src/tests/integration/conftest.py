@@ -4,9 +4,11 @@ from pathlib import Path
 
 import pytest
 from faker import Faker
+from sqlalchemy.ext.asyncio import async_sessionmaker
 from starlette.testclient import TestClient
 
 from app import fast_api
+from depends import get_db
 from enums import CategoryType
 from repos.files import JsonFileMixin
 from schemas.budget import BudgetSchema
@@ -14,6 +16,7 @@ from schemas.category import CategorySchema
 from schemas.transaction import TransactionSchema
 from schemas.user import UserSchema
 from tests.integration.utils import authenticate, create_budget, create_category, create_transaction, register
+from db.engine import _engine
 
 fake = Faker(locale="ru_RU")
 
@@ -21,6 +24,24 @@ fake = Faker(locale="ru_RU")
 @pytest.fixture
 def client() -> TestClient:
     return TestClient(fast_api)
+
+
+@pytest.fixture
+async def db_session():
+    async with _engine.connect() as conn:
+        trans = await conn.begin()
+        TestSessionMaker = async_sessionmaker(bind=conn, expire_on_commit=False)
+        async with TestSessionMaker() as session:
+            yield session
+        await trans.rollback()
+
+
+@pytest.fixture(autouse=True)
+def override_db(client, db_session):
+    async def _get_db():
+        yield db_session
+
+    fast_api.dependency_overrides[get_db] = _get_db
 
 
 @pytest.fixture
