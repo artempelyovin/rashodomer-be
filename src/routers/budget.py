@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from base import ListSchema, write_response_list
-from depends import authentication_user, get_db
+from depends import authentication_user, get_async_session
 from managers.budget import BudgetManager
 from schemas.budget import BudgetSchema, CreateBudgetSchema, UpdateBudgetSchema
 from schemas.user import DetailedUserSchema
@@ -26,7 +26,7 @@ BUDGET_TAG = "budgets"
 async def create_budget(
     body: CreateBudgetSchema,
     *,
-    session: AsyncSession = Depends(get_db),
+    session: AsyncSession = Depends(get_async_session),
     user: Annotated[DetailedUserSchema, Depends(authentication_user)],
 ) -> BudgetSchema:
     manager = BudgetManager(session=session)
@@ -44,7 +44,7 @@ async def list_budgets(
     limit: Annotated[int | None, Query(description="Number of budgets to return")] = None,
     offset: Annotated[int, Query(description="Offset of the budgets to return")] = 0,
     *,
-    session: AsyncSession = Depends(get_db),
+    session: AsyncSession = Depends(get_async_session),
     user: Annotated[DetailedUserSchema, Depends(authentication_user)],
 ) -> ListSchema[BudgetSchema]:
     manager = BudgetManager(session=session)
@@ -65,7 +65,7 @@ async def find_budgets(
     limit: Annotated[int | None, Query(description="Number of budgets to return")] = None,
     offset: Annotated[int, Query(description="Offset of the budgets to return")] = 0,
     *,
-    session: AsyncSession = Depends(get_db),
+    session: AsyncSession = Depends(get_async_session),
     user: Annotated[DetailedUserSchema, Depends(authentication_user)],
 ) -> ListSchema[BudgetSchema]:
     manager = BudgetManager(session=session)
@@ -85,7 +85,7 @@ async def find_budgets(
 async def get_budget(
     budget_id: Annotated[Annotated[str, UUID4Str], Path(description="The ID of the budget")],
     *,
-    session: AsyncSession = Depends(get_db),
+    session: AsyncSession = Depends(get_async_session),
     user: Annotated[DetailedUserSchema, Depends(authentication_user)],
 ) -> BudgetSchema:
     manager = BudgetManager(session=session)
@@ -103,7 +103,7 @@ async def update_budget(
     body: UpdateBudgetSchema,
     budget_id: Annotated[Annotated[str, UUID4Str], Path(description="The ID of the budget")],
     *,
-    session: AsyncSession = Depends(get_db),
+    session: AsyncSession = Depends(get_async_session),
     user: Annotated[DetailedUserSchema, Depends(authentication_user)],
 ) -> BudgetSchema:
     manager = BudgetManager(session=session)
@@ -120,7 +120,7 @@ async def update_budget(
 async def delete_budget(
     budget_id: Annotated[Annotated[str, UUID4Str], Path(description="The ID of the budget")],
     *,
-    session: AsyncSession = Depends(get_db),
+    session: AsyncSession = Depends(get_async_session),
     user: Annotated[DetailedUserSchema, Depends(authentication_user)],
 ) -> BudgetSchema:
     manager = BudgetManager(session=session)

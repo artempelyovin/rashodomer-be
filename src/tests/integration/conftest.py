@@ -1,14 +1,17 @@
 # ruff: noqa: ARG001
 from collections.abc import Generator
 from pathlib import Path
+from typing import AsyncGenerator
 
 import pytest
 from faker import Faker
-from sqlalchemy.ext.asyncio import async_sessionmaker
+from httpx import AsyncClient, ASGITransport
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from starlette.testclient import TestClient
 
 from app import fast_api
-from depends import get_db
+from db.engine import DATABASE_URL
+from depends import get_async_session
 from enums import CategoryType
 from repos.files import JsonFileMixin
 from schemas.budget import BudgetSchema
@@ -16,32 +19,28 @@ from schemas.category import CategorySchema
 from schemas.transaction import TransactionSchema
 from schemas.user import UserSchema
 from tests.integration.utils import authenticate, create_budget, create_category, create_transaction, register
-from db.engine import _engine
 
 fake = Faker(locale="ru_RU")
+engine = create_async_engine(DATABASE_URL, echo=True)
 
 
 @pytest.fixture
-def client() -> TestClient:
-    return TestClient(fast_api)
+async def client() -> AsyncGenerator[AsyncClient, None]:
+    async with engine.connect() as connection:
+        transaction = await connection.begin()
 
+        async def get_session_override() -> AsyncGenerator[AsyncSession, None]:
+            async with AsyncSession(bind=connection, expire_on_commit=False, autoflush=False) as session:
+                await session.begin_nested()
+                yield session
 
-@pytest.fixture
-async def db_session():
-    async with _engine.connect() as conn:
-        trans = await conn.begin()
-        TestSessionMaker = async_sessionmaker(bind=conn, expire_on_commit=False)
-        async with TestSessionMaker() as session:
-            yield session
-        await trans.rollback()
+        fast_api.dependency_overrides[get_async_session] = get_session_override
 
+        async with AsyncClient(transport=ASGITransport(app=fast_api), base_url="http://test") as client:
+            yield client
 
-@pytest.fixture(autouse=True)
-def override_db(client, db_session):
-    async def _get_db():
-        yield db_session
-
-    fast_api.dependency_overrides[get_db] = _get_db
+        await transaction.rollback()
+        fast_api.dependency_overrides.clear()
 
 
 @pytest.fixture

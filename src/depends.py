@@ -45,6 +45,6 @@ async def authentication_user(token: Annotated[str | None, Depends(header_scheme
     return await AuthManager.authenticate(token=token)
 
 
-async def get_db() -> AsyncGenerator[AsyncSession, None]:
+async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
     async for session in get_session():
         yield session

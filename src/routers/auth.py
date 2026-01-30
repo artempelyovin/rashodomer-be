@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
-from depends import get_db
+from depends import get_async_session
 from managers.auth import AuthManager
 from schemas.user import CreateUserSchema, TokenSchema, UserLoginSchema, UserSchema
 
@@ -21,7 +21,7 @@ AUTH_TAG = "auth"
 async def register(
     body: CreateUserSchema,
     *,
-    session: AsyncSession = Depends(get_db),
+    session: AsyncSession = Depends(get_async_session),
 ) -> UserSchema:
     manager = AuthManager(session=session)
     return await manager.register(data=body)
@@ -37,7 +37,7 @@ async def register(
 async def login(
     body: UserLoginSchema,
     *,
-    session: AsyncSession = Depends(get_db),
+    session: AsyncSession = Depends(get_async_session),
 ) -> TokenSchema:
     manager = AuthManager(session=session)
     token = await manager.login(login=body.login, password=body.password)
