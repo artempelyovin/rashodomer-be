@@ -24,7 +24,7 @@ class TimestampMixin:
 
 
 _engine = create_engine(DATABASE_URL, echo=True, future=True, pool_pre_ping=True)
-_session_maker = sessionmaker(bind=_engine, autoflush=False, autocommit=False)
+_session_maker = sessionmaker(bind=_engine, expire_on_commit=False, autoflush=False, autocommit=False)
 
 
 @contextmanager
