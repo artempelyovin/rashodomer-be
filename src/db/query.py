@@ -7,5 +7,5 @@ def login_exists(login: str) -> Select[tuple[bool]]:
     return select(exists().where(User.login == login))
 
 
-def list_users(limit: int | None = None, offset: int = 0) -> Select[tuple[User]]:
-    return select(User).limit(limit).offset(offset)
+def get_user(user_id: str) -> Select[tuple[User]]:
+    return select(User).where(User.id == user_id)

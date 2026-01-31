@@ -20,3 +20,12 @@ class LoginAlreadyExist(BaseError):
 
     def message(self) -> str:
         return f"Login {self.login} already exists"
+
+
+@dataclass
+class UserNotFound(BaseError):
+    status_code = 404
+    user_id: str
+
+    def message(self) -> str:
+        return f"User {self.user_id} not found"

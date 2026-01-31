@@ -1,18 +1,17 @@
-import uuid
 from datetime import datetime
 
-from sqlalchemy import String, DateTime, UUID
+from sqlalchemy import String, DateTime
 from sqlalchemy.orm import Mapped, mapped_column
 
 from db.base import Base, TimestampMixin
-from utils import utc_now
+from utils import utc_now, uuid4_str
 
 
 class User(Base, TimestampMixin):
     __tablename__ = "users"
 
     id: Mapped[str] = mapped_column(
-        UUID(as_uuid=False), primary_key=True, default=uuid.uuid4, nullable=False
+        String, primary_key=True, default=uuid4_str, nullable=False
     )
     first_name: Mapped[str] = mapped_column(String, nullable=False)
     last_name: Mapped[str] = mapped_column(String, nullable=False)

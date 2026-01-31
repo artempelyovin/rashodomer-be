@@ -52,5 +52,16 @@ def create_user(
     return UserSchema.model_validate(new_user, from_attributes=True)
 
 
+@app.get("/v1/users/{user_id}")
+def get_user(
+    user_id: str,
+    *,
+    session: Session = Depends(get_db_session),
+) -> UserSchema:
+    manager = UserManager(session=session)
+    user = manager.get_user(user_id=user_id)
+    return UserSchema.model_validate(user, from_attributes=True)
+
+
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)

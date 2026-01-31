@@ -11,6 +11,7 @@ class CreateUserSchema(BaseModel):
 
 
 class UserSchema(BaseModel):
+    id: str
     first_name: str
     last_name: str
     login: str

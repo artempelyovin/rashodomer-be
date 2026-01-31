@@ -1,9 +1,9 @@
 from sqlalchemy.orm import Session
 
 from db.models import User
-from db.query import login_exists
-from db.utils import fetch_one, save_and_flush
-from errors import LoginAlreadyExist
+from db.query import login_exists, get_user
+from db.utils import fetch_one, save_and_flush, fetch_one_or_none
+from errors import LoginAlreadyExist, UserNotFound
 
 
 class UserManager:
@@ -24,3 +24,9 @@ class UserManager:
         )
         saved_user = save_and_flush(session=self.session, obj=new_user)
         return saved_user
+
+    def get_user(self, user_id: str) -> User:
+        user = fetch_one_or_none(session=self.session, query=get_user(user_id=user_id))
+        if not user:
+            raise UserNotFound(user_id=user_id)
+        return user
