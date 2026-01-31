@@ -1,5 +1,9 @@
+from typing import Generator
+
 import uvicorn
 from fastapi import FastAPI
+from fastapi.params import Depends
+from sqlalchemy.orm import Session
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
@@ -22,17 +26,29 @@ async def base_error_handler(_: Request, exc: BaseError):
     )
 
 
-@app.post("/v1/users")
-def create_user(body: CreateUserSchema) -> UserSchema:
+def get_db_session() -> Generator[Session, None, None]:
     with get_session_managed() as session:
-        manager = UserManager(session=session)
-        new_user = manager.create_user(
-            first_name=body.first_name,
-            last_name=body.last_name,
-            login=body.login,
-            password=body.password,
-        )
-        session.commit()
+        try:
+            yield session
+        except Exception:
+            session.rollback()
+            raise
+
+
+@app.post("/v1/users")
+def create_user(
+    body: CreateUserSchema,
+    *,
+    session: Session = Depends(get_db_session),
+) -> UserSchema:
+    manager = UserManager(session=session)
+    new_user = manager.create_user(
+        first_name=body.first_name,
+        last_name=body.last_name,
+        login=body.login,
+        password=body.password,
+    )
+    session.commit()
     return UserSchema.model_validate(new_user, from_attributes=True)
 
 
