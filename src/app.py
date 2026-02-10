@@ -9,8 +9,8 @@ from starlette.responses import JSONResponse
 
 from db.base import get_session_managed
 from errors import BaseError
-from managers import UserManager
-from schemas import CreateUserSchema, UserSchema
+from managers import UserManager, BudgetManager, auth
+from schemas import CreateUserSchema, UserSchema, CreateBudgetSchema, BudgetSchema
 
 app = FastAPI()
 
@@ -42,14 +42,14 @@ def create_user(
     session: Session = Depends(get_db_session),
 ) -> UserSchema:
     manager = UserManager(session=session)
-    new_user = manager.create_user(
+    user = manager.create_user(
         first_name=body.first_name,
         last_name=body.last_name,
         login=body.login,
         password=body.password,
     )
     session.commit()
-    return UserSchema.model_validate(new_user, from_attributes=True)
+    return UserSchema.model_validate(user, from_attributes=True)
 
 
 @app.get("/v1/users/{user_id}")
@@ -61,6 +61,25 @@ def get_user(
     manager = UserManager(session=session)
     user = manager.get_user(user_id=user_id)
     return UserSchema.model_validate(user, from_attributes=True)
+
+
+@app.post("/v1/budgets")
+def create_budget(
+    body: CreateBudgetSchema,
+    *,
+    session: Session = Depends(get_db_session),
+) -> BudgetSchema:
+    user = auth(session=session)
+    manager = BudgetManager(session=session)
+    # TODO: add user_check
+    budget = manager.create_budget(
+        user_id=user.id,
+        name=body.name,
+        description=body.description,
+        amount=body.amount,
+    )
+    session.commit()
+    return BudgetSchema.model_validate(budget, from_attributes=True)
 
 
 if __name__ == "__main__":

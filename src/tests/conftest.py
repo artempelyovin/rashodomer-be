@@ -1,3 +1,4 @@
+import random
 from typing import Generator
 
 import pytest
@@ -8,7 +9,7 @@ from starlette.testclient import TestClient
 
 from app import app, get_db_session
 from db.base import DATABASE_URL
-from schemas import UserSchema
+from schemas import UserSchema, BudgetSchema
 from tests import utils
 
 
@@ -52,11 +53,21 @@ def client(db_session: Session) -> Generator[TestClient, None, None]:
 
 
 @pytest.fixture
-def created_user(client: TestClient, faker: Faker) -> UserSchema:
+def created_user(client, faker) -> UserSchema:
     return utils.create_user(
         client,
         first_name=faker.first_name(),
         last_name=faker.last_name(),
-        login=faker.user_name(),
+        login="test_user",  # TODO: tmp!!!
         password=faker.password(),
+    )
+
+
+@pytest.fixture
+def created_budget(client, faker, created_user) -> BudgetSchema:
+    return utils.create_budget(
+        client,
+        name=faker.bban(),
+        description=random.choice([faker.text(), None]),
+        amount=faker.pyfloat(min_value=0),
     )
