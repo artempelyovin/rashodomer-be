@@ -8,8 +8,8 @@ from infra.repos.file.budget import BudgetFileRepo
 
 
 @pytest.fixture
-def repo() -> BudgetFileRepo:
-    return BudgetFileRepo(base_dir=Path("/tmp/budgets"))  # noqa: S108
+def repo(tmp_path: Path) -> BudgetFileRepo:
+    return BudgetFileRepo(base_dir=tmp_path / "budgets")
 
 
 @pytest.mark.asyncio

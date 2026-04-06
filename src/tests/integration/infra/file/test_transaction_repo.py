@@ -8,8 +8,8 @@ from infra.repos.file.transaction import TransactionFileRepo
 
 
 @pytest.fixture
-def repo() -> TransactionFileRepo:
-    return TransactionFileRepo(base_dir=Path("/tmp/transactions"))  # noqa: S108
+def repo(tmp_path: Path) -> TransactionFileRepo:
+    return TransactionFileRepo(base_dir=tmp_path / "transactions")
 
 
 @pytest.mark.asyncio

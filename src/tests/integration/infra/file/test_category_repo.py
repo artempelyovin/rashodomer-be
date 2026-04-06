@@ -8,8 +8,8 @@ from infra.repos.file.category import CategoryFileRepo
 
 
 @pytest.fixture
-def repo() -> CategoryFileRepo:
-    return CategoryFileRepo(base_dir=Path("/tmp/categories"))  # noqa: S108
+def repo(tmp_path: Path) -> CategoryFileRepo:
+    return CategoryFileRepo(base_dir=tmp_path / "categories")
 
 
 @pytest.mark.asyncio
