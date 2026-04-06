@@ -45,6 +45,7 @@ ignore = [
     "RUF001",  # ambiguous-unicode-character-string (skip it because many false positives)
     "RUF002",  # ambiguous-unicode-character-docstring (skip it because many false positives)
     "RUF003",  # ambiguous-unicode-character-comment (skip it because many false positives)
+    "ANN",  # flake8-annotations (skip it because using another type checker`)
 ]
 
 [tool.ruff.lint.per-file-ignores]
