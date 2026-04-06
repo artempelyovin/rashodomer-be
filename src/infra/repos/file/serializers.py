@@ -9,14 +9,14 @@ import aiofiles
 
 
 class CustomJSONEncoder(json.JSONEncoder):
-    def default(self, obj: Any) -> Any:
-        if isinstance(obj, datetime):
-            return obj.isoformat()
-        if isinstance(obj, Decimal):
-            return str(obj)
-        if isinstance(obj, Enum):
-            return obj.value
-        return super().default(obj)
+    def default(self, o: Any) -> Any:
+        if isinstance(o, datetime):
+            return o.isoformat()
+        if isinstance(o, Decimal):
+            return str(o)
+        if isinstance(o, Enum):
+            return o.value
+        return super().default(o)
 
 
 async def save_to_file(path: Path, data: dict) -> None:
