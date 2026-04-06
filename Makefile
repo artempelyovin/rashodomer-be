@@ -11,4 +11,4 @@ lint:
 
 .PHONY: type-check
 type-check:
-	poetry run ty check src/
+	uv run ty check src/
