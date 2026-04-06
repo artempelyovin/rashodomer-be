@@ -3,6 +3,7 @@ from pathlib import Path
 import pytest
 
 from domain.use_cases.budget import CreateBudget, DeleteBudget, GetBudget, ListBudgets, UpdateBudget
+from domain.use_cases.category import CreateCategory, DeleteCategory, GetCategory, ListCategories, UpdateCategory
 from infra.repos.file.budget import BudgetFileRepo
 from infra.repos.file.category import CategoryFileRepo
 from infra.repos.file.transaction import TransactionFileRepo
@@ -46,3 +47,28 @@ def update_budget(budget_repo: BudgetFileRepo) -> UpdateBudget:
 @pytest.fixture
 def delete_budget(budget_repo: BudgetFileRepo) -> DeleteBudget:
     return DeleteBudget(budget_repo)
+
+
+@pytest.fixture
+def create_category(category_repo: CategoryFileRepo) -> CreateCategory:
+    return CreateCategory(category_repo)
+
+
+@pytest.fixture
+def get_category(category_repo: CategoryFileRepo) -> GetCategory:
+    return GetCategory(category_repo)
+
+
+@pytest.fixture
+def list_categories(category_repo: CategoryFileRepo) -> ListCategories:
+    return ListCategories(category_repo)
+
+
+@pytest.fixture
+def update_category(category_repo: CategoryFileRepo) -> UpdateCategory:
+    return UpdateCategory(category_repo)
+
+
+@pytest.fixture
+def delete_category(category_repo: CategoryFileRepo) -> DeleteCategory:
+    return DeleteCategory(category_repo)
