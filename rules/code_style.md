@@ -14,6 +14,7 @@
 - Для функций, которые могут ничего не возвращать, используй `-> None` явно
 - Вместо `typing.Collections`, `typing.Mapping` используй `collections.abc.Collections` и `collections.abc.Mapping`
 - При описании enums наследуйся от `StrEnum`, а не от `(str, Enum)`
+- В Decimal передавай `int | float`, не `str` (правило `FURB157` в Ruff)
 
 ## Сложность кода
 
